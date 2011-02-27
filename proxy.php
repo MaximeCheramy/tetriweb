@@ -76,7 +76,7 @@ while(true) {
 	$r = getAllSockets();
 	$w = null;
 	$e = null;
-	if(false === socket_select($r, $w, $e, 0)) {
+	if(false === socket_select($r, $w, $e, NULL)) {
 		echo "socket_select() failed : " . socket_strerror(socket_last_error()) . "\n";	
 	}
 	foreach($r as $s) {
@@ -147,7 +147,9 @@ while(true) {
 							foreach($tb_msg as $msg) {
 								if(preg_match('#^playernum ([0-9]+)$#', $msg, $results)) {
 									$c_id = $results[1];
-									break;
+								}
+								else {
+									array_push($clients[$client]['msg'], $msg);
 								}
 							}
 						} while(!$c_id);	
