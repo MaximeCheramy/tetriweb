@@ -1,0 +1,33 @@
+.bloc {
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	border: 1px solid #000000;
+}
+.piece {
+	position: absolute;
+	width: 80px;
+	height: 80px;
+	//border: 1px solid #000000;
+}
+
+#mycontainer {
+	position: relative;
+	width: 400px;
+	height: 440px;
+	float: left;
+}
+
+#myfield {
+	width: 240px;
+	height: 440px;
+	border: 2px solid #222222;
+}
+
+#nextpiece {
+	position: absolute;
+	left: 280px;
+	width: 80px;
+	height: 80px;
+	border: 2px solid #222222;
+}
