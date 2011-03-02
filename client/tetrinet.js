@@ -149,7 +149,7 @@ Tetrinet.prototype = {
 	},
 
 	sendPlayerlost: function() {
-		this.sendMessage('playerlost' + this.pnum);
+		this.sendMessage('playerlost ' + this.pnum);
 	},
 
 	initMyField: function() {
