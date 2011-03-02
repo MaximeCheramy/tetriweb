@@ -148,6 +148,10 @@ Tetrinet.prototype = {
 		$('content').innerHTML += '<div>' + "&lt;" + this.players[this.pnum] + "&gt; " + msg + '</div>';
 	},
 
+	sendPlayerlost: function() {
+		this.sendMessage('playerlost' + this.pnum);
+	},
+
 	initMyField: function() {
 		var cont = document.createElement("div");
 		$('fields').appendChild(cont);

@@ -93,7 +93,7 @@ Tetris.prototype = {
 				piece[3] = new Array(false, false, false, false);
 				break;
 			case 3:
-				piece[0] = new Array(true, false, false, false);
+				piece[0] = new Array(true, false, false, false);;
 				piece[1] = new Array(true, false, false, false);
 				piece[2] = new Array(true, true, false, false);
 				piece[3] = new Array(false, false, false, false);
@@ -306,6 +306,7 @@ Tetris.prototype = {
 			clearTimeout(this.montimer);
 			this.montimer = window.setTimeout(this.step.bind(this), 1000);
 		} else {
+			this.tetrinet.sendPlayerlost();
 			window.alert("Perdu !");
 		}
 	},
