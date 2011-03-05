@@ -10,6 +10,7 @@ $data_in = array();
 $tmp_clients = 0;
 
 $s_in = socket_create(AF_INET, SOCK_STREAM, 0);
+socket_set_option($s_in, SOL_SOCKET, SO_REUSEADDR, 1);
 socket_bind($s_in, 0, $port);
 socket_listen($s_in);
 
@@ -143,12 +144,15 @@ while(true) {
 						$c_id = 0;
 						do {
 							$msg = socket_read($s_server, BUFFER_LEN);
+							echo "Message du serveur : $msg\n";
 							$tb_msg = explode(chr(0xFF), $msg);
 							foreach($tb_msg as $msg) {
 								if(preg_match('#^playernum ([0-9]+)$#', $msg, $results)) {
+									echo "Recup playernum : $msg\n";
 									$c_id = $results[1];
 								}
 								else {
+									echo "Stockage : $msg...\n";
 									array_push($clients[$client]['msg'], $msg);
 								}
 							}
@@ -158,6 +162,9 @@ while(true) {
 						$clients[$c_id]['s_server'] = $s_server;
 						unset($clients[$client]);
 						$tmp_clients--;
+						// On n'enverra rien d'autre sur cette connexion : fermeture socket
+						socket_close($s);
+						unset($clients[$c_id]['s_client_read']);
 					}
 					elseif(preg_match('#^(read|write) ([0-9]+)$#', $msg, $results)) {
 						// Retour d'un client
@@ -173,6 +180,7 @@ while(true) {
 									socket_write($s, array_shift($clients[$c_id]['msg'])."\n");
 								}*/
 								if(!empty($clients[$c_id]['msg'])) {
+									echo "Envoi de messages en attente : ".implode("\n", $clients[$c_id]['msg'])."\n";
 									socket_write($s, implode("\n", $clients[$c_id]['msg'])."\n");
 									$clients[$c_id]['msg'] = array();
 								}
