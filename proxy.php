@@ -144,27 +144,43 @@ while(true) {
 						$c_id = 0;
 						do {
 							$msg = socket_read($s_server, BUFFER_LEN);
-							echo "Message du serveur : $msg\n";
-							$tb_msg = explode(chr(0xFF), $msg);
-							foreach($tb_msg as $msg) {
-								if(preg_match('#^playernum ([0-9]+)$#', $msg, $results)) {
-									echo "Recup playernum : $msg\n";
-									$c_id = $results[1];
-								}
-								else {
-									echo "Stockage : $msg...\n";
-									array_push($clients[$client]['msg'], $msg);
+							// Connexion refusée (pseudo déjà pris par exemple)
+							if(empty($msg)) {
+								echo "Connexion refusée par le serveur.\n";
+								break;
+							}
+							else {
+								echo "Message du serveur : $msg\n";
+								$tb_msg = explode(chr(0xFF), trim($msg, "\xFF"));
+								print_r($tb_msg);
+								foreach($tb_msg as $msg) {
+									if(preg_match('#^playernum ([0-9]+)$#', $msg, $results)) {
+										echo "Recup playernum : $msg\n";
+										$c_id = $results[1];
+									}
+									else {
+										echo "Stockage : $msg...\n";
+										array_push($clients[$client]['msg'], $msg);
+									}
 								}
 							}
-						} while(!$c_id);	
-						socket_write($s, "playernum $c_id\n");
-						$clients[$c_id] = $clients[$client];
-						$clients[$c_id]['s_server'] = $s_server;
+						} while(!$c_id);
+
+						// Connexion acceptée
+						if($c_id) {	
+							socket_write($s, "playernum $c_id\n");
+							$clients[$c_id] = $clients[$client];
+							$clients[$c_id]['s_server'] = $s_server;
+							unset($clients[$c_id]['s_client_read']); // On va fermer la connexion plus bas
+						}
+						else {
+							socket_write($s, implode("\n", $clients[$client]['msg'])."\n");
+						}
+
+						// Dans tous les cas, suppression du client temporaire et fermeture socket (on n'enverra rien d'autre sur cette connexion) 
 						unset($clients[$client]);
 						$tmp_clients--;
-						// On n'enverra rien d'autre sur cette connexion : fermeture socket
 						socket_close($s);
-						unset($clients[$c_id]['s_client_read']);
 					}
 					elseif(preg_match('#^(read|write) ([0-9]+)$#', $msg, $results)) {
 						// Retour d'un client

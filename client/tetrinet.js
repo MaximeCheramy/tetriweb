@@ -16,12 +16,17 @@ Tetrinet.prototype = {
 			parameters: { 'connect' : nickname },
 			onSuccess: function(transport) {
 				var response = transport.responseText.evalJSON();
-				this.tetrinet.pnum = response['pnum'];
-				this.tetrinet.players[response['pnum']] = $('nickname').value;
-				this.tetrinet.teams[response['pnum']] = $('team').value;
-				this.tetrinet.initMyField();
-				this.tetrinet.sendMessage('team ' + this.tetrinet.pnum + ' ' + $('team').value);
-				this.tetrinet.readFromServer();
+				if(!response['error']) {
+					this.tetrinet.pnum = response['pnum'];
+					this.tetrinet.players[response['pnum']] = $('nickname').value;
+					this.tetrinet.teams[response['pnum']] = $('team').value;
+					this.tetrinet.initMyField();
+					this.tetrinet.sendMessage('team ' + this.tetrinet.pnum + ' ' + $('team').value);
+					this.tetrinet.readFromServer();
+				}
+				else {
+					alert('Connexion impossible : ' + response['error']);
+				}
 			},
 		});
 		this.ajax.tetrinet = this;
@@ -214,8 +219,6 @@ Tetrinet.prototype = {
 				}
 			}
 		}
-		console.log(field);
-		console.log(oldfield);
 		this.sendMessage(f);
 	},
 
