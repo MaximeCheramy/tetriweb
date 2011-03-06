@@ -218,6 +218,29 @@ Tetris.prototype = {
     }
   },
 
+  addline: function() {
+    for (var c = 0; c < 12; c++) {
+      if (this.gamearea[0][c] > 0) {
+        this.perdu = true;
+      }
+    }
+    if (!this.perdu) {
+      // On decale tout vers le haut.
+      for (var l = 1; l < 22; l++) {
+        for (var c = 0; c < 12; c++) {
+          this.gamearea[l - 1][c] = this.gamearea[l][c];
+        }
+      }
+
+      for (var l = 1; l < 22; l++) {
+        for (var c = 0; c < 12; c++) {
+          this.gamearea[21][c] = Math.floor(Math.random() * 6);
+        }
+      }
+      this.actualise_grille();
+    }
+  },
+
   checktetris: function() {
     for (var l = 0; l < 22; l++) {
       var tetris = true;
