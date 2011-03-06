@@ -31,6 +31,7 @@ Tetris.prototype = {
     this.generate_random();
     this.newpiece();
     this.montimer = window.setTimeout(this.step.bind(this), 1000);
+    this.actualise_grille();
 
     $('myfield').observe('keypress', this.touche.bind(this));
   },
