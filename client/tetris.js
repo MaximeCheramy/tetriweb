@@ -304,7 +304,15 @@ Tetris.prototype = {
     }
 
     this.tetrinet.sendField(this.gamearea, this.oldField);
-    this.oldField = this.gamearea;
+
+    // copie
+    this.oldField = new Array(22);
+    for (var l = 0; l < 22; l++) {
+      this.oldField[l] = new Array(12);
+      for (var c = 0; c < 12; c++) {
+        this.oldField[l][c] = this.gamearea[l][c];
+      }
+    }
   },
 
   step: function() {
