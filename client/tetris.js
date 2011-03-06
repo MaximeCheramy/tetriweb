@@ -31,7 +31,7 @@ Tetris.prototype = {
     this.generate_random();
     this.newpiece();
     this.montimer = window.setTimeout(this.step.bind(this), 1000);
-    this.actualise_grille();
+    //this.actualise_grille();
 
     $('myfield').observe('keypress', this.touche.bind(this));
   },
@@ -231,7 +231,7 @@ Tetris.prototype = {
     this.actualise_grille();
   },
 
-  addline: function() {
+  addLine: function() {
     for (var c = 0; c < 12; c++) {
       if (this.gamearea[0][c] > 0) {
         this.perdu = true;
@@ -250,6 +250,16 @@ Tetris.prototype = {
       }
       this.actualise_grille();
     }
+  },
+
+  clearLine: function() {
+    // On décale tout vers le bas.
+    for (var l = 21; l > 0; l--) {
+      for (var c = 0; c < 12; c++) {
+        this.gamearea[l][c] = this.gamearea[l - 1][c];
+      }
+    }
+    this.actualise_grille();
   },
 
   checktetris: function() {

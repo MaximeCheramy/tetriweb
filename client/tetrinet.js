@@ -141,15 +141,17 @@ Tetrinet.prototype = {
           // Reception d'un special
           if (data[1] == this.pnum) {
             if (data[2] == 'cs1' || data[2] == 'a') {
-              this.tetris.addline();
+              this.tetris.addLine();
             } else if (data[2] == 'cs2') {
-              this.tetris.addline();
-              this.tetris.addline();
+              this.tetris.addLine();
+              this.tetris.addLine();
             } else if (data[2] == 'cs4') {
-              this.tetris.addline();
-              this.tetris.addline();
-              this.tetris.addline();
-              this.tetris.addline();
+              this.tetris.addLine();
+              this.tetris.addLine();
+              this.tetris.addLine();
+              this.tetris.addLine();
+            } else if (data[2] == 'c') {
+              this.tetris.clearLine();
             }
           }
           break;
