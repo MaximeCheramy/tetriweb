@@ -218,6 +218,15 @@ Tetris.prototype = {
     }
   },
 
+  fillRandomly: function() {
+    for (var l = 0; l < 22; l++) {
+      for (var c = 0; c < 12; c++) {
+        this.gamearea[l][c] = Math.ceil(Math.random() * 5);
+      }
+    }
+    this.actualise_grille();
+  },
+
   addline: function() {
     for (var c = 0; c < 12; c++) {
       if (this.gamearea[0][c] > 0) {
@@ -232,10 +241,8 @@ Tetris.prototype = {
         }
       }
 
-      for (var l = 1; l < 22; l++) {
-        for (var c = 0; c < 12; c++) {
-          this.gamearea[21][c] = Math.floor(Math.random() * 6);
-        }
+      for (var c = 0; c < 12; c++) {
+        this.gamearea[21][c] = Math.floor(Math.random() * 6);
       }
       this.actualise_grille();
     }
@@ -336,7 +343,7 @@ Tetris.prototype = {
       this.montimer = window.setTimeout(this.step.bind(this), 1000);
     } else {
       this.tetrinet.sendPlayerlost();
-      window.alert('Perdu !');
+      this.fillRandomly();
     }
   },
 
