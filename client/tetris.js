@@ -12,6 +12,7 @@ Tetris.prototype = {
   next_id: null,
   next_o: null,
   tetrinet: null,
+  oldField: null,
 
   initialize: function(tetrinet) {
     this.tetrinet = tetrinet;
@@ -216,6 +217,8 @@ Tetris.prototype = {
         }
       }
     }
+
+    this.sendField();
   },
 
   fillRandomly: function() {
@@ -288,6 +291,21 @@ Tetris.prototype = {
     }
   },
 
+  sendField: function() {
+    if (this.oldField == null) {
+      this.oldField = new Array(22);
+      for (var l = 0; l < 22; l++) {
+        this.oldField[l] = new Array(12);
+        for (var c = 0; c < 12; c++) {
+          this.oldField[l][c] = 0;
+        }
+      }
+    }
+
+    this.tetrinet.sendField(this.gamearea, this.oldField);
+    this.oldField = this.gamearea;
+  },
+
   step: function() {
     //this.print_debug();
 
@@ -310,15 +328,7 @@ Tetris.prototype = {
         this.perdu = true;
       }
 
-      var oldfield = new Array(22);
-      for (var l = 0; l < 22; l++) {
-        oldfield[l] = new Array(12);
-        for (var c = 0; c < 12; c++) {
-          oldfield[l][c] = this.gamearea[l][c];
-        }
-      }
-
-      // On dépose les pièces
+     // On dépose les pièces
       for (var l = 0; l < 4; l++) {
         for (var c = 0; c < 4; c++) {
           if (this.current[l][c]) {
@@ -335,7 +345,7 @@ Tetris.prototype = {
       }
       this.piecedepose = true;
       this.checktetris();
-      this.tetrinet.sendField(this.gamearea, oldfield);
+      this.sendField();
       this.newpiece();
     }
     if (!this.perdu) {

@@ -209,6 +209,8 @@ Tetrinet.prototype = {
     block.style.background = this.blockColor(type);
     if (type > 0) {
       block.style.border = '1px solid #000000';
+    } else {
+      block.style.border = 'none';
     }
   },
 
