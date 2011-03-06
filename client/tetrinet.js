@@ -198,6 +198,7 @@ Tetrinet.prototype = {
         block.style.top = l * 20 + 1;
         block.style.left = c * 20 + 1;
         block.style.background = this.blockColor('0');
+		  block.style.border = 'none';
       }
     }
   },
@@ -206,6 +207,9 @@ Tetrinet.prototype = {
     this.fields[player_id][y][x] = type;
     var block = $('block-' + player_id + '-' + y + '-' + x);
     block.style.background = this.blockColor(type);
+	 if (type > 0) {
+      block.style.border = '1px solid #000000';
+	 }
   },
 
   sendField: function(field, oldfield) {

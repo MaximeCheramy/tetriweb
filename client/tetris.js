@@ -60,7 +60,7 @@ Tetris.prototype = {
         if (nextpiece[l][c]) {
           var bloc = document.createElement('div');
           nextpieceobj.appendChild(bloc);
-          bloc.className = 'bloc';
+          bloc.className = 'block';
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
           bloc.style.background = this.convert(
@@ -163,7 +163,7 @@ Tetris.prototype = {
         if (this.current[l][c]) {
           bloc = document.createElement('div');
           this.currentobj.appendChild(bloc);
-          bloc.className = 'bloc';
+          bloc.className = 'block';
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
           bloc.style.background = this.convert(
@@ -208,7 +208,7 @@ Tetris.prototype = {
         if (this.gamearea[l][c] > 0) {
           bloc = document.createElement('div');
           myfield.appendChild(bloc);
-          bloc.className = 'bloc';
+          bloc.className = 'block';
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
           bloc.style.background = this.convert(
@@ -319,7 +319,7 @@ Tetris.prototype = {
               this.currentcolor;
             bloc = document.createElement('div');
             document.getElementById('myfield').appendChild(bloc);
-            bloc.className = 'bloc';
+            bloc.className = 'block';
             bloc.style.top = (this.cur_y + l) * 20 + 1;
             bloc.style.left = (this.cur_x + c) * 20 + 1;
             bloc.style.background = this.convert(this.currentcolor);
