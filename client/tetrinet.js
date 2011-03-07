@@ -21,11 +21,11 @@ Tetrinet.prototype = {
           this.tetrinet.players[response['pnum']] = $('nickname').value;
           this.tetrinet.teams[response['pnum']] = $('team').value;
           this.tetrinet.initMyField();
-          this.tetrinet.sendMessage('team ' +
-                                    this.tetrinet.pnum +
-                                    ' ' +
-                                    $('team').value);
+          this.tetrinet.sendMessage('team ' + this.tetrinet.pnum + ' ' + $('team').value);
           this.tetrinet.readFromServer();
+          if (this.tetrinet.pnum == 1) {
+            $('startgame').disabled = false;
+          }
         }
         else {
           alert('Connexion impossible : ' + response['error']);
@@ -173,6 +173,10 @@ Tetrinet.prototype = {
     });
   },
 
+  startGame: function() {
+    this.sendMessage('startgame 1 ' + this.pnum);
+  },
+
   sayPline: function(msg) {
     this.sendMessage('pline ' + this.pnum + ' ' + msg);
     $('content').innerHTML += '<div>' + '&lt;' +
@@ -181,6 +185,10 @@ Tetrinet.prototype = {
 
   sendPlayerlost: function() {
     this.sendMessage('playerlost ' + this.pnum);
+  },
+
+  sendLines: function(nblines) {
+    this.sendMessage('sb 0 cs' + nblines + ' ' + this.pnum);
   },
 
   initMyField: function() {

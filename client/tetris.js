@@ -44,6 +44,31 @@ Tetris.prototype = {
         npiece[l][c] = piece[3 - c][l];
       }
     }
+    var done_t = false, done_l = false;
+    do {
+      done_t = npiece[0][0] || npiece[0][1] || npiece[0][2] || npiece[0][3];
+      if (!done_t) {
+        for (l = 0; l < 3; l++) {
+          for (c = 0; c < 4; c++) {
+            npiece[l][c] = npiece[l+1][c];
+          }
+        }
+        for (c = 0; c < 4; c++) {
+          npiece[3][c] = false;
+        }
+      }
+      done_l = npiece[0][0] || npiece[1][0] || npiece[2][0] || npiece[3][0];
+      if (!done_l) {
+        for (l = 0; l < 4; l++) {
+          for (c = 0; c < 3; c++) {
+            npiece[l][c] = npiece[l][c+1];
+          }
+        }
+        for (l = 0; l < 4; l++) {
+          npiece[l][3] = false;
+        }
+      }
+    } while (!(done_l && done_t));
     return npiece;
   },
 
@@ -284,13 +309,15 @@ Tetris.prototype = {
     this.actualise_grille();
   },
 
-  checktetris: function() {
+  checkline: function() {
+    var nblines = 0;
     for (var l = 0; l < 22; l++) {
       var tetris = true;
       for (var c = 0; c < 12; c++) {
         tetris = tetris && (this.gamearea[l][c] > 0);
       }
       if (tetris) {
+        nblines++;
         for (var ll = l; ll > 0; ll--) {
           for (var c = 0; c < 12; c++) {
             this.gamearea[ll][c] = this.gamearea[ll - 1][c];
@@ -302,6 +329,11 @@ Tetris.prototype = {
       }
     }
     this.actualise_grille();
+    if (nblines == 4) {
+      this.tetrinet.sendLines(nblines);
+    } else if (nblines > 1) {
+      this.tetrinet.sendLines(nblines-1);
+    }
   },
 
   print_debug: function() {
@@ -385,7 +417,7 @@ Tetris.prototype = {
         }
       }
       this.piecedepose = true;
-      this.checktetris();
+      this.checkline();
       this.sendField();
       this.newpiece();
     }
