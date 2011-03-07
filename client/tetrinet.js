@@ -155,6 +155,8 @@ Tetrinet.prototype = {
               this.tetris.clearLine();
             } else if (data[2] == 'g') {
               this.tetris.blockGravity();
+            } else if (data[2] == 'n') {
+              this.tetris.nukeField();
             }
           }
           break;

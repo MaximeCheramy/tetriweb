@@ -178,6 +178,15 @@ Tetris.prototype = {
     this.updatePiece();
   },
 
+  nukeField: function() {
+    for (var l = 0; l < 22; l++) {
+      for (var c = 0; c < 12; c++) {
+        this.gameArea[l][c] = 0;
+      }
+    }
+    this.updateGrid();
+  },
+
   updatePiece: function() {
     this.currentObj = document.createElement('div');
     var myfield = document.getElementById('myfield');
