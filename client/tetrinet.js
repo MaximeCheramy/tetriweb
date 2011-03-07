@@ -152,6 +152,8 @@ Tetrinet.prototype = {
               this.tetris.addLine();
             } else if (data[2] == 'c') {
               this.tetris.clearLine();
+            } else if (data[2] == 'g') {
+              this.tetris.blockGravity();
             }
           }
           break;

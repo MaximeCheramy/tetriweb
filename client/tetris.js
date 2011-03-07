@@ -262,6 +262,28 @@ Tetris.prototype = {
     this.actualise_grille();
   },
 
+  blockGravity: function() {
+    for (var l = 20; l >= 0; l--) {
+      var g = false;
+      for (var c = 0; c < 12; c++) {
+        if (this.gamearea[l][c] > 0 && this.gamearea[l + 1][c] == 0) {
+          this.gamearea[l + 1][c] = this.gamearea[l][c];
+          this.gamearea[l][c] = 0;
+          g = true;
+        }
+      }
+      if (g) {
+        l += 2;
+        // Un peu crade je trouve, peut-etre remplacer le for sur les lignes
+        // par un while ou alors inserer un while pour faire tomber les blocks.
+        if (l > 20) { 
+          l = 21;
+        }
+      }
+    }
+    this.actualise_grille();
+  },
+
   checktetris: function() {
     for (var l = 0; l < 22; l++) {
       var tetris = true;
