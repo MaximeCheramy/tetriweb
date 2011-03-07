@@ -1,14 +1,14 @@
 var Tetris = Class.create();
 Tetris.prototype = {
-  gamearea: new Array(22),
+  gameArea: new Array(22),
   cur_x: 6,
   cur_y: 0,
   current: null,
-  currentobj: null,
-  currentcolor: null,
+  currentObj: null,
+  currentColor: null,
   montimer: null,
-  piecedepose: true,
-  perdu: false,
+  pieceDropped: true,
+  gameLost: false,
   next_id: null,
   next_o: null,
   tetrinet: null,
@@ -22,16 +22,16 @@ Tetris.prototype = {
   init: function() {
     // init the game area : all empty.
     for (var l = 0; l < 22; l++) {
-      this.gamearea[l] = new Array(12);
+      this.gameArea[l] = new Array(12);
       for (var c = 0; c < 12; c++) {
-        this.gamearea[l][c] = 0;
+        this.gameArea[l][c] = 0;
       }
     }
 
-    this.generate_random();
-    this.newpiece();
+    this.generateRandom();
+    this.newPiece();
     this.montimer = window.setTimeout(this.step.bind(this), 1000);
-    //this.actualise_grille();
+    //this.updateGrid();
 
     $('myfield').observe('keypress', this.touche.bind(this));
   },
@@ -50,7 +50,7 @@ Tetris.prototype = {
       if (!done_t) {
         for (l = 0; l < 3; l++) {
           for (c = 0; c < 4; c++) {
-            npiece[l][c] = npiece[l+1][c];
+            npiece[l][c] = npiece[l + 1][c];
           }
         }
         for (c = 0; c < 4; c++) {
@@ -61,7 +61,7 @@ Tetris.prototype = {
       if (!done_l) {
         for (l = 0; l < 4; l++) {
           for (c = 0; c < 3; c++) {
-            npiece[l][c] = npiece[l][c+1];
+            npiece[l][c] = npiece[l][c + 1];
           }
         }
         for (l = 0; l < 4; l++) {
@@ -72,11 +72,11 @@ Tetris.prototype = {
     return npiece;
   },
 
-  generate_random: function() {
+  generateRandom: function() {
     this.next_id = Math.floor(Math.random() * 7);
     this.next_o = Math.floor(Math.random() * 4);
 
-    var nextpiece = this.generate_piece(this.next_id,
+    var nextpiece = this.generatePiece(this.next_id,
                                         this.next_o);
     var nextpieceobj = document.getElementById('nextpiece');
     while (nextpieceobj.childNodes.length > 0) {
@@ -91,13 +91,13 @@ Tetris.prototype = {
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
           bloc.style.background = this.convert(
-              this.get_color(this.next_id));
+              this.getColor(this.next_id));
         }
       }
     }
   },
 
-  generate_piece: function(id, orientation) {
+  generatePiece: function(id, orientation) {
     var piece = new Array(4);
 
     switch (id) {
@@ -153,14 +153,14 @@ Tetris.prototype = {
     return piece;
   },
 
-  newpiece: function() {
+  newPiece: function() {
     // temp.
     this.cur_x = 5;
     this.cur_y = 0;
 
-    this.current = this.generate_piece(this.next_id, this.next_o);
-    this.currentcolor = this.get_color(this.next_id);
-    this.generate_random();
+    this.current = this.generatePiece(this.next_id, this.next_o);
+    this.currentColor = this.getColor(this.next_id);
+    this.generateRandom();
 
     // Remonte un peu l'objet si commence par du vide.
     for (var l = 0; l < 4; l++) {
@@ -175,26 +175,26 @@ Tetris.prototype = {
       }
     }
 
-    this.actualise_piece();
+    this.updatePiece();
   },
 
-  actualise_piece: function() {
-    this.currentobj = document.createElement('div');
+  updatePiece: function() {
+    this.currentObj = document.createElement('div');
     var myfield = document.getElementById('myfield');
-    myfield.appendChild(this.currentobj);
-    this.currentobj.className = 'piece';
-    this.currentobj.style.top = this.cur_y * 20;
-    this.currentobj.style.left = this.cur_x * 20;
+    myfield.appendChild(this.currentObj);
+    this.currentObj.className = 'piece';
+    this.currentObj.style.top = this.cur_y * 20;
+    this.currentObj.style.left = this.cur_x * 20;
     for (var l = 0; l < 4; l++) {
       for (var c = 0; c < 4; c++) {
         if (this.current[l][c]) {
           bloc = document.createElement('div');
-          this.currentobj.appendChild(bloc);
+          this.currentObj.appendChild(bloc);
           bloc.className = 'block';
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
           bloc.style.background = this.convert(
-              this.currentcolor);
+              this.currentColor);
         }
       }
     }
@@ -211,7 +211,7 @@ Tetris.prototype = {
     }
   },
 
-  get_color: function(id) {
+  getColor: function(id) {
     switch (id) {
       case 0: return 1; // barre : bleu
       case 1: return 2; // carré : jaune
@@ -223,7 +223,7 @@ Tetris.prototype = {
     }
   },
 
-  actualise_grille: function() {
+  updateGrid: function() {
     var myfield = document.getElementById('myfield');
     while (myfield.childNodes.length > 0) {
       myfield.removeChild(myfield.childNodes[0]);
@@ -232,14 +232,14 @@ Tetris.prototype = {
     // On reconstruit
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
-        if (this.gamearea[l][c] > 0) {
+        if (this.gameArea[l][c] > 0) {
           bloc = document.createElement('div');
           myfield.appendChild(bloc);
           bloc.className = 'block';
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
           bloc.style.background = this.convert(
-              this.gamearea[l][c]);
+              this.gameArea[l][c]);
         }
       }
     }
@@ -250,30 +250,30 @@ Tetris.prototype = {
   fillRandomly: function() {
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
-        this.gamearea[l][c] = Math.ceil(Math.random() * 5);
+        this.gameArea[l][c] = Math.ceil(Math.random() * 5);
       }
     }
-    this.actualise_grille();
+    this.updateGrid();
   },
 
   addLine: function() {
     for (var c = 0; c < 12; c++) {
-      if (this.gamearea[0][c] > 0) {
-        this.perdu = true;
+      if (this.gameArea[0][c] > 0) {
+        this.gameLost = true;
       }
     }
-    if (!this.perdu) {
+    if (!this.gameLost) {
       // On decale tout vers le haut.
       for (var l = 1; l < 22; l++) {
         for (var c = 0; c < 12; c++) {
-          this.gamearea[l - 1][c] = this.gamearea[l][c];
+          this.gameArea[l - 1][c] = this.gameArea[l][c];
         }
       }
 
       for (var c = 0; c < 12; c++) {
-        this.gamearea[21][c] = Math.floor(Math.random() * 6);
+        this.gameArea[21][c] = Math.floor(Math.random() * 6);
       }
-      this.actualise_grille();
+      this.updateGrid();
     }
   },
 
@@ -281,19 +281,19 @@ Tetris.prototype = {
     // On décale tout vers le bas.
     for (var l = 21; l > 0; l--) {
       for (var c = 0; c < 12; c++) {
-        this.gamearea[l][c] = this.gamearea[l - 1][c];
+        this.gameArea[l][c] = this.gameArea[l - 1][c];
       }
     }
-    this.actualise_grille();
+    this.updateGrid();
   },
 
   blockGravity: function() {
     for (var l = 20; l >= 0; l--) {
       var g = false;
       for (var c = 0; c < 12; c++) {
-        if (this.gamearea[l][c] > 0 && this.gamearea[l + 1][c] == 0) {
-          this.gamearea[l + 1][c] = this.gamearea[l][c];
-          this.gamearea[l][c] = 0;
+        if (this.gameArea[l][c] > 0 && this.gameArea[l + 1][c] == 0) {
+          this.gameArea[l + 1][c] = this.gameArea[l][c];
+          this.gameArea[l][c] = 0;
           g = true;
         }
       }
@@ -301,42 +301,42 @@ Tetris.prototype = {
         l += 2;
         // Un peu crade je trouve, peut-etre remplacer le for sur les lignes
         // par un while ou alors inserer un while pour faire tomber les blocks.
-        if (l > 20) { 
+        if (l > 20) {
           l = 21;
         }
       }
     }
-    this.actualise_grille();
+    this.updateGrid();
   },
 
-  checkline: function() {
-    var nblines = 0;
+  checkLine: function() {
+    var nbLines = 0;
     for (var l = 0; l < 22; l++) {
       var tetris = true;
       for (var c = 0; c < 12; c++) {
-        tetris = tetris && (this.gamearea[l][c] > 0);
+        tetris = tetris && (this.gameArea[l][c] > 0);
       }
       if (tetris) {
-        nblines++;
+        nbLines++;
         for (var ll = l; ll > 0; ll--) {
           for (var c = 0; c < 12; c++) {
-            this.gamearea[ll][c] = this.gamearea[ll - 1][c];
+            this.gameArea[ll][c] = this.gameArea[ll - 1][c];
           }
         }
         for (var c = 0; c < 12; c++) {
-          this.gamearea[0][c] = 0;
+          this.gameArea[0][c] = 0;
         }
       }
     }
-    this.actualise_grille();
-    if (nblines == 4) {
-      this.tetrinet.sendLines(nblines);
-    } else if (nblines > 1) {
-      this.tetrinet.sendLines(nblines-1);
+    this.updateGrid();
+    if (nbLines == 4) {
+      this.tetrinet.sendLines(nbLines);
+    } else if (nbLines > 1) {
+      this.tetrinet.sendLines(nbLines - 1);
     }
   },
 
-  print_debug: function() {
+  printDebug: function() {
     // Debug !
     var debug = document.getElementById('debug');
     debug.innerHTML = '';
@@ -347,9 +347,9 @@ Tetris.prototype = {
             this.current[l - this.cur_y][c - this.cur_x]) {
           debug.innerHTML += '#';
         } else {
-          if (this.gamearea[l][c] > 0)
+          if (this.gameArea[l][c] > 0)
             debug.innerHTML += ' ';
-          debug.innerHTML += this.gamearea[l][c];
+          debug.innerHTML += this.gameArea[l][c];
         }
       }
       debug.innerHTML += '<br/>';
@@ -367,27 +367,27 @@ Tetris.prototype = {
       }
     }
 
-    this.tetrinet.sendField(this.gamearea, this.oldField);
+    this.tetrinet.sendField(this.gameArea, this.oldField);
 
     // copie
     this.oldField = new Array(22);
     for (var l = 0; l < 22; l++) {
       this.oldField[l] = new Array(12);
       for (var c = 0; c < 12; c++) {
-        this.oldField[l][c] = this.gamearea[l][c];
+        this.oldField[l][c] = this.gameArea[l][c];
       }
     }
   },
 
   step: function() {
-    //this.print_debug();
+    //this.printDebug();
 
     var stop = false;
     for (var l = 0; l < 4 && !stop; l++) {
       for (var c = 0; c < 4 && !stop; c++) {
         if (this.current[l][c]) {
           if (l + this.cur_y + 1 >= 22 ||
-              this.gamearea[l + this.cur_y + 1][c + this.cur_x] > 0) {
+              this.gameArea[l + this.cur_y + 1][c + this.cur_x] > 0) {
             stop = true;
           }
         }
@@ -395,33 +395,33 @@ Tetris.prototype = {
     }
     if (!stop) {
       this.cur_y++;
-      this.currentobj.style.top = this.cur_y * 20;
+      this.currentObj.style.top = this.cur_y * 20;
     } else {
       if (this.cur_y <= 0) {
-        this.perdu = true;
+        this.gameLost = true;
       }
 
      // On dépose les pièces
       for (var l = 0; l < 4; l++) {
         for (var c = 0; c < 4; c++) {
           if (this.current[l][c]) {
-            this.gamearea[l + this.cur_y][c + this.cur_x] =
-              this.currentcolor;
+            this.gameArea[l + this.cur_y][c + this.cur_x] =
+              this.currentColor;
             bloc = document.createElement('div');
             document.getElementById('myfield').appendChild(bloc);
             bloc.className = 'block';
             bloc.style.top = (this.cur_y + l) * 20 + 1;
             bloc.style.left = (this.cur_x + c) * 20 + 1;
-            bloc.style.background = this.convert(this.currentcolor);
+            bloc.style.background = this.convert(this.currentColor);
           }
         }
       }
-      this.piecedepose = true;
-      this.checkline();
+      this.pieceDropped = true;
+      this.checkLine();
       this.sendField();
-      this.newpiece();
+      this.newPiece();
     }
-    if (!this.perdu) {
+    if (!this.gameLost) {
       clearTimeout(this.montimer);
       this.montimer = window.setTimeout(this.step.bind(this), 1000);
     } else {
@@ -432,7 +432,7 @@ Tetris.prototype = {
 
   touche: function(e) {
     e.stop();
-    if (this.perdu) return;
+    if (this.gameLost) return;
     if (e.keyCode == 38 || e.keyCode == 56) {
       piece = this.rotate(this.current);
       // verifie si new ok.
@@ -445,15 +445,15 @@ Tetris.prototype = {
               (this.cur_x + c) < 12 &&
               (this.cur_y + l) >= 0 &&
               (this.cur_y + l) < 22 &&
-              this.gamearea[this.cur_y + l][this.cur_x + c] == 0;
+              this.gameArea[this.cur_y + l][this.cur_x + c] == 0;
           }
         }
       }
 
       if (ok) {
         this.current = piece;
-        document.getElementById('myfield').removeChild(this.currentobj);
-        this.actualise_piece();
+        document.getElementById('myfield').removeChild(this.currentObj);
+        this.updatePiece();
       }
     }
     if (e.keyCode == 39 || e.keyCode == 54) {
@@ -462,7 +462,7 @@ Tetris.prototype = {
         for (var c = 0; c < 4 && ok; c++) {
           if (this.current[l][c]) {
             if (c + this.cur_x + 1 >= 12 ||
-                this.gamearea[l + this.cur_y][c + this.cur_x + 1] > 0) {
+                this.gameArea[l + this.cur_y][c + this.cur_x + 1] > 0) {
               ok = false;
             }
           }
@@ -478,7 +478,7 @@ Tetris.prototype = {
         for (var c = 0; c < 4 && ok; c++) {
           if (this.current[l][c]) {
             if (c + this.cur_x - 1 < 0 ||
-                this.gamearea[l + this.cur_y][c + this.cur_x - 1] > 0) {
+                this.gameArea[l + this.cur_y][c + this.cur_x - 1] > 0) {
               ok = false;
             }
           }
@@ -495,12 +495,12 @@ Tetris.prototype = {
     }
 
     if (e.charCode == 32) {
-      this.piecedepose = false;
-      while (!this.piecedepose) {
+      this.pieceDropped = false;
+      while (!this.pieceDropped) {
         this.step();
       }
     }
 
-    this.currentobj.style.left = this.cur_x * 20;
+    this.currentObj.style.left = this.cur_x * 20;
   }
 };

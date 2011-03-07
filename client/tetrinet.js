@@ -21,7 +21,8 @@ Tetrinet.prototype = {
           this.tetrinet.players[response['pnum']] = $('nickname').value;
           this.tetrinet.teams[response['pnum']] = $('team').value;
           this.tetrinet.initMyField();
-          this.tetrinet.sendMessage('team ' + this.tetrinet.pnum + ' ' + $('team').value);
+          this.tetrinet.sendMessage('team ' + this.tetrinet.pnum +
+                 ' ' + $('team').value);
           this.tetrinet.readFromServer();
           if (this.tetrinet.pnum == 1) {
             $('startgame').disabled = false;
