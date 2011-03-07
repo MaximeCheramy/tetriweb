@@ -443,6 +443,7 @@ Tetris.prototype = {
           if (piece[l][c]) {
             ok = (this.cur_x + c) >= 0 &&
               (this.cur_x + c) < 12 &&
+              (this.cur_y + l) >= 0 &&
               (this.cur_y + l) < 22 &&
               this.gamearea[this.cur_y + l][this.cur_x + c] == 0;
           }

@@ -139,7 +139,7 @@ Tetrinet.prototype = {
           break;
         case 'sb':
           // Reception d'un special
-          if (data[1] == this.pnum) {
+          if (data[1] == 0 || data[1] == this.pnum) {
             if (data[2] == 'cs1' || data[2] == 'a') {
               this.tetris.addLine();
             } else if (data[2] == 'cs2') {
