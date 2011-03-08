@@ -28,11 +28,14 @@ Tetris.prototype = {
       }
     }
 
+    this.gameLost = false;
+
+    this.updateGrid();
     this.generateRandom();
     this.newPiece();
     this.montimer = window.setTimeout(this.step.bind(this), 1000);
-    //this.updateGrid();
-
+    
+    $('myfield').stopObserving();
     $('myfield').observe('keypress', this.touche.bind(this));
   },
 

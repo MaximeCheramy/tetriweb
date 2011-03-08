@@ -1,8 +1,24 @@
+/**
+ * Ajax.Request.abort
+ * extend the prototype.js Ajax.Request object so that it supports an abort method
+ */
+Ajax.Request.prototype.abort = function() {
+  // prevent and state change callbacks from being issued
+  this.transport.onreadystatechange = Prototype.emptyFunction;
+  // abort the XHR
+  this.transport.abort();
+  // update the request counter
+  Ajax.activeRequestCount--;
+};
+
 var Tetrinet = Class.create();
 Tetrinet.prototype = {
   pnum: 0,
   url: './backend.php',
   noerror: true,
+  ajax: null,
+  request: null,
+  timer: null,
   players: [],
   teams: [],
   fields: [],
@@ -17,6 +33,14 @@ Tetrinet.prototype = {
       onSuccess: function(transport) {
         var response = transport.responseText.evalJSON();
         if (!response['error']) {
+          // Reset all
+          if (this.tetrinet.timer) { clearTimeout(this.tetrinet.timer); }
+          if (this.tetrinet.request) { this.tetrinet.request.abort(); }
+          $('fields').update();
+          this.tetrinet.players.clear();
+          this.tetrinet.teams.clear();
+          this.tetrinet.fields.clear();
+          // Init
           this.tetrinet.pnum = response['pnum'];
           this.tetrinet.players[response['pnum']] = $('nickname').value;
           this.tetrinet.teams[response['pnum']] = $('team').value;
@@ -37,7 +61,7 @@ Tetrinet.prototype = {
   },
 
   readFromServer: function() {
-    this.ajax = new Ajax.Request(this.url, {
+    this.request = new Ajax.Request(this.url, {
       method: 'get',
       parameters: { 'pnum' : this.pnum },
       onSuccess: function(transport) {
@@ -50,14 +74,14 @@ Tetrinet.prototype = {
       },
       onComplete: function(transport) {
         if (!this.tetrinet.noerror) {
-          setTimeout(function() { tetrinet.readFromServer() }, 5000);
+          this.tetrinet.timer = setTimeout(function() { tetrinet.readFromServer() }, 5000);
         }
         else {
           this.tetrinet.readFromServer();
         }
       }
     });
-    this.ajax.tetrinet = this;
+    this.request.tetrinet = this;
   },
 
   disconnect: function() {
@@ -79,6 +103,7 @@ Tetrinet.prototype = {
           break;
         case 'playerleave':
           var player_id = data[1];
+          this.destroyField(player_id);
           message = '*** ' + this.players[player_id] + ' a quitté le jeu.';
           break;
         case 'team':
@@ -105,10 +130,14 @@ Tetrinet.prototype = {
           break;
         case 'newgame':
           message = '*** La partie a débuté';
+          /*for (player_id in this.players) {
+            this.clearField(player_id);
+          }*/
           this.tetris.init();
           break;
         case 'endgame':
           message = '*** La partie est terminée';
+          clearTimeout(tetris.montimer);
           break;
         case 'f':
           var player_id = data[1];
@@ -230,6 +259,19 @@ Tetrinet.prototype = {
         block.style.left = c * 20 + 1;
         block.style.background = this.blockColor('0');
         block.style.border = 'none';
+      }
+    }
+  },
+
+  destroyField: function(player_id) {
+    $('field-' + player_id).remove();
+    delete this.fields[player_id];
+  },
+
+  clearField: function(player_id) {
+    for (var l = 0; l < 22; l++) {
+      for (var c = 0; c < 12; c++) {
+        this.setBlock(player_id, l, c, 0);
       }
     }
   },
