@@ -34,45 +34,9 @@ Tetris.prototype = {
     this.generateRandom();
     this.newPiece();
     this.montimer = window.setTimeout(this.step.bind(this), 1000);
-    
-    $('myfield').stopObserving();
-    $('myfield').observe('keypress', this.touche.bind(this));
-  },
 
-  rotate: function(piece) {
-    var npiece = new Array(4);
-    for (var l = 0; l < 4; l++) {
-      npiece[l] = new Array(4);
-      for (var c = 0; c < 4; c++) {
-        npiece[l][c] = piece[3 - c][l];
-      }
-    }
-    var done_t = false, done_l = false;
-    do {
-      done_t = npiece[0][0] || npiece[0][1] || npiece[0][2] || npiece[0][3];
-      if (!done_t) {
-        for (l = 0; l < 3; l++) {
-          for (c = 0; c < 4; c++) {
-            npiece[l][c] = npiece[l + 1][c];
-          }
-        }
-        for (c = 0; c < 4; c++) {
-          npiece[3][c] = false;
-        }
-      }
-      done_l = npiece[0][0] || npiece[1][0] || npiece[2][0] || npiece[3][0];
-      if (!done_l) {
-        for (l = 0; l < 4; l++) {
-          for (c = 0; c < 3; c++) {
-            npiece[l][c] = npiece[l][c + 1];
-          }
-        }
-        for (l = 0; l < 4; l++) {
-          npiece[l][3] = false;
-        }
-      }
-    } while (!(done_l && done_t));
-    return npiece;
+    $('myfield').stopObserving();
+    $('myfield').observe('keypress', this.keyHandler.bind(this));
   },
 
   generateRandom: function() {
@@ -370,7 +334,11 @@ Tetris.prototype = {
     }
   },
 
+  /**
+   * Fonction qui permet l'envoie au serveur tetrinet de la grille de jeu.
+   */
   sendField: function() {
+    // Si c'est le premier appel.
     if (this.oldField == null) {
       this.oldField = new Array(22);
       for (var l = 0; l < 22; l++) {
@@ -381,9 +349,10 @@ Tetris.prototype = {
       }
     }
 
+    // On envoie la nouvelle grille.
     this.tetrinet.sendField(this.gameArea, this.oldField);
 
-    // copie
+    // Copie de la grille actuelle.
     this.oldField = new Array(22);
     for (var l = 0; l < 22; l++) {
       this.oldField[l] = new Array(12);
@@ -393,6 +362,10 @@ Tetris.prototype = {
     }
   },
 
+  /**
+   * Fonction appelée périodiquement pour faire avancer le jeu.
+   * TODO: Commenter le workflow du moteur de jeu.
+   */
   step: function() {
     //this.printDebug();
 
@@ -415,7 +388,7 @@ Tetris.prototype = {
         this.gameLost = true;
       }
 
-     // On dépose les pièces
+      // On dépose les pièces
       for (var l = 0; l < 4; l++) {
         for (var c = 0; c < 4; c++) {
           if (this.current[l][c]) {
@@ -445,9 +418,19 @@ Tetris.prototype = {
     }
   },
 
-  touche: function(e) {
+  /**
+   * Fonction appelée lors de l'appuie d'une touche sur le tetris.
+   * @param e L'event.
+   * TODO: Séparer en plusieurs fonctions ? Oui/Non ?
+   */
+  keyHandler: function(e) {
+    // Stop la propagation de l'event.
     e.stop();
+
+    // Si la partie est perdue alors on ne fait rien.
     if (this.gameLost) return;
+
+    // Touche haut ou 8.
     if (e.keyCode == 38 || e.keyCode == 56) {
       piece = this.rotate(this.current);
       // verifie si new ok.
@@ -471,6 +454,8 @@ Tetris.prototype = {
         this.updatePiece();
       }
     }
+
+    // Touche droite.
     if (e.keyCode == 39 || e.keyCode == 54) {
       var ok = true;
       for (var l = 0; l < 4 && ok; l++) {
@@ -487,6 +472,8 @@ Tetris.prototype = {
         this.cur_x++;
       }
     }
+
+    // Touche gauche.
     if (e.keyCode == 37 || e.keyCode == 52) {
       var ok = true;
       for (var l = 0; l < 4 && ok; l++) {
@@ -504,11 +491,14 @@ Tetris.prototype = {
       }
 
     }
+
+    // Touche bas.
     if (e.keyCode == 40 || e.keyCode == 50) {
       clearTimeout(this.montimer);
       this.step();
     }
 
+    // Touche espace.
     if (e.charCode == 32) {
       this.pieceDropped = false;
       while (!this.pieceDropped) {
@@ -516,6 +506,54 @@ Tetris.prototype = {
       }
     }
 
+    // Actualise la position de la piece.
     this.currentObj.style.left = this.cur_x * 20;
+  },
+
+  /**
+   * Rotation d'une piece de 90° dans le sens horaire.
+   * @param {Array.<Array<number>>} piece La piece que l'on veut faire pivoter.
+   * @return {Array.<Array<number>>} La piece retournée.
+   */
+  rotate: function(piece) {
+    // Rotation de la piece.
+    var npiece = new Array(4);
+    for (var l = 0; l < 4; l++) {
+      npiece[l] = new Array(4);
+      for (var c = 0; c < 4; c++) {
+        npiece[l][c] = piece[3 - c][l];
+      }
+    }
+
+    // Deplacement de la piece en haut a gauche.
+    var done_t = false, done_l = false;
+    do {
+      done_t = npiece[0][0] || npiece[0][1] || npiece[0][2] || npiece[0][3];
+      if (!done_t) {
+        for (l = 0; l < 3; l++) {
+          for (c = 0; c < 4; c++) {
+            npiece[l][c] = npiece[l + 1][c];
+          }
+        }
+        for (c = 0; c < 4; c++) {
+          npiece[3][c] = false;
+        }
+      }
+      done_l = npiece[0][0] || npiece[1][0] || npiece[2][0] || npiece[3][0];
+      if (!done_l) {
+        for (l = 0; l < 4; l++) {
+          for (c = 0; c < 3; c++) {
+            npiece[l][c] = npiece[l][c + 1];
+          }
+        }
+        for (l = 0; l < 4; l++) {
+          npiece[l][3] = false;
+        }
+      }
+    } while (!(done_l && done_t));
+
+    // Retourne la nouvelle piece.
+    return npiece;
   }
+
 };
