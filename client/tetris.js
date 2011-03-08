@@ -191,24 +191,22 @@ Tetris.prototype = {
   },
 
   updatePiece: function() {
-    if(this.current != null) {
-      this.currentObj = document.createElement('div');
-      var myfield = document.getElementById('myfield');
-      myfield.appendChild(this.currentObj);
-      this.currentObj.className = 'piece';
-      this.currentObj.style.top = this.cur_y * 20;
-      this.currentObj.style.left = this.cur_x * 20;
-      for (var l = 0; l < 4; l++) {
-        for (var c = 0; c < 4; c++) {
-          if (this.current[l][c]) {
-            bloc = document.createElement('div');
-            this.currentObj.appendChild(bloc);
-            bloc.className = 'block';
-            bloc.style.top = l * 20 + 1;
-            bloc.style.left = c * 20 + 1;
-            bloc.style.background = this.convert(
-                this.currentColor);
-          }
+    this.currentObj = document.createElement('div');
+    var myfield = document.getElementById('myfield');
+    myfield.appendChild(this.currentObj);
+    this.currentObj.className = 'piece';
+    this.currentObj.style.top = this.cur_y * 20;
+    this.currentObj.style.left = this.cur_x * 20;
+    for (var l = 0; l < 4; l++) {
+      for (var c = 0; c < 4; c++) {
+        if (this.current[l][c]) {
+          bloc = document.createElement('div');
+          this.currentObj.appendChild(bloc);
+          bloc.className = 'block';
+          bloc.style.top = l * 20 + 1;
+          bloc.style.left = c * 20 + 1;
+          bloc.style.background = this.convert(
+              this.currentColor);
         }
       }
     }
@@ -239,9 +237,12 @@ Tetris.prototype = {
 
   updateGrid: function() {
     var myfield = document.getElementById('myfield');
-    while (myfield.childNodes.length > 0) {
-      myfield.removeChild(myfield.childNodes[0]);
-    }
+    myfield.childElements().each(function(el) {
+      if (el != this.currentObj) {
+        console.log("Removing " + el + "car c'est pas " + this.currentObj);
+        el.remove();
+      }
+    }.bind(this));
 
     // On reconstruit
     for (var l = 0; l < 22; l++) {
@@ -258,7 +259,6 @@ Tetris.prototype = {
       }
     }
 
-    this.updatePiece();
     this.sendField();
   },
 
@@ -431,6 +431,7 @@ Tetris.prototype = {
           }
         }
       }
+      document.getElementById('myfield').removeChild(this.currentObj);
       this.pieceDropped = true;
       this.checkLine();
       this.sendField();
