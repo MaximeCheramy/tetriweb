@@ -239,7 +239,6 @@ Tetris.prototype = {
     var myfield = document.getElementById('myfield');
     myfield.childElements().each(function(el) {
       if (el != this.currentObj) {
-        console.log("Removing " + el + "car c'est pas " + this.currentObj);
         el.remove();
       }
     }.bind(this));
