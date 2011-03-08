@@ -191,22 +191,24 @@ Tetris.prototype = {
   },
 
   updatePiece: function() {
-    this.currentObj = document.createElement('div');
-    var myfield = document.getElementById('myfield');
-    myfield.appendChild(this.currentObj);
-    this.currentObj.className = 'piece';
-    this.currentObj.style.top = this.cur_y * 20;
-    this.currentObj.style.left = this.cur_x * 20;
-    for (var l = 0; l < 4; l++) {
-      for (var c = 0; c < 4; c++) {
-        if (this.current[l][c]) {
-          bloc = document.createElement('div');
-          this.currentObj.appendChild(bloc);
-          bloc.className = 'block';
-          bloc.style.top = l * 20 + 1;
-          bloc.style.left = c * 20 + 1;
-          bloc.style.background = this.convert(
-              this.currentColor);
+    if(this.current != null) {
+      this.currentObj = document.createElement('div');
+      var myfield = document.getElementById('myfield');
+      myfield.appendChild(this.currentObj);
+      this.currentObj.className = 'piece';
+      this.currentObj.style.top = this.cur_y * 20;
+      this.currentObj.style.left = this.cur_x * 20;
+      for (var l = 0; l < 4; l++) {
+        for (var c = 0; c < 4; c++) {
+          if (this.current[l][c]) {
+            bloc = document.createElement('div');
+            this.currentObj.appendChild(bloc);
+            bloc.className = 'block';
+            bloc.style.top = l * 20 + 1;
+            bloc.style.left = c * 20 + 1;
+            bloc.style.background = this.convert(
+                this.currentColor);
+          }
         }
       }
     }
@@ -256,6 +258,7 @@ Tetris.prototype = {
       }
     }
 
+    this.updatePiece();
     this.sendField();
   },
 
