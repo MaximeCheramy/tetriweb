@@ -17,11 +17,11 @@ function Tetris(tetrinet_) {
   var next_o = null;
   var tetrinet = null;
   var oldField = null;
-  specialLines: null,
-  specialCount: null,
-  specialCapacity: null,
-  currentSpecialLines: null,
-  specialsQueue: null,
+  var specialLines = null;
+  var specialCount = null;
+  var specialCapacity = null;
+  var currentSpecialLines = null;
+  var specialsQueue = null;
 
   tetrinet = tetrinet_;
   tetrinet.tetris = this;
@@ -328,8 +328,8 @@ function Tetris(tetrinet_) {
         nbLines++;
         // Take specials
         for (var c = 0; c < 12; c++) {
-          if (this.gameArea[l][c] > 5) {
-            tmpSpecials.push(this.gameArea[l][c]);
+          if (gameArea[l][c] > 5) {
+            tmpSpecials.push(gameArea[l][c]);
           }
         }
         for (var ll = l; ll > 0; ll--) {
@@ -361,7 +361,7 @@ function Tetris(tetrinet_) {
     var availBlocks = 0;
     for (l = 0; l < 22; l++) {
       for (c = 0; c < 12; c++) {
-        if (this.gameArea[l][c] > 0 && this.gameArea[l][c] <= 5) {
+        if (gameArea[l][c] > 0 && gameArea[l][c] <= 5) {
           availBlocks++;
         }
       }
@@ -377,9 +377,9 @@ function Tetris(tetrinet_) {
        //console.log("place : " + place);
        for (l = 0; place >= 0 && l < 22; l++) {
          for (c = 0; place >= 0 && c < 12; c++) {
-           if (this.gameArea[l][c] > 0 && this.gameArea[l][c] <= 5) {
+           if (gameArea[l][c] > 0 && gameArea[l][c] <= 5) {
              if (place == 0) {
-               this.gameArea[l][c] = special;
+               gameArea[l][c] = special;
              }
              place--;
            }
