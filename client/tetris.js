@@ -9,7 +9,9 @@ goog.provide('tetriweb.Tetris');
  * @param {object} tetrinet_ L'objet tetrinet.
  * @constructor
  */
-tetriweb.Tetris = function(tetrinet_) {
+tetriweb.Tetris = function(_tetrinet) {
+  // TODO: Les variables locales devraient etre def en dehors du constructeur
+  // sous la forme: tetriweb.Tetris.variable_.
   var gameArea = new Array(22);
   var myField = null;
   var cur_x = 6;
@@ -30,9 +32,10 @@ tetriweb.Tetris = function(tetrinet_) {
   var currentSpecialLines = null;
   var specialsQueue = null;
 
-  tetrinet = tetrinet_;
+  tetrinet = _tetrinet;
   tetrinet.tetris = this;
 
+  //TODO: Deplacer les fonctions vers tetriweb.Tetris.fonction et en dehors du constructeur.
   this.init = function(_specialLines, _specialCount, _specialCapacity) {
     // init the game area : all empty.
     for (var l = 0; l < 22; l++) {
