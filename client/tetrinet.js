@@ -133,7 +133,7 @@ Tetrinet.prototype = {
           /*for (player_id in this.players) {
             this.clearField(player_id);
           }*/
-          this.tetris.init();
+          this.tetris.init(data[5], data[6], data[7]);
           break;
         case 'endgame':
           message = '*** La partie est terminée';
@@ -148,7 +148,7 @@ Tetrinet.prototype = {
             for (var i = 0; i < field.length; i++) {
               y = Math.floor(i / 12);
               x = i % 12;
-              this.setBlock(player_id, x, y, field[i]);
+              this.setBlock(player_id, x, y, this.normalize(field[i]));
             }
           }
           // Description partielle du field (blocs qui ont changé)
@@ -253,12 +253,10 @@ Tetrinet.prototype = {
         this.fields[player_id][l][c] = '0';
         block = document.createElement('div');
         field.appendChild(block);
-        block.className = 'block';
+        block.className = 'block ' + this.tetris.convert(0);
         block.id = 'block-' + player_id + '-' + l + '-' + c;
         block.style.top = l * 20 + 1;
         block.style.left = c * 20 + 1;
-        block.style.background = this.blockColor('0');
-        block.style.border = 'none';
       }
     }
   },
@@ -279,12 +277,7 @@ Tetrinet.prototype = {
   setBlock: function(player_id, x, y, type) {
     this.fields[player_id][y][x] = type;
     var block = $('block-' + player_id + '-' + y + '-' + x);
-    block.style.background = this.blockColor(type);
-    if (type > 0) {
-      block.style.border = '1px solid #000000';
-    } else {
-      block.style.border = 'none';
-    }
+    block.className = 'block ' + this.tetris.convert(type);
   },
 
   sendField: function(field, oldfield) {
@@ -308,29 +301,13 @@ Tetrinet.prototype = {
     this.sendMessage(f);
   },
 
-  blockColor: function(type) {
-    switch (type) {
-      case '0':
-      case 0:
-        return '#FFFFFF';
-      case '1':
-      case 1:
-        return '#0000FF';
-      case '2':
-      case 2:
-        return '#FFFF00';
-      case '3':
-      case 3:
-        return '#00FF00';
-      case '4':
-      case 4:
-        return '#FF00FF';
-      case '5':
-      case 5:
-        return '#FF0000';
-      default:
-        return '#000000';
+  normalize: function(type) {
+    var specials = {'a': 6, 'c': 7, 'n': 8, 'r': 9, 's': 10, 'b': 11, 'g': 12, 'q': 13, 'o': 14};
+    if (type >= '0' && type <= '5') {
+      type = parseInt(type);
+    } else if (specials[type] != undefined) {
+      type = specials[type];
     }
+    return type;
   }
 };
-

@@ -4,6 +4,23 @@
 	height: 16px;
 	border: 1px solid #000000;
 }
+
+.block.empty { border: none; }
+.blue { background: #0000FF; }
+.yellow { background: #FFFF00; }
+.green { background: #00FF00; }
+.purple { background: #800080; }
+.red { background: #FF0000; }
+.sb-a { background: url(img/sb-a.png); }
+.sb-b { background: url(img/sb-b.png); }
+.sb-c { background: url(img/sb-c.png); }
+.sb-g { background: url(img/sb-g.png); }
+.sb-n { background: url(img/sb-n.png); }
+.sb-o { background: url(img/sb-o.png); }
+.sb-q { background: url(img/sb-q.png); }
+.sb-r { background: url(img/sb-r.png); }
+.sb-s { background: url(img/sb-s.png); }
+
 .piece {
 	position: absolute;
 	width: 80px;

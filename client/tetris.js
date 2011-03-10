@@ -17,11 +17,16 @@ function Tetris(tetrinet_) {
   var next_o = null;
   var tetrinet = null;
   var oldField = null;
+  specialLines: null,
+  specialCount: null,
+  specialCapacity: null,
+  currentSpecialLines: null,
+  specialsQueue: null,
 
   tetrinet = tetrinet_;
   tetrinet.tetris = this;
 
-  this.init = function() {
+  this.init = function(specialLines, specialCount, specialCapacity) {
     // init the game area : all empty.
     for (var l = 0; l < 22; l++) {
       gameArea[l] = new Array(12);
@@ -31,6 +36,11 @@ function Tetris(tetrinet_) {
     }
 
     gameLost = false;
+    this.specialLines = specialLines;
+    this.specialCount = specialCount;
+    this.specialCapacity = specialCapacity;
+    this.currentSpecialLines = 0;
+    this.specialsQueue = [];
 
     this.updateGrid();
     this.generateRandom();
@@ -56,11 +66,13 @@ function Tetris(tetrinet_) {
         if (nextpiece[l][c]) {
           var bloc = document.createElement('div');
           nextpieceobj.appendChild(bloc);
-          bloc.className = 'block';
+          //bloc.className = 'block';
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.style.background = this.convert(
-              this.getColor(next_id));
+          //bloc.style.background = this.convert(
+          //    this.getColor(next_id));
+          bloc.className = 'block ' + this.convert(
+            this.getColor(next_id));
         }
       }
     }
@@ -168,11 +180,13 @@ function Tetris(tetrinet_) {
         if (current[l][c]) {
           bloc = document.createElement('div');
           currentObj.appendChild(bloc);
-          bloc.className = 'block';
+          //bloc.className = 'block';
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.style.background = this.convert(
-              currentColor);
+          //bloc.style.background = this.convert(
+          //    currentColor);
+          bloc.className = 'block ' + this.convert(
+            currentColor);
         }
       }
     }
@@ -180,12 +194,22 @@ function Tetris(tetrinet_) {
 
   this.convert = function(color) {
     switch (color) {
-      case 1: return '#0000FF'; // bleu
-      case 2: return '#FFFF00'; // jaune
-      case 3: return '#00FF00'; // vert
-      case 4: return '#800080'; // violet
-      case 5: return '#FF0000'; // rouge
-      default: alert('problème...');
+      case 0: return 'empty';
+      case 1: return 'blue';//return '#0000FF'; // bleu
+      case 2: return 'yellow';//return '#FFFF00'; // jaune
+      case 3: return 'green';//return '#00FF00'; // vert
+      case 4: return 'purple';//return '#800080'; // violet
+      case 5: return 'red';//return '#FF0000'; // rouge
+      case 6: return 'sb-a';
+      case 7: return 'sb-c';
+      case 8: return 'sb-n';
+      case 9: return 'sb-r';
+      case 10: return 'sb-s';
+      case 11: return 'sb-b';
+      case 12: return 'sb-g';
+      case 13: return 'sb-q';
+      case 14: return 'sb-o';
+      default: alert('unknown block ' + typeof(color) + ' ' + color);//return '#000000'; 
     }
   };
 
@@ -198,6 +222,7 @@ function Tetris(tetrinet_) {
       case 4: return 5; // Z : rouge
       case 5: return 1; // Z inversé : bleu
       case 6: return 2; // T : jaune
+      default: return id;
     }
   };
 
@@ -215,11 +240,13 @@ function Tetris(tetrinet_) {
         if (gameArea[l][c] > 0) {
           bloc = document.createElement('div');
           myfield.appendChild(bloc);
-          bloc.className = 'block';
+          //bloc.className = 'block';
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.style.background = this.convert(
-              gameArea[l][c]);
+          //bloc.style.background = this.convert(
+          //    gameArea[l][c]);
+          bloc.className = 'block ' + this.convert(
+            gameArea[l][c]);
         }
       }
     }
@@ -291,6 +318,7 @@ function Tetris(tetrinet_) {
 
   this.checkLine = function() {
     var nbLines = 0;
+    var tmpSpecials = [];
     for (var l = 0; l < 22; l++) {
       var tetris = true;
       for (var c = 0; c < 12; c++) {
@@ -298,6 +326,12 @@ function Tetris(tetrinet_) {
       }
       if (tetris) {
         nbLines++;
+        // Take specials
+        for (var c = 0; c < 12; c++) {
+          if (this.gameArea[l][c] > 5) {
+            tmpSpecials.push(this.gameArea[l][c]);
+          }
+        }
         for (var ll = l; ll > 0; ll--) {
           for (var c = 0; c < 12; c++) {
             gameArea[ll][c] = gameArea[ll - 1][c];
@@ -313,6 +347,48 @@ function Tetris(tetrinet_) {
       tetrinet.sendLines(nbLines);
     } else if (nbLines > 1) {
       tetrinet.sendLines(nbLines - 1);
+    }
+
+    //console.log(tmpSpecials);
+
+    // Special handling
+    this.currentSpecialLines += nbLines;
+    this.placeSpecials((this.currentSpecialLines/this.specialLines)*this.specialCount);
+    this.currentSpecialLines %= this.specialLines;
+  };
+
+  this.placeSpecials = function(nb) {
+    var availBlocks = 0;
+    for (l = 0; l < 22; l++) {
+      for (c = 0; c < 12; c++) {
+        if (this.gameArea[l][c] > 0 && this.gameArea[l][c] <= 5) {
+          availBlocks++;
+        }
+      }
+    }
+    var blocksToPlace = Math.min(nb, availBlocks);
+
+    //console.log("availBlocks : " + availBlocks);
+    //console.log("blocksToPlace : " + blocksToPlace);
+
+    for (var i = 0; i < blocksToPlace; i++) {
+       var special = Math.round(Math.random()*8) + 6;
+       var place = Math.round(Math.random()*(availBlocks-i-1));
+       //console.log("place : " + place);
+       for (l = 0; place >= 0 && l < 22; l++) {
+         for (c = 0; place >= 0 && c < 12; c++) {
+           if (this.gameArea[l][c] > 0 && this.gameArea[l][c] <= 5) {
+             if (place == 0) {
+               this.gameArea[l][c] = special;
+             }
+             place--;
+           }
+         }
+       } 
+    }
+
+    if (blocksToPlace > 0) {
+      this.updateGrid();
     }
   };
 
@@ -398,10 +474,11 @@ function Tetris(tetrinet_) {
               currentColor;
             bloc = document.createElement('div');
             document.getElementById('myfield').appendChild(bloc);
-            bloc.className = 'block';
+            //bloc.className = 'block';
             bloc.style.top = (cur_y + l) * 20 + 1;
             bloc.style.left = (cur_x + c) * 20 + 1;
-            bloc.style.background = this.convert(currentColor);
+            //bloc.style.background = this.convert(this.currentColor);
+            bloc.className = 'block ' + this.convert(currentColor);
           }
         }
       }
