@@ -1,10 +1,17 @@
+goog.require('goog.array');
+goog.require('goog.dom');
+goog.require('goog.events');
+
+goog.provide('tetriweb.Tetris');
+
 /**
  * Tetris.
  * @param {object} tetrinet_ L'objet tetrinet.
  * @constructor
  */
-function Tetris(tetrinet_) {
+tetriweb.Tetris = function(tetrinet_) {
   var gameArea = new Array(22);
+  var myField = null;
   var cur_x = 6;
   var cur_y = 0;
   var current = null;
@@ -26,7 +33,7 @@ function Tetris(tetrinet_) {
   tetrinet = tetrinet_;
   tetrinet.tetris = this;
 
-  this.init = function(specialLines, specialCount, specialCapacity) {
+  this.init = function(_specialLines, _specialCount, _specialCapacity) {
     // init the game area : all empty.
     for (var l = 0; l < 22; l++) {
       gameArea[l] = new Array(12);
@@ -36,43 +43,39 @@ function Tetris(tetrinet_) {
     }
 
     gameLost = false;
-    this.specialLines = specialLines;
-    this.specialCount = specialCount;
-    this.specialCapacity = specialCapacity;
-    this.currentSpecialLines = 0;
-    this.specialsQueue = [];
+    specialLines = _specialLines;
+    specialCount = _specialCount;
+    specialCapacity = _specialCapacity;
+    currentSpecialLines = 0;
+    specialsQueue = [];
+
+    myField = goog.dom.getElement('myfield');
 
     this.updateGrid();
     this.generateRandom();
     this.newPiece();
-    montimer = window.setTimeout(this.step.bind(this), 1000);
+    montimer = window.setTimeout(goog.bind(this.step, this), 1000);
 
-    $('myfield').stopObserving();
-    $('myfield').observe('keypress', this.keyHandler.bind(this));
+    goog.events.removeAll(myField);
+    goog.events.listen(myField, goog.events.EventType.KEYPRESS,
+      goog.bind(this.keyHandler, this));
   };
 
   this.generateRandom = function() {
     next_id = Math.floor(Math.random() * 7);
     next_o = Math.floor(Math.random() * 4);
 
-    var nextpiece = this.generatePiece(next_id,
-                                        next_o);
-    var nextpieceobj = document.getElementById('nextpiece');
-    while (nextpieceobj.childNodes.length > 0) {
-      nextpieceobj.removeChild(nextpieceobj.childNodes[0]);
-    }
+    var nextpiece = this.generatePiece(next_id, next_o);
+    var nextpieceobj = goog.dom.getElement('nextpiece');
+    goog.dom.removeChildren(nextpieceobj);
     for (var l = 0; l < 4; l++) {
       for (var c = 0; c < 4; c++) {
         if (nextpiece[l][c]) {
-          var bloc = document.createElement('div');
-          nextpieceobj.appendChild(bloc);
-          //bloc.className = 'block';
+          var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          //bloc.style.background = this.convert(
-          //    this.getColor(next_id));
-          bloc.className = 'block ' + this.convert(
-            this.getColor(next_id));
+          bloc.className = 'block ' + this.convert(this.getColor(next_id));
+          goog.dom.appendChild(nextpieceobj, bloc);
         }
       }
     }
@@ -169,24 +172,18 @@ function Tetris(tetrinet_) {
   };
 
   this.updatePiece = function() {
-    currentObj = document.createElement('div');
-    var myfield = document.getElementById('myfield');
-    myfield.appendChild(currentObj);
-    currentObj.className = 'piece';
+    currentObj = goog.dom.createDom('div', {class: 'piece'});
     currentObj.style.top = cur_y * 20;
     currentObj.style.left = cur_x * 20;
+    goog.dom.appendChild(myField, currentObj);
     for (var l = 0; l < 4; l++) {
       for (var c = 0; c < 4; c++) {
         if (current[l][c]) {
-          bloc = document.createElement('div');
-          currentObj.appendChild(bloc);
-          //bloc.className = 'block';
+          var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          //bloc.style.background = this.convert(
-          //    currentColor);
-          bloc.className = 'block ' + this.convert(
-            currentColor);
+          bloc.className = 'block ' + this.convert(currentColor);
+          goog.dom.appendChild(currentObj, bloc);
         }
       }
     }
@@ -209,7 +206,7 @@ function Tetris(tetrinet_) {
       case 12: return 'sb-g';
       case 13: return 'sb-q';
       case 14: return 'sb-o';
-      default: alert('unknown block ' + typeof(color) + ' ' + color);//return '#000000'; 
+      default: alert('unknown block ' + typeof(color) + ' ' + color);
     }
   };
 
@@ -227,26 +224,22 @@ function Tetris(tetrinet_) {
   };
 
   this.updateGrid = function() {
-    var myfield = document.getElementById('myfield');
-    myfield.childElements().each(function(el) {
-      if (el != currentObj) {
-        el.remove();
+    var fieldContent = goog.array.clone(myField.childNodes);
+    goog.array.forEach(fieldContent, function(n) {
+      if (n != currentObj) {
+        goog.dom.removeNode(n);
       }
-    }.bind(this));
+    }, this);
 
     // On reconstruit
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
         if (gameArea[l][c] > 0) {
-          bloc = document.createElement('div');
-          myfield.appendChild(bloc);
-          //bloc.className = 'block';
+          var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          //bloc.style.background = this.convert(
-          //    gameArea[l][c]);
-          bloc.className = 'block ' + this.convert(
-            gameArea[l][c]);
+          bloc.className = 'block ' + this.convert(gameArea[l][c]);
+          myField.appendChild(bloc);
         }
       }
     }
@@ -352,15 +345,15 @@ function Tetris(tetrinet_) {
     //console.log(tmpSpecials);
 
     // Special handling
-    this.currentSpecialLines += nbLines;
-    this.placeSpecials((this.currentSpecialLines/this.specialLines)*this.specialCount);
-    this.currentSpecialLines %= this.specialLines;
+    currentSpecialLines += nbLines;
+    this.placeSpecials((currentSpecialLines / specialLines) * specialCount);
+    currentSpecialLines %= specialLines;
   };
 
   this.placeSpecials = function(nb) {
     var availBlocks = 0;
-    for (l = 0; l < 22; l++) {
-      for (c = 0; c < 12; c++) {
+    for (var l = 0; l < 22; l++) {
+      for (var c = 0; c < 12; c++) {
         if (gameArea[l][c] > 0 && gameArea[l][c] <= 5) {
           availBlocks++;
         }
@@ -368,15 +361,15 @@ function Tetris(tetrinet_) {
     }
     var blocksToPlace = Math.min(nb, availBlocks);
 
-    //console.log("availBlocks : " + availBlocks);
-    //console.log("blocksToPlace : " + blocksToPlace);
+    //console.log('availBlocks : ' + availBlocks);
+    //console.log('blocksToPlace : ' + blocksToPlace);
 
     for (var i = 0; i < blocksToPlace; i++) {
-       var special = Math.round(Math.random()*8) + 6;
-       var place = Math.round(Math.random()*(availBlocks-i-1));
-       //console.log("place : " + place);
-       for (l = 0; place >= 0 && l < 22; l++) {
-         for (c = 0; place >= 0 && c < 12; c++) {
+       var special = Math.round(Math.random() * 8) + 6;
+       var place = Math.round(Math.random() * (availBlocks - i - 1));
+       //console.log('place : ' + place);
+       for (var l = 0; place >= 0 && l < 22; l++) {
+         for (var c = 0; place >= 0 && c < 12; c++) {
            if (gameArea[l][c] > 0 && gameArea[l][c] <= 5) {
              if (place == 0) {
                gameArea[l][c] = special;
@@ -384,7 +377,7 @@ function Tetris(tetrinet_) {
              place--;
            }
          }
-       } 
+       }
     }
 
     if (blocksToPlace > 0) {
@@ -394,7 +387,7 @@ function Tetris(tetrinet_) {
 
   this.printDebug = function() {
     // Debug !
-    var debug = document.getElementById('debug');
+    var debug = goog.dom.getElement('debug');
     debug.innerHTML = '';
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
@@ -451,8 +444,7 @@ function Tetris(tetrinet_) {
     for (var l = 0; l < 4 && !stop; l++) {
       for (var c = 0; c < 4 && !stop; c++) {
         if (current[l][c]) {
-          if (l + cur_y + 1 >= 22 ||
-              gameArea[l + cur_y + 1][c + cur_x] > 0) {
+          if (l + cur_y + 1 >= 22 || gameArea[l + cur_y + 1][c + cur_x] > 0) {
             stop = true;
           }
         }
@@ -470,19 +462,16 @@ function Tetris(tetrinet_) {
       for (var l = 0; l < 4; l++) {
         for (var c = 0; c < 4; c++) {
           if (current[l][c]) {
-            gameArea[l + cur_y][c + cur_x] =
-              currentColor;
-            bloc = document.createElement('div');
-            document.getElementById('myfield').appendChild(bloc);
-            //bloc.className = 'block';
+            gameArea[l + cur_y][c + cur_x] = currentColor;
+            var bloc = goog.dom.createDom('div');
             bloc.style.top = (cur_y + l) * 20 + 1;
             bloc.style.left = (cur_x + c) * 20 + 1;
-            //bloc.style.background = this.convert(this.currentColor);
             bloc.className = 'block ' + this.convert(currentColor);
+            goog.dom.appendChild(myField, bloc);
           }
         }
       }
-      document.getElementById('myfield').removeChild(currentObj);
+      goog.dom.removeNode(currentObj);
       pieceDropped = true;
       this.checkLine();
       this.sendField();
@@ -490,7 +479,7 @@ function Tetris(tetrinet_) {
     }
     if (!gameLost) {
       clearTimeout(montimer);
-      montimer = window.setTimeout(this.step.bind(this), 1000);
+      montimer = window.setTimeout(goog.bind(this.step, this), 1000);
     } else {
       tetrinet.sendPlayerlost();
       this.fillRandomly();
@@ -505,7 +494,7 @@ function Tetris(tetrinet_) {
     // TODO: Séparer en plusieurs fonctions ? Oui/Non ?
 
     // Stop la propagation de l'event.
-    e.stop();
+    e.preventDefault();
 
     // Si la partie est perdue alors on ne fait rien.
     if (gameLost) return;
@@ -530,7 +519,7 @@ function Tetris(tetrinet_) {
 
       if (ok) {
         current = piece;
-        document.getElementById('myfield').removeChild(currentObj);
+        goog.dom.removeNode(currentObj);
         this.updatePiece();
       }
     }
@@ -559,8 +548,7 @@ function Tetris(tetrinet_) {
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
           if (current[l][c]) {
-            if (c + cur_x - 1 < 0 ||
-                gameArea[l + cur_y][c + cur_x - 1] > 0) {
+            if (c + cur_x - 1 < 0 || gameArea[l + cur_y][c + cur_x - 1] > 0) {
               ok = false;
             }
           }
@@ -569,7 +557,6 @@ function Tetris(tetrinet_) {
       if (ok) {
         cur_x--;
       }
-
     }
 
     // Touche bas.
@@ -610,23 +597,23 @@ function Tetris(tetrinet_) {
     do {
       done_t = npiece[0][0] || npiece[0][1] || npiece[0][2] || npiece[0][3];
       if (!done_t) {
-        for (l = 0; l < 3; l++) {
-          for (c = 0; c < 4; c++) {
+        for (var l = 0; l < 3; l++) {
+          for (var c = 0; c < 4; c++) {
             npiece[l][c] = npiece[l + 1][c];
           }
         }
-        for (c = 0; c < 4; c++) {
+        for (var c = 0; c < 4; c++) {
           npiece[3][c] = false;
         }
       }
       done_l = npiece[0][0] || npiece[1][0] || npiece[2][0] || npiece[3][0];
       if (!done_l) {
-        for (l = 0; l < 4; l++) {
-          for (c = 0; c < 3; c++) {
+        for (var l = 0; l < 4; l++) {
+          for (var c = 0; c < 3; c++) {
             npiece[l][c] = npiece[l][c + 1];
           }
         }
-        for (l = 0; l < 4; l++) {
+        for (var l = 0; l < 4; l++) {
           npiece[l][3] = false;
         }
       }
@@ -634,6 +621,5 @@ function Tetris(tetrinet_) {
 
     // Retourne la nouvelle piece.
     return npiece;
-  }
-
-}
+  };
+};

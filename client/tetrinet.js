@@ -1,102 +1,93 @@
+goog.require('goog.dom');
+goog.require('goog.events');
+goog.require('goog.net.XhrIo');
+
+goog.provide('tetriweb.Tetrinet');
+
 /**
- * Ajax.Request.abort
- * extend the prototype.js Ajax.Request object so that it supports an abort method
+ * Tetrinet.
+ * @constructor
  */
-Ajax.Request.prototype.abort = function() {
-  // prevent and state change callbacks from being issued
-  this.transport.onreadystatechange = Prototype.emptyFunction;
-  // abort the XHR
-  this.transport.abort();
-  // update the request counter
-  Ajax.activeRequestCount--;
-};
+tetriweb.Tetrinet = function() {
+  var pnum = 0;
+  var url = 'backend.php';
+  var xhr_in = null;
+  var xhr_out = null;
+  var timer = null;
+  var players = [];
+  var teams = [];
+  var fields = [];
 
-var Tetrinet = Class.create();
-Tetrinet.prototype = {
-  pnum: 0,
-  url: './backend.php',
-  noerror: true,
-  ajax: null,
-  request: null,
-  timer: null,
-  players: [],
-  teams: [],
-  fields: [],
+  this.connect = function(nickname, team) {
+    // Clear
+    if (timer) { clearTimeout(timer); }
+    if (xhr_in) { xhr_in.abort(); }
 
-  initialize: function() {
-  },
+    xhr_in = new goog.net.XhrIo();
 
-  connect: function(nickname, team) {
-    this.ajax = new Ajax.Request(this.url, {
-      method: 'get',
-      parameters: { 'connect' : nickname },
-      onSuccess: function(transport) {
-        var response = transport.responseText.evalJSON();
+    goog.events.listen(xhr_in, goog.net.EventType.COMPLETE,
+        goog.bind(function(e) {
+      if (e.target.isSuccess()) {
+        var response = e.target.getResponseJson();
         if (!response['error']) {
-          // Reset all
-          if (this.tetrinet.timer) { clearTimeout(this.tetrinet.timer); }
-          if (this.tetrinet.request) { this.tetrinet.request.abort(); }
-          $('fields').update();
-          this.tetrinet.players.clear();
-          this.tetrinet.teams.clear();
-          this.tetrinet.fields.clear();
+          // Reset
+          goog.dom.removeChildren(goog.dom.getElement('fields'));
+          players = [];
+          teams = [];
+          fields = [];
+
           // Init
-          this.tetrinet.pnum = response['pnum'];
-          this.tetrinet.players[response['pnum']] = $('nickname').value;
-          this.tetrinet.teams[response['pnum']] = $('team').value;
-          this.tetrinet.initMyField();
-          this.tetrinet.sendMessage('team ' + this.tetrinet.pnum +
-                 ' ' + $('team').value);
-          this.tetrinet.readFromServer();
-          if (this.tetrinet.pnum == 1) {
-            $('startgame').disabled = false;
+          var nick = goog.dom.getElement('nickname').value;
+          var team = goog.dom.getElement('team').value;
+          pnum = response['pnum'];
+          players[response['pnum']] = nick;
+          teams[response['pnum']] = team;
+          this.initMyField();
+          this.sendMessage('team ' + pnum + ' ' + team);
+          this.readFromServer();
+
+          if (pnum == 1) {
+            goog.dom.getElement('startGame').disabled = false;
           }
-        }
-        else {
+        } else {
           alert('Connexion impossible : ' + response['error']);
         }
       }
-    });
-    this.ajax.tetrinet = this;
-  },
+    }, this));
 
-  readFromServer: function() {
-    this.request = new Ajax.Request(this.url, {
-      method: 'get',
-      parameters: { 'pnum' : this.pnum },
-      onSuccess: function(transport) {
-        var response = transport.responseText.evalJSON();
-        this.tetrinet.handleResponse(response);
-        this.tetrinet.noerror = true;
-      },
-      onFailure: function(transport) {
-        this.tetrinet.noerror = false;
-      },
-      onComplete: function(transport) {
-        if (!this.tetrinet.noerror) {
-          this.tetrinet.timer = setTimeout(function() { tetrinet.readFromServer() }, 5000);
-        }
-        else {
-          this.tetrinet.readFromServer();
-        }
+    xhr_in.send(url + '?connect=' + nickname);
+  };
+
+  this.readFromServer = function() {
+    xhr_in = new goog.net.XhrIo();
+
+    goog.events.listen(xhr_in, goog.net.EventType.COMPLETE,
+        goog.bind(function(e) {
+      if (e.target.isSuccess()) {
+        this.handleResponse(e.target.getResponseJson());
+        this.readFromServer();
+      } else {
+        timer = setTimeout(function() { tetrinet.readFromServer(); }, 5000);
       }
-    });
-    this.request.tetrinet = this;
-  },
+    }, this));
 
-  disconnect: function() {
-  },
+    xhr_in.send(url + '?pnum=' + pnum);
+  };
 
-  handleResponse: function(response) {
-    for each(msg in response['msg']) {
+  this.disconnect = function() {
+  };
+
+  this.handleResponse = function(response) {
+    for (var i = 0; i < response['msg'].length; i++) {
+      var msg = response['msg'][i];
       var data = msg.split(' ');
       var message = '';
       switch (data[0]) {
         case 'playerjoin':
           var player_id = data[1];
           var nick = data[2];
-          if (player_id != this.pnum) {
-            this.players[player_id] = nick;
+          if (player_id != pnum) {
+            players[player_id] = nick;
             this.initField(player_id);
           }
           message = '*** ' + nick + ' a rejoint le jeu.';
@@ -104,18 +95,17 @@ Tetrinet.prototype = {
         case 'playerleave':
           var player_id = data[1];
           this.destroyField(player_id);
-          message = '*** ' + this.players[player_id] + ' a quitté le jeu.';
+          message = '*** ' + players[player_id] + ' a quitté le jeu.';
           break;
         case 'team':
           var player_id = data[1];
           var team = data[2];
           if (team != undefined) {
-            this.teams[player_id] = team;
-            message = '*** ' + this.players[player_id] +
+            teams[player_id] = team;
+            message = '*** ' + players[player_id] +
               " est dans l'équipe " + team + '.';
-          }
-          else {
-            message = '*** ' + this.players[player_id] + ' est seul.';
+          } else {
+            message = '*** ' + players[player_id] + ' est seul.';
           }
           break;
         case 'pline':
@@ -123,17 +113,16 @@ Tetrinet.prototype = {
           var m = msg.substr(data[0].length + data[1].length + 2);
           if (player_id == 0) {
             message = '*** ' + m;
-          }
-          else {
-            message = '&lt;' + this.players[player_id] + '&gt; ' + m;
+          } else {
+            message = '&lt;' + players[player_id] + '&gt; ' + m;
           }
           break;
         case 'newgame':
           message = '*** La partie a débuté';
-          /*for (player_id in this.players) {
+          /*for (player_id in players) {
             this.clearField(player_id);
           }*/
-          this.tetris.init(data[5], data[6], data[7]);
+          tetris.init(data[5], data[6], data[7]);
           break;
         case 'endgame':
           message = '*** La partie est terminée';
@@ -150,16 +139,14 @@ Tetrinet.prototype = {
               x = i % 12;
               this.setBlock(player_id, x, y, this.normalize(field[i]));
             }
-          }
-          // Description partielle du field (blocs qui ont changé)
-          // "!" et "3" trouvés dans le code de gtetrinet...
-          else {
+          } else {
+            // Description partielle du field (blocs qui ont changé)
+            // "!" et "3" trouvés dans le code de gtetrinet...
             var block;
             for (var i = 0; i < field.length; i++) {
               if (field[i] < '0') {
                 block = field.charCodeAt(i) - '!'.charCodeAt(0);
-              }
-              else {
+              } else {
                 x = field.charCodeAt(i) - '3'.charCodeAt(0);
                 y = field.charCodeAt(++i) - '3'.charCodeAt(0);
                 this.setBlock(player_id, x, y, block);
@@ -169,23 +156,23 @@ Tetrinet.prototype = {
           break;
         case 'sb':
           // Reception d'un special
-          if (data[1] == 0 || data[1] == this.pnum) {
+          if (data[1] == 0 || data[1] == pnum) {
             if (data[2] == 'cs1' || data[2] == 'a') {
-              this.tetris.addLine();
+              tetris.addLine();
             } else if (data[2] == 'cs2') {
-              this.tetris.addLine();
-              this.tetris.addLine();
+              tetris.addLine();
+              tetris.addLine();
             } else if (data[2] == 'cs4') {
-              this.tetris.addLine();
-              this.tetris.addLine();
-              this.tetris.addLine();
-              this.tetris.addLine();
+              tetris.addLine();
+              tetris.addLine();
+              tetris.addLine();
+              tetris.addLine();
             } else if (data[2] == 'c') {
-              this.tetris.clearLine();
+              tetris.clearLine();
             } else if (data[2] == 'g') {
-              this.tetris.blockGravity();
+              tetris.blockGravity();
             } else if (data[2] == 'n') {
-              this.tetris.nukeField();
+              tetris.nukeField();
             }
           }
           break;
@@ -193,96 +180,87 @@ Tetrinet.prototype = {
           message = msg;
       }
       if (message.length > 0) {
-        $('content').innerHTML += '<div>' + message + '</div>';
+        goog.dom.getElement('content').innerHTML +=
+          '<div>' + message + '</div>';
       }
     }
-  },
+  };
 
-  sendMessage: function(msg) {
-    new Ajax.Request(this.url, {
-      method: 'get',
-      parameters: { 'pnum' : this.pnum, 'send' : msg }
-    });
-  },
+  this.sendMessage = function(msg) {
+    xhr_out = new goog.net.XhrIo();
+    xhr_out.send(url + '?' +
+      goog.uri.utils.buildQueryDataFromMap({pnum: pnum, send: msg}));
+  };
 
-  startGame: function() {
-    this.sendMessage('startgame 1 ' + this.pnum);
-  },
+  this.startGame = function() {
+    this.sendMessage('startgame 1 ' + pnum);
+  };
 
-  sayPline: function(msg) {
-    this.sendMessage('pline ' + this.pnum + ' ' + msg);
-    $('content').innerHTML += '<div>' + '&lt;' +
-      this.players[this.pnum] + '&gt; ' + msg + '</div>';
-  },
+  this.sayPline = function(msg) {
+    this.sendMessage('pline ' + pnum + ' ' + msg);
+    goog.dom.getElement('content').innerHTML += '<div>' + '&lt;' +
+      players[pnum] + '&gt; ' + msg + '</div>';
+  };
 
-  sendPlayerlost: function() {
-    this.sendMessage('playerlost ' + this.pnum);
-  },
+  this.sendPlayerlost = function() {
+    this.sendMessage('playerlost ' + pnum);
+  };
 
-  sendLines: function(nblines) {
-    this.sendMessage('sb 0 cs' + nblines + ' ' + this.pnum);
-  },
+  this.sendLines = function(nblines) {
+    this.sendMessage('sb 0 cs' + nblines + ' ' + pnum);
+  };
 
-  initMyField: function() {
-    var cont = document.createElement('div');
-    $('fields').appendChild(cont);
-    cont.id = 'mycontainer';
-
-    var next = document.createElement('div');
-    cont.appendChild(next);
-    next.id = 'nextpiece';
-
-    var field = document.createElement('div');
-    cont.appendChild(field);
-    field.id = 'myfield';
+  this.initMyField = function() {
+    var next = goog.dom.createDom('div', {id: 'nextpiece'});
+    var field = goog.dom.createDom('div', {id: 'myfield'});
     field.setAttribute('tabindex', 1);
-  },
+    var cont = goog.dom.createDom('div', {id: 'mycontainer'}, next, field);
+    goog.dom.appendChild(goog.dom.getElement('fields'), cont);
+  };
 
-  initField: function(player_id) {
-    var field = document.createElement('div');
-    $('fields').appendChild(field);
-    field.className = 'field';
-    field.id = 'field-' + player_id;
+  this.initField = function(player_id) {
+    var field = goog.dom.createDom('div', {class: 'field', id: 'field-' +
+      player_id});
+    goog.dom.appendChild(goog.dom.getElement('fields'), field);
 
     var block;
-
-    this.fields[player_id] = new Array(22);
+    fields[player_id] = new Array(22);
     for (var l = 0; l < 22; l++) {
-      this.fields[player_id][l] = new Array(12);
+      fields[player_id][l] = new Array(12);
       for (var c = 0; c < 12; c++) {
-        this.fields[player_id][l][c] = '0';
-        block = document.createElement('div');
-        field.appendChild(block);
+        fields[player_id][l][c] = '0';
+        block = goog.dom.createDom('div');
         block.className = 'block ' + this.tetris.convert(0);
         block.id = 'block-' + player_id + '-' + l + '-' + c;
         block.style.top = l * 20 + 1;
         block.style.left = c * 20 + 1;
+        goog.dom.appendChild(field, block);
       }
     }
-  },
+  };
 
-  destroyField: function(player_id) {
-    $('field-' + player_id).remove();
-    delete this.fields[player_id];
-  },
+  this.destroyField = function(player_id) {
+    goog.dom.removeNode(goog.dom.getElement('field-' + player_id));
+    delete fields[player_id];
+  };
 
-  clearField: function(player_id) {
+  this.clearField = function(player_id) {
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
         this.setBlock(player_id, l, c, 0);
       }
     }
-  },
+  };
 
-  setBlock: function(player_id, x, y, type) {
-    this.fields[player_id][y][x] = type;
-    var block = $('block-' + player_id + '-' + y + '-' + x);
-    block.className = 'block ' + this.tetris.convert(type);
-  },
+  this.setBlock = function(player_id, x, y, type) {
+    fields[player_id][y][x] = type;
+    var block = goog.dom.getElement('block-' + player_id + '-' + y + '-' + x);
+    block.className = 'block ' + tetris.convert(type);
+  };
 
-  sendField: function(field, oldfield) {
+  this.sendField = function(field, oldfield) {
     var seen;
-    var f = 'f ' + this.pnum + ' ';
+    var f = 'f ' + pnum + ' ';
     for (var b = 0; b < 15; b++) {
       seen = false;
       for (var l = 0; l < 22; l++) {
@@ -299,15 +277,16 @@ Tetrinet.prototype = {
       }
     }
     this.sendMessage(f);
-  },
+  };
 
-  normalize: function(type) {
-    var specials = {'a': 6, 'c': 7, 'n': 8, 'r': 9, 's': 10, 'b': 11, 'g': 12, 'q': 13, 'o': 14};
+  this.normalize = function(type) {
+    var specials = {'a': 6, 'c': 7, 'n': 8, 'r': 9, 's': 10, 'b': 11, 'g': 12,
+                    'q': 13, 'o': 14};
     if (type >= '0' && type <= '5') {
       type = parseInt(type);
     } else if (specials[type] != undefined) {
       type = specials[type];
     }
     return type;
-  }
+  };
 };
