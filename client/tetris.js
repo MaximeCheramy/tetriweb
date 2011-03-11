@@ -1,6 +1,7 @@
 goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.events');
+goog.require('goog.events.KeyHandler');
 
 goog.provide('tetriweb.Tetris');
 
@@ -60,7 +61,8 @@ tetriweb.Tetris = function(_tetrinet) {
     montimer = window.setTimeout(goog.bind(this.step, this), 1000);
 
     goog.events.removeAll(myField);
-    goog.events.listen(myField, goog.events.EventType.KEYPRESS,
+    var keyHandler = new goog.events.KeyHandler(myField);
+    goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
       goog.bind(this.keyHandler, this));
   };
 
@@ -347,11 +349,32 @@ tetriweb.Tetris = function(_tetrinet) {
 
     //console.log(tmpSpecials);
 
+    for (var i = 0; i < tmpSpecials.length &&
+          specialsQueue.length < specialCapacity; i++) {
+      for (var j = 0; j < nbLines &&
+            specialsQueue.length < specialCapacity; j++) {
+        specialsQueue.push(tmpSpecials[i]);
+      }
+    }
+    this.updateSpecialBar();
+
     // Special handling
     currentSpecialLines += nbLines;
     this.placeSpecials((currentSpecialLines / specialLines) * specialCount);
     currentSpecialLines %= specialLines;
   };
+
+  this.updateSpecialBar = function() {
+    var specialBar = goog.dom.getElement('specialbar');
+    goog.dom.removeChildren(specialBar);
+    for (var i = 0; i < specialsQueue.length; i++) {
+      var special = goog.dom.createDom('div');
+      special.className = 'block ' + this.convert(specialsQueue[i]);
+      special.style.top = 0;
+      special.style.left = i * 20 + 1;
+      goog.dom.appendChild(specialBar, special);
+    }
+  }
 
   this.placeSpecials = function(nb) {
     var availBlocks = 0;
@@ -494,6 +517,7 @@ tetriweb.Tetris = function(_tetrinet) {
    * @param {object} e L'event.
    */
   this.keyHandler = function(e) {
+    //console.log(e.keyCode);
     // TODO: Séparer en plusieurs fonctions ? Oui/Non ?
 
     // Stop la propagation de l'event.
@@ -574,6 +598,22 @@ tetriweb.Tetris = function(_tetrinet) {
       while (!pieceDropped) {
         this.step();
       }
+    }
+
+    // Envoi bonus (touches 1 à 6 haut du clavier)
+    if (e.keyCode >= 49 && e.keyCode <= 54) {
+      var playerNum = e.keyCode - 48;
+      if (tetrinet.playerExists(playerNum)) {
+        var specialName = this.convert(specialsQueue.shift()).substring(3);
+        tetrinet.sendSpecial(specialName, playerNum);
+        this.updateSpecialBar();
+      }
+    }
+
+    // Delete bonus (d)
+    if (e.keyCode == 68) {
+      specialsQueue.shift();
+      this.updateSpecialBar();
     }
 
     // Actualise la position de la piece.

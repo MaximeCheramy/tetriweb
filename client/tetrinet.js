@@ -210,11 +210,17 @@ tetriweb.Tetrinet = function() {
     this.sendMessage('sb 0 cs' + nblines + ' ' + pnum);
   };
 
+  this.sendSpecial = function(special, playerDest) {
+    this.sendMessage('sb ' + playerDest + ' ' + special + ' ' + pnum);
+  };
+
   this.initMyField = function() {
     var next = goog.dom.createDom('div', {id: 'nextpiece'});
+    var specialBar = goog.dom.createDom('div', {id: 'specialbar'});
     var field = goog.dom.createDom('div', {id: 'myfield'});
     field.setAttribute('tabindex', 1);
-    var cont = goog.dom.createDom('div', {id: 'mycontainer'}, next, field);
+    var cont = goog.dom.createDom('div', {id: 'mycontainer'},
+      next, field, specialBar);
     goog.dom.appendChild(goog.dom.getElement('fields'), cont);
   };
 
@@ -288,5 +294,9 @@ tetriweb.Tetrinet = function() {
       type = specials[type];
     }
     return type;
+  };
+
+  this.playerExists = function(playerNum) {
+    return players[playerNum] != undefined;
   };
 };
