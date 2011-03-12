@@ -18,7 +18,6 @@ tetriweb.Tetris = function(tetrinet) {
   var currentColor = null;
   var montimer = null;
   var pieceDropped = true;
-  var gameLost = false;
   var next_id = null;
   var next_o = null;
   var piecesFreq = null;
@@ -45,7 +44,7 @@ tetriweb.Tetris = function(tetrinet) {
       }
     }
 
-    gameLost = false;
+    this.gameLost_ = false;
     // fréquence des pièces
     piecesFreq = goog.array.repeat(0, 7);
     for (var i = 0; i < _piecesFreq.length; i++) {
@@ -244,48 +243,6 @@ tetriweb.Tetris = function(tetrinet) {
     this.updateGrid();
   };
 
-
-  /**
-   * Ajoute une ligne (incomplete) tout en bas de l'air de jeu.
-   */
-  this.addLine = function() {
-    for (var c = 0; c < 12; c++) {
-      if (this.gameArea_[0][c] > 0) {
-        gameLost = true;
-      }
-    }
-    if (!gameLost) {
-      var randomInt = tetriweb.Tetris.randomInt;
-      // On decale tout vers le haut.
-      for (var l = 1; l < 22; l++) {
-        for (var c = 0; c < 12; c++) {
-          this.gameArea_[l - 1][c] = this.gameArea_[l][c];
-        }
-      }
-
-      for (var c = 0; c < 12; c++) {
-        // TODO: Algo trop approximatif choisi pour sa simplicité. A recoder.
-        this.gameArea_[21][c] = randomInt(0, 5);
-      }
-      this.updateGrid();
-    }
-  };
-
-
-  /**
-   * Supprime la ligne la plus en bas de l'air de jeu.
-   */
-  this.clearLine = function() {
-    // On décale tout vers le bas.
-    for (var l = 21; l > 0; l--) {
-      for (var c = 0; c < 12; c++) {
-        this.gameArea_[l][c] = this.gameArea_[l - 1][c];
-      }
-    }
-    this.updateGrid();
-  };
-
-
   /**
    * Vérifie s'il y a des lignes completes pour les supprimer et créer des
    * bonus ou envoyer des lignes a l'adversaire.
@@ -423,7 +380,7 @@ tetriweb.Tetris = function(tetrinet) {
       currentObj.style.top = this.curY_ * 20;
     } else {
       if (this.curY_ <= 0) {
-        gameLost = true;
+        this.gameLost_ = true;
       }
 
       // On dépose les pièces
@@ -445,12 +402,12 @@ tetriweb.Tetris = function(tetrinet) {
       this.sendField_();
       this.newPiece();
     }
-    if (!gameLost) {
-      clearTimeout(montimer);
-      montimer = window.setTimeout(goog.bind(this.step, this), 1000);
-    } else {
+    if (this.gameLost_) {
       this.tetrinet_.sendPlayerlost();
       this.fillRandomly();
+    } else {
+      clearTimeout(montimer);
+      montimer = window.setTimeout(goog.bind(this.step, this), 1000);
     }
   };
 
@@ -466,7 +423,7 @@ tetriweb.Tetris = function(tetrinet) {
     e.preventDefault();
 
     // Si la partie est perdue alors on ne fait rien.
-    if (gameLost) return;
+    if (this.gameLost_) return;
 
     // Touche haut ou 8.
     if (e.keyCode == 38 || e.keyCode == 56) {
@@ -698,6 +655,52 @@ tetriweb.Tetris.randomInt = function(min, max) {
 };
 
 
+//
+// Actions
+//
+
+
+/**
+ * Ajoute une ligne (incomplete) tout en bas de l'air de jeu.
+ */
+tetriweb.Tetris.prototype.addLine = function() {
+  for (var c = 0; c < 12; c++) {
+    if (this.gameArea_[0][c] > 0) {
+      this.gameLost_ = true;
+    }
+  }
+  if (!this.gameLost_) {
+    var randomInt = tetriweb.Tetris.randomInt;
+    // On decale tout vers le haut.
+    for (var l = 1; l < 22; l++) {
+      for (var c = 0; c < 12; c++) {
+        this.gameArea_[l - 1][c] = this.gameArea_[l][c];
+      }
+    }
+
+    for (var c = 0; c < 12; c++) {
+      // TODO: Algo trop approximatif choisi pour sa simplicité. A recoder.
+      this.gameArea_[21][c] = randomInt(0, 5);
+    }
+    this.updateGrid();
+  }
+};
+
+
+/**
+ * Supprime la ligne la plus en bas de l'air de jeu.
+ */
+tetriweb.Tetris.prototype.clearLine = function() {
+  // On décale tout vers le bas.
+  for (var l = 21; l > 0; l--) {
+    for (var c = 0; c < 12; c++) {
+      this.gameArea_[l][c] = this.gameArea_[l - 1][c];
+    }
+  }
+  this.updateGrid();
+};
+
+
 /**
  * Fait tomber les blocs par gravité.
  */
@@ -791,3 +794,9 @@ tetriweb.Tetris.prototype.curY_ = 0;
  * @private
  */
 tetriweb.Tetris.prototype.myField_ = null;
+
+/**
+ * @type {boolean}
+ * @private
+ */
+tetriweb.Tetris.prototype.gameLost_ = false;
