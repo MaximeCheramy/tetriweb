@@ -89,7 +89,10 @@ tetriweb.Tetris = function(tetrinet) {
   };
 
   this.generateRandom = function() {
+    var convert = tetriweb.Tetris.convert;
+    var getColor = tetriweb.Tetris.getColor;
     var randomInt = tetriweb.Tetris.randomInt;
+
     var n = randomInt(0, 99);
     next_id = 0; // prochaine pièce
     while (n >= piecesFreq[next_id]) {
@@ -106,7 +109,7 @@ tetriweb.Tetris = function(tetrinet) {
           var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + this.convert(this.getColor(next_id));
+          bloc.className = 'block ' + convert(getColor(next_id));
           goog.dom.appendChild(nextpieceobj, bloc);
         }
       }
@@ -115,12 +118,13 @@ tetriweb.Tetris = function(tetrinet) {
 
 
   this.newPiece = function() {
+    var getColor = tetriweb.Tetris.getColor;
     // temp.
     this.curX_ = 5;
     this.curY_ = 0;
 
     current = tetriweb.Tetris.generatePiece(next_id, next_o);
-    currentColor = this.getColor(next_id);
+    currentColor = getColor(next_id);
     this.generateRandom();
 
     // Remonte un peu l'objet si commence par du vide.
@@ -149,6 +153,8 @@ tetriweb.Tetris = function(tetrinet) {
   };
 
   this.updatePiece = function() {
+    var convert = tetriweb.Tetris.convert;
+
     currentObj = goog.dom.createDom('div', {class: 'piece'});
     currentObj.style.top = this.curY_ * 20;
     currentObj.style.left = this.curX_ * 20;
@@ -159,53 +165,20 @@ tetriweb.Tetris = function(tetrinet) {
           var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + this.convert(currentColor);
+          bloc.className = 'block ' + convert(currentColor);
           goog.dom.appendChild(currentObj, bloc);
         }
       }
     }
   };
 
-  this.convert = function(color) {
-    switch (color) {
-      case 0: return 'empty';
-      case 1: return 'blue';//return '#0000FF'; // bleu
-      case 2: return 'yellow';//return '#FFFF00'; // jaune
-      case 3: return 'green';//return '#00FF00'; // vert
-      case 4: return 'purple';//return '#800080'; // violet
-      case 5: return 'red';//return '#FF0000'; // rouge
-      case 6: return 'sb-a';
-      case 7: return 'sb-c';
-      case 8: return 'sb-n';
-      case 9: return 'sb-r';
-      case 10: return 'sb-s';
-      case 11: return 'sb-b';
-      case 12: return 'sb-g';
-      case 13: return 'sb-q';
-      case 14: return 'sb-o';
-      default: alert('unknown block ' + typeof(color) + ' ' + color);
-    }
-  };
-
-  this.getColor = function(id) {
-    switch (id) {
-      case 0: return 1; // barre : bleu
-      case 1: return 2; // carré : jaune
-      case 2: return 3; // L gauche : vert
-      case 3: return 4; // L droite : violet
-      case 4: return 5; // Z : rouge
-      case 5: return 1; // Z inversé : bleu
-      case 6: return 2; // T : jaune
-      default: return id;
-    }
-  };
-
-
   /**
    * Met a jour graphiquement la grille a partir de la representation interne
    * du jeu.
    */
   this.updateGrid = function() {
+    var convert = tetriweb.Tetris.convert;
+
     var fieldContent = goog.array.clone(this.myField_.childNodes);
     goog.array.forEach(fieldContent, function(n) {
       if (n != currentObj) {
@@ -220,7 +193,7 @@ tetriweb.Tetris = function(tetrinet) {
           var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + this.convert(this.gameArea_[l][c]);
+          bloc.className = 'block ' + convert(this.gameArea_[l][c]);
           this.myField_.appendChild(bloc);
         }
       }
@@ -229,19 +202,6 @@ tetriweb.Tetris = function(tetrinet) {
     this.sendField_();
   };
 
-
-  /**
-   * Rempli la grille de cases aléatoires. Utilisé lors d'une partie perdue.
-   */
-  this.fillRandomly = function() {
-    var randomInt = tetriweb.Tetris.randomInt;
-    for (var l = 0; l < 22; l++) {
-      for (var c = 0; c < 12; c++) {
-        this.gameArea_[l][c] = randomInt(1, 5);
-      }
-    }
-    this.updateGrid();
-  };
 
   /**
    * Vérifie s'il y a des lignes completes pour les supprimer et créer des
@@ -273,7 +233,7 @@ tetriweb.Tetris = function(tetrinet) {
         }
       }
     }
-    this.updateGrid();
+   this.updateGrid();
     if (nbLines == 4) {
       this.tetrinet_.sendLines(nbLines);
     } else if (nbLines > 1) {
@@ -302,11 +262,13 @@ tetriweb.Tetris = function(tetrinet) {
    * TODO: Comment.
    */
   this.updateSpecialBar = function() {
+    var convert = tetriweb.Tetris.convert;
+
     var specialBar = goog.dom.getElement('specialbar');
     goog.dom.removeChildren(specialBar);
     for (var i = 0; i < specialsQueue.length; i++) {
       var special = goog.dom.createDom('div');
-      special.className = 'block ' + this.convert(specialsQueue[i]);
+      special.className = 'block ' + convert(specialsQueue[i]);
       special.style.top = 0;
       special.style.left = i * 20 + 1;
       goog.dom.appendChild(specialBar, special);
@@ -379,6 +341,8 @@ tetriweb.Tetris = function(tetrinet) {
       this.curY_++;
       currentObj.style.top = this.curY_ * 20;
     } else {
+      var convert = tetriweb.Tetris.convert;
+
       if (this.curY_ <= 0) {
         this.gameLost_ = true;
       }
@@ -391,7 +355,7 @@ tetriweb.Tetris = function(tetrinet) {
             var bloc = goog.dom.createDom('div');
             bloc.style.top = (this.curY_ + l) * 20 + 1;
             bloc.style.left = (this.curX_ + c) * 20 + 1;
-            bloc.className = 'block ' + this.convert(currentColor);
+            bloc.className = 'block ' + convert(currentColor);
             goog.dom.appendChild(this.myField_, bloc);
           }
         }
@@ -404,7 +368,7 @@ tetriweb.Tetris = function(tetrinet) {
     }
     if (this.gameLost_) {
       this.tetrinet_.sendPlayerlost();
-      this.fillRandomly();
+      this.fillRandomly_();
     } else {
       clearTimeout(montimer);
       montimer = window.setTimeout(goog.bind(this.step, this), 1000);
@@ -513,9 +477,10 @@ tetriweb.Tetris = function(tetrinet) {
 
     // Envoi bonus (touches 1 à 6 haut du clavier)
     if (e.keyCode >= 49 && e.keyCode <= 54) {
+      var convert = tetriweb.Tetris.convert;
       var playerNum = e.keyCode - 48;
       if (this.tetrinet_.playerExists(playerNum)) {
-        var specialName = this.convert(specialsQueue.shift()).substring(3);
+        var specialName = convert(specialsQueue.shift()).substring(3);
         this.tetrinet_.sendSpecial(specialName, playerNum);
         this.updateSpecialBar();
       }
@@ -655,6 +620,43 @@ tetriweb.Tetris.randomInt = function(min, max) {
 };
 
 
+tetriweb.Tetris.convert = function(color) {
+  switch (color) {
+    case 0: return 'empty';
+    case 1: return 'blue';//return '#0000FF'; // bleu
+    case 2: return 'yellow';//return '#FFFF00'; // jaune
+    case 3: return 'green';//return '#00FF00'; // vert
+    case 4: return 'purple';//return '#800080'; // violet
+    case 5: return 'red';//return '#FF0000'; // rouge
+    case 6: return 'sb-a';
+    case 7: return 'sb-c';
+    case 8: return 'sb-n';
+    case 9: return 'sb-r';
+    case 10: return 'sb-s';
+    case 11: return 'sb-b';
+    case 12: return 'sb-g';
+    case 13: return 'sb-q';
+    case 14: return 'sb-o';
+    default: alert('unknown block ' + typeof(color) + ' ' + color);
+  }
+};
+
+tetriweb.Tetris.getColor = function(id) {
+  switch (id) {
+    case 0: return 1; // barre : bleu
+    case 1: return 2; // carré : jaune
+    case 2: return 3; // L gauche : vert
+    case 3: return 4; // L droite : violet
+    case 4: return 5; // Z : rouge
+    case 5: return 1; // Z inversé : bleu
+    case 6: return 2; // T : jaune
+    default: return id;
+  }
+};
+
+
+
+
 //
 // Actions
 //
@@ -727,8 +729,27 @@ tetriweb.Tetris.prototype.blockGravity = function() {
 };
 
 
+
+
+
+/**
+ * Rempli la grille de cases aléatoires. Utilisé lors d'une partie perdue.
+ * @private
+ */
+tetriweb.Tetris.prototype.fillRandomly_ = function() {
+  var randomInt = tetriweb.Tetris.randomInt;
+  for (var l = 0; l < 22; l++) {
+    for (var c = 0; c < 12; c++) {
+      this.gameArea_[l][c] = randomInt(1, 5);
+    }
+  }
+  this.updateGrid();
+};
+
+
 /**
  * Fonction qui permet l'envoie au serveur tetrinet de la grille de jeu.
+ * @private
  */
 tetriweb.Tetris.prototype.sendField_ = function() {
   // Si c'est le premier appel.
