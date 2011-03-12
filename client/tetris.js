@@ -29,6 +29,8 @@ tetriweb.Tetris = function(tetrinet) {
   var next_o = null;
   var tetrinet_ = null;
   var oldField = null;
+  var piecesFreq = null;
+  var specialsFreq = null;
   var specialLines = null;
   var specialCount = null;
   var specialCapacity = null;
@@ -40,7 +42,7 @@ tetriweb.Tetris = function(tetrinet) {
 
   // TODO: Deplacer les fonctions vers tetriweb.Tetris.fonction et en dehors du
   // constructeur.
-  this.init = function(_specialLines, _specialCount, _specialCapacity) {
+  this.init = function(_specialLines, _specialCount, _specialCapacity, _piecesFreq, _specialsFreq) {
     // init the game area : all empty.
     for (var l = 0; l < 22; l++) {
       gameArea[l] = new Array(12);
@@ -50,6 +52,17 @@ tetriweb.Tetris = function(tetrinet) {
     }
 
     gameLost = false;
+    // fréquence des pièces
+    piecesFreq = goog.array.repeat(0, 7);
+    for (var i = 0; i < _piecesFreq.length; i++) {
+      piecesFreq[parseInt(_piecesFreq[i]) - 1]++;
+    }
+    var n = 0;
+    for (var i = 0; i < 7; i++) {
+      n += piecesFreq[i];
+      piecesFreq[i] = n;
+    }
+    //console.log(piecesFreq);
     specialLines = _specialLines;
     specialCount = _specialCount;
     specialCapacity = _specialCapacity;
@@ -70,8 +83,12 @@ tetriweb.Tetris = function(tetrinet) {
   };
 
   this.generateRandom = function() {
-    next_id = Math.floor(Math.random() * 7);
-    next_o = Math.floor(Math.random() * 4);
+    var n = Math.floor(Math.random() * 99);
+    next_id = 0; // prochaine pièce
+    while (n >= piecesFreq[next_id]) {
+      next_id++;
+    }
+    next_o = Math.floor(Math.random() * 4); // orientation de la pièce
 
     var nextpiece = this.generatePiece(next_id, next_o);
     var nextpieceobj = goog.dom.getElement('nextpiece');

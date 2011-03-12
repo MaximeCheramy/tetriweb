@@ -118,11 +118,12 @@ tetriweb.Tetrinet = function() {
           }
           break;
         case 'newgame':
+          //console.log(msg);
           message = '*** La partie a débuté';
           /*for (player_id in players) {
             this.clearField(player_id);
           }*/
-          tetris.init(data[5], data[6], data[7]);
+          tetris.init(data[5], data[6], data[7], data[8], data[9]);
           break;
         case 'endgame':
           message = '*** La partie est terminée';
