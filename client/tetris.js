@@ -13,13 +13,9 @@ goog.provide('tetriweb.Tetris');
 tetriweb.Tetris = function(tetrinet) {
   // TODO: Les variables locales devraient etre def en dehors du constructeur
   // sous la forme: tetriweb.Tetris.variable_.
-  var current = null;
   var currentObj = null;
-  var currentColor = null;
   var montimer = null;
   var pieceDropped = true;
-  var next_id = null;
-  var next_o = null;
   var piecesFreq = null;
   var specialsFreq = null;
   var specialLines = null;
@@ -79,7 +75,7 @@ tetriweb.Tetris = function(tetrinet) {
 
     this.updateGrid();
     this.generateRandom();
-    this.newPiece();
+    this.newPiece_();
     montimer = window.setTimeout(goog.bind(this.step, this), 1000);
 
     goog.events.removeAll(this.myField_);
@@ -94,13 +90,13 @@ tetriweb.Tetris = function(tetrinet) {
     var randomInt = tetriweb.Tetris.randomInt;
 
     var n = randomInt(0, 99);
-    next_id = 0; // prochaine pièce
-    while (n >= piecesFreq[next_id]) {
-      next_id++;
+    this.nextId_ = 0; // prochaine pièce
+    while (n >= piecesFreq[this.nextId_]) {
+      this.nextId_++;
     }
-    next_o = randomInt(0, 3); // orientation de la pièce
+    this.nextDirection_ = randomInt(0, 3); // orientation de la pièce
 
-    var nextpiece = tetriweb.Tetris.generatePiece(next_id, next_o);
+    var nextpiece = tetriweb.Tetris.generatePiece(this.nextId_, this.nextDirection_);
     var nextpieceobj = goog.dom.getElement('nextpiece');
     goog.dom.removeChildren(nextpieceobj);
     for (var l = 0; l < 4; l++) {
@@ -109,7 +105,7 @@ tetriweb.Tetris = function(tetrinet) {
           var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + convert(getColor(next_id));
+          bloc.className = 'block ' + convert(getColor(this.nextId_));
           goog.dom.appendChild(nextpieceobj, bloc);
         }
       }
@@ -117,31 +113,7 @@ tetriweb.Tetris = function(tetrinet) {
   };
 
 
-  this.newPiece = function() {
-    var getColor = tetriweb.Tetris.getColor;
-    // temp.
-    this.curX_ = 5;
-    this.curY_ = 0;
 
-    current = tetriweb.Tetris.generatePiece(next_id, next_o);
-    currentColor = getColor(next_id);
-    this.generateRandom();
-
-    // Remonte un peu l'objet si commence par du vide.
-    for (var l = 0; l < 4; l++) {
-      var vide = true;
-      for (var c = 0; c < 4; c++) {
-        vide = vide && !current[l][c];
-      }
-      if (vide) {
-        this.curY_--;
-      } else {
-        break;
-      }
-    }
-
-    this.updatePiece();
-  };
 
   this.nukeField = function() {
     for (var l = 0; l < 22; l++) {
@@ -161,11 +133,11 @@ tetriweb.Tetris = function(tetrinet) {
     goog.dom.appendChild(this.myField_, currentObj);
     for (var l = 0; l < 4; l++) {
       for (var c = 0; c < 4; c++) {
-        if (current[l][c]) {
+        if (this.current_[l][c]) {
           var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + convert(currentColor);
+          bloc.className = 'block ' + convert(this.currentColor_);
           goog.dom.appendChild(currentObj, bloc);
         }
       }
@@ -330,7 +302,7 @@ tetriweb.Tetris = function(tetrinet) {
     var stop = false;
     for (var l = 0; l < 4 && !stop; l++) {
       for (var c = 0; c < 4 && !stop; c++) {
-        if (current[l][c]) {
+        if (this.current_[l][c]) {
           if (l + this.curY_ + 1 >= 22 || this.gameArea_[l + this.curY_ + 1][c + this.curX_] > 0) {
             stop = true;
           }
@@ -350,12 +322,12 @@ tetriweb.Tetris = function(tetrinet) {
       // On dépose les pièces
       for (var l = 0; l < 4; l++) {
         for (var c = 0; c < 4; c++) {
-          if (current[l][c]) {
-            this.gameArea_[l + this.curY_][c + this.curX_] = currentColor;
+          if (this.current_[l][c]) {
+            this.gameArea_[l + this.curY_][c + this.curX_] = this.currentColor_;
             var bloc = goog.dom.createDom('div');
             bloc.style.top = (this.curY_ + l) * 20 + 1;
             bloc.style.left = (this.curX_ + c) * 20 + 1;
-            bloc.className = 'block ' + convert(currentColor);
+            bloc.className = 'block ' + convert(this.currentColor_);
             goog.dom.appendChild(this.myField_, bloc);
           }
         }
@@ -364,7 +336,7 @@ tetriweb.Tetris = function(tetrinet) {
       pieceDropped = true;
       this.checkLine();
       this.sendField_();
-      this.newPiece();
+      this.newPiece_();
     }
     if (this.gameLost_) {
       this.tetrinet_.sendPlayerlost();
@@ -391,7 +363,7 @@ tetriweb.Tetris = function(tetrinet) {
 
     // Touche haut ou 8.
     if (e.keyCode == 38 || e.keyCode == 56) {
-      piece = tetriweb.Tetris.rotate_(current);
+      piece = tetriweb.Tetris.rotate_(this.current_);
 
       // verifie si new ok.
       var ok = false;
@@ -419,7 +391,7 @@ tetriweb.Tetris = function(tetrinet) {
 
       if (ok) {
         this.curX_ += delta_x[dx];
-        current = piece;
+        this.current_ = piece;
         goog.dom.removeNode(currentObj);
         this.updatePiece();
       }
@@ -430,7 +402,7 @@ tetriweb.Tetris = function(tetrinet) {
       var ok = true;
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
-          if (current[l][c]) {
+          if (this.current_[l][c]) {
             if (c + this.curX_ + 1 >= 12 ||
                 this.gameArea_[l + this.curY_][c + this.curX_ + 1] > 0) {
               ok = false;
@@ -448,7 +420,7 @@ tetriweb.Tetris = function(tetrinet) {
       var ok = true;
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
-          if (current[l][c]) {
+          if (this.current_[l][c]) {
             if (c + this.curX_ - 1 < 0 ||
                 this.gameArea_[l + this.curY_][c + this.curX_ - 1] > 0) {
               ok = false;
@@ -756,6 +728,36 @@ tetriweb.Tetris.prototype.fillRandomly_ = function() {
   this.updateGrid();
 };
 
+/**
+ * Genere une nouvelle piece.
+ * @private
+ */
+tetriweb.Tetris.prototype.newPiece_ = function() {
+  var getColor = tetriweb.Tetris.getColor;
+  // temp.
+  this.curX_ = 5;
+  this.curY_ = 0;
+
+  this.current_ = tetriweb.Tetris.generatePiece(this.nextId_, this.nextDirection_);
+  this.currentColor_ = getColor(this.nextId_);
+  this.generateRandom();
+
+  // Remonte un peu l'objet si commence par du vide.
+  for (var l = 0; l < 4; l++) {
+    var vide = true;
+    for (var c = 0; c < 4; c++) {
+      vide = vide && !this.current_[l][c];
+    }
+    if (vide) {
+      this.curY_--;
+    } else {
+      break;
+    }
+  }
+
+  this.updatePiece();
+};
+
 
 /**
  * Fonction qui permet l'envoie au serveur tetrinet de la grille de jeu.
@@ -821,10 +823,36 @@ tetriweb.Tetris.prototype.curY_ = 0;
 
 
 /**
+ * TODO
+ * @private
+ */
+tetriweb.Tetris.prototype.current_ = null;
+
+
+/**
+ * TODO
+ * @private
+ */
+tetriweb.Tetris.prototype.currentColor_ = null;
+
+
+/**
  * @type {object}
  * @private
  */
 tetriweb.Tetris.prototype.myField_ = null;
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.nextId_ = null;
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.nextDirection_ = null;
 
 /**
  * @type {boolean}
