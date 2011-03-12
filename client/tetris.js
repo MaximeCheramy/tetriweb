@@ -37,7 +37,8 @@ tetriweb.Tetris = function(tetrinet) {
 
   // TODO: Deplacer les fonctions vers tetriweb.Tetris.fonction et en dehors du
   // constructeur.
-  this.init = function(_specialLines, _specialCount, _specialCapacity, _piecesFreq, _specialsFreq) {
+  this.init = function(
+      _specialLines, _specialCount, _specialCapacity, _piecesFreq, _specialsFreq) {
     // init the game area : all empty.
     for (var l = 0; l < 22; l++) {
       this.gameArea_[l] = new Array(12);
@@ -603,7 +604,7 @@ tetriweb.Tetris = function(tetrinet) {
     // Touche haut ou 8.
     if (e.keyCode == 38 || e.keyCode == 56) {
       piece = this.rotate(current);
-      
+
       // verifie si new ok.
       var ok = false;
       // TODO: visiblement 2 ne sert jamais, et 3 que pour les linebar.
@@ -660,7 +661,8 @@ tetriweb.Tetris = function(tetrinet) {
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
           if (current[l][c]) {
-            if (c + this.curX_ - 1 < 0 || this.gameArea_[l + this.curY_][c + this.curX_ - 1] > 0) {
+            if (c + this.curX_ - 1 < 0 ||
+                this.gameArea_[l + this.curY_][c + this.curX_ - 1] > 0) {
               ok = false;
             }
           }
@@ -758,11 +760,11 @@ tetriweb.Tetris = function(tetrinet) {
  * Génération d'un entier pseudo-aléatoire appartenant à [|min, max|]
  * @param {number} min Borne inferieure.
  * @param {number} max Borne superieure.
+ * @return {number} Un nombre entre min et max compris.
  */
 tetriweb.Tetris.randomInt = function(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
+};
 
 
 /**
