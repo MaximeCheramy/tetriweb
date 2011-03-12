@@ -5,8 +5,6 @@ goog.require('goog.events.KeyHandler');
 
 goog.provide('tetriweb.Tetris');
 
-
-
 /**
  * Tetris.
  * @param {object} tetrinet L'objet tetrinet.
@@ -15,7 +13,6 @@ goog.provide('tetriweb.Tetris');
 tetriweb.Tetris = function(tetrinet) {
   // TODO: Les variables locales devraient etre def en dehors du constructeur
   // sous la forme: tetriweb.Tetris.variable_.
-  var gameArea = new Array(22);
   var myField = null;
   var cur_x = 6;
   var cur_y = 0;
@@ -39,15 +36,16 @@ tetriweb.Tetris = function(tetrinet) {
 
   tetrinet_ = tetrinet;
   tetrinet_.tetris = this;
+  this.gameArea_ = new Array(22);
 
   // TODO: Deplacer les fonctions vers tetriweb.Tetris.fonction et en dehors du
   // constructeur.
   this.init = function(_specialLines, _specialCount, _specialCapacity, _piecesFreq, _specialsFreq) {
     // init the game area : all empty.
     for (var l = 0; l < 22; l++) {
-      gameArea[l] = new Array(12);
+      this.gameArea_[l] = new Array(12);
       for (var c = 0; c < 12; c++) {
-        gameArea[l][c] = 0;
+        this.gameArea_[l][c] = 0;
       }
     }
 
@@ -96,12 +94,13 @@ tetriweb.Tetris = function(tetrinet) {
   };
 
   this.generateRandom = function() {
-    var n = this.randomInt(0, 99);
+    var randomInt = tetriweb.Tetris.randomInt;
+    var n = randomInt(0, 99);
     next_id = 0; // prochaine pièce
     while (n >= piecesFreq[next_id]) {
       next_id++;
     }
-    next_o = this.randomInt(0, 3); // orientation de la pièce
+    next_o = randomInt(0, 3); // orientation de la pièce
 
     var nextpiece = this.generatePiece(next_id, next_o);
     var nextpieceobj = goog.dom.getElement('nextpiece');
@@ -203,7 +202,7 @@ tetriweb.Tetris = function(tetrinet) {
   this.nukeField = function() {
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
-        gameArea[l][c] = 0;
+        this.gameArea_[l][c] = 0;
       }
     }
     this.updateGrid();
@@ -277,11 +276,11 @@ tetriweb.Tetris = function(tetrinet) {
     // On reconstruit
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
-        if (gameArea[l][c] > 0) {
+        if (this.gameArea_[l][c] > 0) {
           var bloc = goog.dom.createDom('div');
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + this.convert(gameArea[l][c]);
+          bloc.className = 'block ' + this.convert(this.gameArea_[l][c]);
           myField.appendChild(bloc);
         }
       }
@@ -295,9 +294,10 @@ tetriweb.Tetris = function(tetrinet) {
    * Rempli la grille de cases aléatoires. Utilisé lors d'une partie perdue.
    */
   this.fillRandomly = function() {
+    var randomInt = tetriweb.Tetris.randomInt;
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
-        gameArea[l][c] = this.randomInt(1, 5);
+        this.gameArea_[l][c] = randomInt(1, 5);
       }
     }
     this.updateGrid();
@@ -309,21 +309,22 @@ tetriweb.Tetris = function(tetrinet) {
    */
   this.addLine = function() {
     for (var c = 0; c < 12; c++) {
-      if (gameArea[0][c] > 0) {
+      if (this.gameArea_[0][c] > 0) {
         gameLost = true;
       }
     }
     if (!gameLost) {
+      var randomInt = tetriweb.Tetris.randomInt;
       // On decale tout vers le haut.
       for (var l = 1; l < 22; l++) {
         for (var c = 0; c < 12; c++) {
-          gameArea[l - 1][c] = gameArea[l][c];
+          this.gameArea_[l - 1][c] = this.gameArea_[l][c];
         }
       }
 
       for (var c = 0; c < 12; c++) {
         // TODO: Algo trop approximatif choisi pour sa simplicité. A recoder.
-        gameArea[21][c] = this.randomInt(0, 5);
+        this.gameArea_[21][c] = randomInt(0, 5);
       }
       this.updateGrid();
     }
@@ -337,7 +338,7 @@ tetriweb.Tetris = function(tetrinet) {
     // On décale tout vers le bas.
     for (var l = 21; l > 0; l--) {
       for (var c = 0; c < 12; c++) {
-        gameArea[l][c] = gameArea[l - 1][c];
+        this.gameArea_[l][c] = this.gameArea_[l - 1][c];
       }
     }
     this.updateGrid();
@@ -351,9 +352,9 @@ tetriweb.Tetris = function(tetrinet) {
     for (var l = 20; l >= 0; l--) {
       var g = false;
       for (var c = 0; c < 12; c++) {
-        if (gameArea[l][c] > 0 && gameArea[l + 1][c] == 0) {
-          gameArea[l + 1][c] = gameArea[l][c];
-          gameArea[l][c] = 0;
+        if (this.gameArea_[l][c] > 0 && this.gameArea_[l + 1][c] == 0) {
+          this.gameArea_[l + 1][c] = this.gameArea_[l][c];
+          this.gameArea_[l][c] = 0;
           g = true;
         }
       }
@@ -380,23 +381,23 @@ tetriweb.Tetris = function(tetrinet) {
     for (var l = 0; l < 22; l++) {
       var tetris = true;
       for (var c = 0; c < 12; c++) {
-        tetris = tetris && (gameArea[l][c] > 0);
+        tetris = tetris && (this.gameArea_[l][c] > 0);
       }
       if (tetris) {
         nbLines++;
         // Take specials
         for (var c = 0; c < 12; c++) {
-          if (gameArea[l][c] > 5) {
-            tmpSpecials.push(gameArea[l][c]);
+          if (this.gameArea_[l][c] > 5) {
+            tmpSpecials.push(this.gameArea_[l][c]);
           }
         }
         for (var ll = l; ll > 0; ll--) {
           for (var c = 0; c < 12; c++) {
-            gameArea[ll][c] = gameArea[ll - 1][c];
+            this.gameArea_[ll][c] = this.gameArea_[ll - 1][c];
           }
         }
         for (var c = 0; c < 12; c++) {
-          gameArea[0][c] = 0;
+          this.gameArea_[0][c] = 0;
         }
       }
     }
@@ -445,10 +446,11 @@ tetriweb.Tetris = function(tetrinet) {
    * TODO: Comment.
    */
   this.placeSpecials = function(nb) {
+    var randomInt = tetriweb.Tetris.randomInt;
     var availBlocks = 0;
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
-        if (gameArea[l][c] > 0 && gameArea[l][c] <= 5) {
+        if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
           availBlocks++;
         }
       }
@@ -459,19 +461,19 @@ tetriweb.Tetris = function(tetrinet) {
     //console.log('blocksToPlace : ' + blocksToPlace);
 
     for (var i = 0; i < blocksToPlace; i++) {
-      var n = this.randomInt(0, 99);
+      var n = randomInt(0, 99);
       var special = 0;
       while (n >= specialsFreq[special]) {
         special++;
       }
       special += 6;
-      var place = this.randomInt(0, availBlocks - i - 1);
+      var place = randomInt(0, availBlocks - i - 1);
       //console.log('place : ' + place);
       for (var l = 0; place >= 0 && l < 22; l++) {
         for (var c = 0; place >= 0 && c < 12; c++) {
-          if (gameArea[l][c] > 0 && gameArea[l][c] <= 5) {
+          if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
             if (place == 0) {
-              gameArea[l][c] = special;
+              this.gameArea_[l][c] = special;
             }
             place--;
           }
@@ -495,9 +497,9 @@ tetriweb.Tetris = function(tetrinet) {
             current[l - cur_y][c - cur_x]) {
           debug.innerHTML += '#';
         } else {
-          if (gameArea[l][c] > 0)
+          if (this.gameArea_[l][c] > 0)
             debug.innerHTML += ' ';
-          debug.innerHTML += gameArea[l][c];
+          debug.innerHTML += this.gameArea_[l][c];
         }
       }
       debug.innerHTML += '<br/>';
@@ -521,14 +523,14 @@ tetriweb.Tetris = function(tetrinet) {
     }
 
     // On envoie la nouvelle grille.
-    tetrinet_.sendField(gameArea, oldField);
+    tetrinet_.sendField(this.gameArea_, oldField);
 
     // Copie de la grille actuelle.
     oldField = new Array(22);
     for (var l = 0; l < 22; l++) {
       oldField[l] = new Array(12);
       for (var c = 0; c < 12; c++) {
-        oldField[l][c] = gameArea[l][c];
+        oldField[l][c] = this.gameArea_[l][c];
       }
     }
   };
@@ -545,7 +547,7 @@ tetriweb.Tetris = function(tetrinet) {
     for (var l = 0; l < 4 && !stop; l++) {
       for (var c = 0; c < 4 && !stop; c++) {
         if (current[l][c]) {
-          if (l + cur_y + 1 >= 22 || gameArea[l + cur_y + 1][c + cur_x] > 0) {
+          if (l + cur_y + 1 >= 22 || this.gameArea_[l + cur_y + 1][c + cur_x] > 0) {
             stop = true;
           }
         }
@@ -563,7 +565,7 @@ tetriweb.Tetris = function(tetrinet) {
       for (var l = 0; l < 4; l++) {
         for (var c = 0; c < 4; c++) {
           if (current[l][c]) {
-            gameArea[l + cur_y][c + cur_x] = currentColor;
+            this.gameArea_[l + cur_y][c + cur_x] = currentColor;
             var bloc = goog.dom.createDom('div');
             bloc.style.top = (cur_y + l) * 20 + 1;
             bloc.style.left = (cur_x + c) * 20 + 1;
@@ -621,7 +623,7 @@ tetriweb.Tetris = function(tetrinet) {
                    (cur_x + delta_x[dx] + c) < 12 &&
                    (cur_y + l) >= 0 &&
                    (cur_y + l) < 22 &&
-                   gameArea[cur_y + l][cur_x + delta_x[dx] + c] == 0;
+                   this.gameArea_[cur_y + l][cur_x + delta_x[dx] + c] == 0;
             }
           }
         }
@@ -644,7 +646,7 @@ tetriweb.Tetris = function(tetrinet) {
         for (var c = 0; c < 4 && ok; c++) {
           if (current[l][c]) {
             if (c + cur_x + 1 >= 12 ||
-                gameArea[l + cur_y][c + cur_x + 1] > 0) {
+                this.gameArea_[l + cur_y][c + cur_x + 1] > 0) {
               ok = false;
             }
           }
@@ -661,7 +663,7 @@ tetriweb.Tetris = function(tetrinet) {
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
           if (current[l][c]) {
-            if (c + cur_x - 1 < 0 || gameArea[l + cur_y][c + cur_x - 1] > 0) {
+            if (c + cur_x - 1 < 0 || this.gameArea_[l + cur_y][c + cur_x - 1] > 0) {
               ok = false;
             }
           }
@@ -752,10 +754,22 @@ tetriweb.Tetris = function(tetrinet) {
     return npiece;
   };
 
-  /**
-   * Génération d'un entier pseudo-aléatoire appartenant à [|min, max|]
-   */
-  this.randomInt = function(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
 };
+
+
+/**
+ * Génération d'un entier pseudo-aléatoire appartenant à [|min, max|]
+ * @param {number} min Borne inferieure.
+ * @param {number} max Borne superieure.
+ */
+tetriweb.Tetris.randomInt = function(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * @type {Array<Array<number>>}
+ * @private
+ */
+tetriweb.Tetris.prototype.gameArea_ = null;
+
+
