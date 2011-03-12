@@ -62,7 +62,20 @@ tetriweb.Tetris = function(tetrinet) {
       n += piecesFreq[i];
       piecesFreq[i] = n;
     }
-    //console.log(piecesFreq);
+    console.log(piecesFreq);
+
+    // fréquence des specials
+    specialsFreq = goog.array.repeat(0, 9);
+    for (var i = 0; i < _specialsFreq.length; i++) {
+      specialsFreq[parseInt(_specialsFreq[i]) - 1]++;
+    }
+    n = 0;
+    for (var i = 0; i < 9; i++) {
+      n += specialsFreq[i];
+      specialsFreq[i] = n;
+    }
+    //console.log(specialsFreq);
+
     specialLines = _specialLines;
     specialCount = _specialCount;
     specialCapacity = _specialCapacity;
@@ -83,12 +96,12 @@ tetriweb.Tetris = function(tetrinet) {
   };
 
   this.generateRandom = function() {
-    var n = Math.floor(Math.random() * 99);
+    var n = this.randomInt(0, 99);
     next_id = 0; // prochaine pièce
     while (n >= piecesFreq[next_id]) {
       next_id++;
     }
-    next_o = Math.floor(Math.random() * 4); // orientation de la pièce
+    next_o = this.randomInt(0, 3); // orientation de la pièce
 
     var nextpiece = this.generatePiece(next_id, next_o);
     var nextpieceobj = goog.dom.getElement('nextpiece');
@@ -284,7 +297,7 @@ tetriweb.Tetris = function(tetrinet) {
   this.fillRandomly = function() {
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
-        gameArea[l][c] = Math.ceil(Math.random() * 5);
+        gameArea[l][c] = this.randomInt(1, 5);
       }
     }
     this.updateGrid();
@@ -310,7 +323,7 @@ tetriweb.Tetris = function(tetrinet) {
 
       for (var c = 0; c < 12; c++) {
         // TODO: Algo trop approximatif choisi pour sa simplicité. A recoder.
-        gameArea[21][c] = Math.floor(Math.random() * 6);
+        gameArea[21][c] = this.randomInt(0, 5);
       }
       this.updateGrid();
     }
@@ -446,8 +459,13 @@ tetriweb.Tetris = function(tetrinet) {
     //console.log('blocksToPlace : ' + blocksToPlace);
 
     for (var i = 0; i < blocksToPlace; i++) {
-      var special = Math.round(Math.random() * 8) + 6;
-      var place = Math.round(Math.random() * (availBlocks - i - 1));
+      var n = this.randomInt(0, 99);
+      var special = 0;
+      while (n >= specialsFreq[special]) {
+        special++;
+      }
+      special += 6;
+      var place = this.randomInt(0, availBlocks - i - 1);
       //console.log('place : ' + place);
       for (var l = 0; place >= 0 && l < 22; l++) {
         for (var c = 0; place >= 0 && c < 12; c++) {
@@ -722,4 +740,11 @@ tetriweb.Tetris = function(tetrinet) {
     // Retourne la nouvelle piece.
     return npiece;
   };
+
+  /**
+   * Génération d'un entier pseudo-aléatoire appartenant à [|min, max|]
+   */
+  this.randomInt = function(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 };
