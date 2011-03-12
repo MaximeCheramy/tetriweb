@@ -427,26 +427,6 @@ tetriweb.Tetris = function(tetrinet) {
     }
   };
 
-  this.printDebug = function() {
-    // Debug !
-    var debug = goog.dom.getElement('debug');
-    debug.innerHTML = '';
-    for (var l = 0; l < 22; l++) {
-      for (var c = 0; c < 12; c++) {
-        if (l >= this.curY_ && l < this.curY_ + 4 &&
-            c >= this.curX_ && c < this.curX_ + 4 &&
-            current[l - this.curY_][c - this.curX_]) {
-          debug.innerHTML += '#';
-        } else {
-          if (this.gameArea_[l][c] > 0)
-            debug.innerHTML += ' ';
-          debug.innerHTML += this.gameArea_[l][c];
-        }
-      }
-      debug.innerHTML += '<br/>';
-    }
-  };
-
 
   /**
    * Fonction qui permet l'envoie au serveur this.tetrinet_ de la grille de jeu.
@@ -482,7 +462,6 @@ tetriweb.Tetris = function(tetrinet) {
    */
   this.step = function() {
     //TODO: Commenter le workflow du moteur de jeu.
-    //this.printDebug();
 
     var stop = false;
     for (var l = 0; l < 4 && !stop; l++) {
