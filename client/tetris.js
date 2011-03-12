@@ -165,7 +165,7 @@ tetriweb.Tetris = function(tetrinet) {
     }
 
     while (orientation > 0) {
-      piece = this.rotate(piece);
+      piece = tetriweb.Tetris.rotate(piece);
       orientation--;
     }
 
@@ -603,7 +603,7 @@ tetriweb.Tetris = function(tetrinet) {
 
     // Touche haut ou 8.
     if (e.keyCode == 38 || e.keyCode == 56) {
-      piece = this.rotate(current);
+      piece = tetriweb.Tetris.rotate(current);
 
       // verifie si new ok.
       var ok = false;
@@ -707,52 +707,53 @@ tetriweb.Tetris = function(tetrinet) {
     currentObj.style.left = this.curX_ * 20;
   };
 
-  /**
-   * Rotation d'une piece de 90° dans le sens horaire.
-   * @param {Array.<Array<number>>} piece La piece que l'on veut faire pivoter.
-   * @return {Array.<Array<number>>} La piece retournée.
-   */
-  this.rotate = function(piece) {
-    // Rotation de la piece.
-    var npiece = new Array(4);
-    for (var l = 0; l < 4; l++) {
-      npiece[l] = new Array(4);
+};
+
+
+/**
+ * Rotation d'une piece de 90° dans le sens horaire.
+ * @param {Array.<Array<number>>} piece La piece que l'on veut faire pivoter.
+ * @return {Array.<Array<number>>} La piece retournée.
+ */
+tetriweb.Tetris.rotate = function(piece) {
+  // Rotation de la piece.
+  var npiece = new Array(4);
+  for (var l = 0; l < 4; l++) {
+    npiece[l] = new Array(4);
+    for (var c = 0; c < 4; c++) {
+      npiece[l][c] = piece[3 - c][l];
+    }
+  }
+
+  // Deplacement de la piece en haut a gauche.
+  var done_t = false, done_l = false;
+  do {
+    done_t = npiece[0][0] || npiece[0][1] || npiece[0][2] || npiece[0][3];
+    if (!done_t) {
+      for (var l = 0; l < 3; l++) {
+        for (var c = 0; c < 4; c++) {
+          npiece[l][c] = npiece[l + 1][c];
+        }
+      }
       for (var c = 0; c < 4; c++) {
-        npiece[l][c] = piece[3 - c][l];
+        npiece[3][c] = false;
       }
     }
-
-    // Deplacement de la piece en haut a gauche.
-    var done_t = false, done_l = false;
-    do {
-      done_t = npiece[0][0] || npiece[0][1] || npiece[0][2] || npiece[0][3];
-      if (!done_t) {
-        for (var l = 0; l < 3; l++) {
-          for (var c = 0; c < 4; c++) {
-            npiece[l][c] = npiece[l + 1][c];
-          }
-        }
-        for (var c = 0; c < 4; c++) {
-          npiece[3][c] = false;
+    done_l = npiece[0][0] || npiece[1][0] || npiece[2][0] || npiece[3][0];
+    if (!done_l) {
+      for (var l = 0; l < 4; l++) {
+        for (var c = 0; c < 3; c++) {
+          npiece[l][c] = npiece[l][c + 1];
         }
       }
-      done_l = npiece[0][0] || npiece[1][0] || npiece[2][0] || npiece[3][0];
-      if (!done_l) {
-        for (var l = 0; l < 4; l++) {
-          for (var c = 0; c < 3; c++) {
-            npiece[l][c] = npiece[l][c + 1];
-          }
-        }
-        for (var l = 0; l < 4; l++) {
-          npiece[l][3] = false;
-        }
+      for (var l = 0; l < 4; l++) {
+        npiece[l][3] = false;
       }
-    } while (!(done_l && done_t));
+    }
+  } while (!(done_l && done_t));
 
-    // Retourne la nouvelle piece.
-    return npiece;
-  };
-
+  // Retourne la nouvelle piece.
+  return npiece;
 };
 
 
