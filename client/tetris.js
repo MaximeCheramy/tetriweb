@@ -13,7 +13,6 @@ goog.provide('tetriweb.Tetris');
 tetriweb.Tetris = function(tetrinet) {
   // TODO: Les variables locales devraient etre def en dehors du constructeur
   // sous la forme: tetriweb.Tetris.variable_.
-  var myField = null;
   var current = null;
   var currentObj = null;
   var currentColor = null;
@@ -78,15 +77,15 @@ tetriweb.Tetris = function(tetrinet) {
     currentSpecialLines = 0;
     specialsQueue = [];
 
-    myField = goog.dom.getElement('myfield');
+    this.myField = goog.dom.getElement('myfield');
 
     this.updateGrid();
     this.generateRandom();
     this.newPiece();
     montimer = window.setTimeout(goog.bind(this.step, this), 1000);
 
-    goog.events.removeAll(myField);
-    var keyHandler = new goog.events.KeyHandler(myField);
+    goog.events.removeAll(this.myField);
+    var keyHandler = new goog.events.KeyHandler(this.myField);
     goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
         goog.bind(this.keyHandler, this));
   };
@@ -210,7 +209,7 @@ tetriweb.Tetris = function(tetrinet) {
     currentObj = goog.dom.createDom('div', {class: 'piece'});
     currentObj.style.top = this.curY_ * 20;
     currentObj.style.left = this.curX_ * 20;
-    goog.dom.appendChild(myField, currentObj);
+    goog.dom.appendChild(this.myField, currentObj);
     for (var l = 0; l < 4; l++) {
       for (var c = 0; c < 4; c++) {
         if (current[l][c]) {
@@ -264,7 +263,7 @@ tetriweb.Tetris = function(tetrinet) {
    * du jeu.
    */
   this.updateGrid = function() {
-    var fieldContent = goog.array.clone(myField.childNodes);
+    var fieldContent = goog.array.clone(this.myField.childNodes);
     goog.array.forEach(fieldContent, function(n) {
       if (n != currentObj) {
         goog.dom.removeNode(n);
@@ -279,7 +278,7 @@ tetriweb.Tetris = function(tetrinet) {
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
           bloc.className = 'block ' + this.convert(this.gameArea_[l][c]);
-          myField.appendChild(bloc);
+          this.myField.appendChild(bloc);
         }
       }
     }
@@ -568,7 +567,7 @@ tetriweb.Tetris = function(tetrinet) {
             bloc.style.top = (this.curY_ + l) * 20 + 1;
             bloc.style.left = (this.curX_ + c) * 20 + 1;
             bloc.className = 'block ' + this.convert(currentColor);
-            goog.dom.appendChild(myField, bloc);
+            goog.dom.appendChild(this.myField, bloc);
           }
         }
       }
@@ -794,3 +793,10 @@ tetriweb.Tetris.prototype.curX_ = 6;
  * @private
  */
 tetriweb.Tetris.prototype.curY_ = 0;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.myField = null;
