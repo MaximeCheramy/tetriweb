@@ -34,8 +34,8 @@ tetriweb.Tetris = function(tetrinet) {
 
   // TODO: Deplacer les fonctions vers tetriweb.Tetris.fonction et en dehors du
   // constructeur.
-  this.init = function(
-      _specialLines, _specialCount, _specialCapacity, _piecesFreq, _specialsFreq) {
+  this.init = function(_specialLines, _specialCount, _specialCapacity,
+      _piecesFreq, _specialsFreq) {
     // init the game area : all empty.
     for (var l = 0; l < 22; l++) {
       this.gameArea_[l] = new Array(12);
@@ -566,6 +566,7 @@ tetriweb.Tetris.generatePiece = function(id, orientation) {
  * Rotation d'une piece de 90° dans le sens horaire.
  * @param {Array.<Array<number>>} piece La piece que l'on veut faire pivoter.
  * @return {Array.<Array<number>>} La piece retournée.
+ * @private
  */
 tetriweb.Tetris.rotate_ = function(piece) {
   // Rotation de la piece.
@@ -619,7 +620,11 @@ tetriweb.Tetris.randomInt = function(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-
+/**
+ * Convertion d'un code couleur vers un nom de couleur.
+ * @param {number} color Identifiant de couleur.
+ * @return {string} Classe.
+ */
 tetriweb.Tetris.convert = function(color) {
   switch (color) {
     case 0: return 'empty';
@@ -641,6 +646,11 @@ tetriweb.Tetris.convert = function(color) {
   }
 };
 
+/**
+ * Retourne le code couleur pour un identifiant de piece donné.
+ * @param {number} id Identifiant de la piece.
+ * @return {number} Code couleur.
+ */
 tetriweb.Tetris.getColor = function(id) {
   switch (id) {
     case 0: return 1; // barre : bleu
