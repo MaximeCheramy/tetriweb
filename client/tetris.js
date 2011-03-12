@@ -227,7 +227,7 @@ tetriweb.Tetris = function(tetrinet) {
       }
     }
 
-    this.sendField();
+    this.sendField_();
   };
 
 
@@ -429,35 +429,6 @@ tetriweb.Tetris = function(tetrinet) {
 
 
   /**
-   * Fonction qui permet l'envoie au serveur this.tetrinet_ de la grille de jeu.
-   */
-  this.sendField = function() {
-    // Si c'est le premier appel.
-    if (this.oldGameArea_ == null) {
-      this.oldGameArea_ = new Array(22);
-      for (var l = 0; l < 22; l++) {
-        this.oldGameArea_[l] = new Array(12);
-        for (var c = 0; c < 12; c++) {
-          this.oldGameArea_[l][c] = 0;
-        }
-      }
-    }
-
-    // On envoie la nouvelle grille.
-    this.tetrinet_.sendField(this.gameArea_, this.oldGameArea_);
-
-    // Copie de la grille actuelle.
-    this.oldGameArea_ = new Array(22);
-    for (var l = 0; l < 22; l++) {
-      this.oldGameArea_[l] = new Array(12);
-      for (var c = 0; c < 12; c++) {
-        this.oldGameArea_[l][c] = this.gameArea_[l][c];
-      }
-    }
-  };
-
-
-  /**
    * Fonction appelée périodiquement pour faire avancer le jeu.
    */
   this.step = function() {
@@ -497,7 +468,7 @@ tetriweb.Tetris = function(tetrinet) {
       goog.dom.removeNode(currentObj);
       pieceDropped = true;
       this.checkLine();
-      this.sendField();
+      this.sendField_();
       this.newPiece();
     }
     if (!gameLost) {
@@ -525,7 +496,7 @@ tetriweb.Tetris = function(tetrinet) {
 
     // Touche haut ou 8.
     if (e.keyCode == 38 || e.keyCode == 56) {
-      piece = tetriweb.Tetris.rotate(current);
+      piece = tetriweb.Tetris.rotate_(current);
 
       // verifie si new ok.
       var ok = false;
@@ -687,7 +658,7 @@ tetriweb.Tetris.generatePiece = function(id, orientation) {
   }
 
   while (orientation > 0) {
-    piece = tetriweb.Tetris.rotate(piece);
+    piece = tetriweb.Tetris.rotate_(piece);
     orientation--;
   }
 
@@ -700,7 +671,7 @@ tetriweb.Tetris.generatePiece = function(id, orientation) {
  * @param {Array.<Array<number>>} piece La piece que l'on veut faire pivoter.
  * @return {Array.<Array<number>>} La piece retournée.
  */
-tetriweb.Tetris.rotate = function(piece) {
+tetriweb.Tetris.rotate_ = function(piece) {
   // Rotation de la piece.
   var npiece = new Array(4);
   for (var l = 0; l < 4; l++) {
@@ -750,6 +721,35 @@ tetriweb.Tetris.rotate = function(piece) {
  */
 tetriweb.Tetris.randomInt = function(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+
+/**
+ * Fonction qui permet l'envoie au serveur tetrinet de la grille de jeu.
+ */
+tetriweb.Tetris.prototype.sendField_ = function() {
+  // Si c'est le premier appel.
+  if (this.oldGameArea_ == null) {
+    this.oldGameArea_ = new Array(22);
+    for (var l = 0; l < 22; l++) {
+      this.oldGameArea_[l] = new Array(12);
+      for (var c = 0; c < 12; c++) {
+        this.oldGameArea_[l][c] = 0;
+      }
+    }
+  }
+
+  // On envoie la nouvelle grille.
+  this.tetrinet_.sendField(this.gameArea_, this.oldGameArea_);
+
+  // Copie de la grille actuelle.
+  this.oldGameArea_ = new Array(22);
+  for (var l = 0; l < 22; l++) {
+    this.oldGameArea_[l] = new Array(12);
+    for (var c = 0; c < 12; c++) {
+      this.oldGameArea_[l][c] = this.gameArea_[l][c];
+    }
+  }
 };
 
 
