@@ -98,7 +98,7 @@ tetriweb.Tetris = function(tetrinet) {
     }
     next_o = randomInt(0, 3); // orientation de la pièce
 
-    var nextpiece = this.generatePiece(next_id, next_o);
+    var nextpiece = tetriweb.Tetris.generatePiece(next_id, next_o);
     var nextpieceobj = goog.dom.getElement('nextpiece');
     goog.dom.removeChildren(nextpieceobj);
     for (var l = 0; l < 4; l++) {
@@ -114,68 +114,13 @@ tetriweb.Tetris = function(tetrinet) {
     }
   };
 
-  this.generatePiece = function(id, orientation) {
-    var piece = new Array(4);
-
-    switch (id) {
-      case 0:
-        piece[0] = new Array(false, false, false, false);
-        piece[1] = new Array(true, true, true, true);
-        piece[2] = new Array(false, false, false, false);
-        piece[3] = new Array(false, false, false, false);
-        break;
-      case 1:
-        piece[0] = new Array(false, false, false, false);
-        piece[1] = new Array(false, true, true, false);
-        piece[2] = new Array(false, true, true, false);
-        piece[3] = new Array(false, false, false, false);
-        break;
-      case 2:
-        piece[0] = new Array(false, true, false, false);
-        piece[1] = new Array(false, true, false, false);
-        piece[2] = new Array(true, true, false, false);
-        piece[3] = new Array(false, false, false, false);
-        break;
-      case 3:
-        piece[0] = new Array(true, false, false, false);
-        piece[1] = new Array(true, false, false, false);
-        piece[2] = new Array(true, true, false, false);
-        piece[3] = new Array(false, false, false, false);
-        break;
-      case 4:
-        piece[0] = new Array(false, false, false, false);
-        piece[1] = new Array(true, true, false, false);
-        piece[2] = new Array(false, true, true, false);
-        piece[3] = new Array(false, false, false, false);
-        break;
-      case 5:
-        piece[0] = new Array(false, false, false, false);
-        piece[1] = new Array(false, true, true, false);
-        piece[2] = new Array(true, true, false, false);
-        piece[3] = new Array(false, false, false, false);
-        break;
-      case 6:
-        piece[0] = new Array(false, true, false, false);
-        piece[1] = new Array(true, true, true, false);
-        piece[2] = new Array(false, false, false, false);
-        piece[3] = new Array(false, false, false, false);
-        break;
-    }
-
-    while (orientation > 0) {
-      piece = tetriweb.Tetris.rotate(piece);
-      orientation--;
-    }
-
-    return piece;
-  };
 
   this.newPiece = function() {
     // temp.
     this.curX_ = 5;
     this.curY_ = 0;
 
-    current = this.generatePiece(next_id, next_o);
+    current = tetriweb.Tetris.generatePiece(next_id, next_o);
     currentColor = this.getColor(next_id);
     this.generateRandom();
 
@@ -705,6 +650,69 @@ tetriweb.Tetris = function(tetrinet) {
     currentObj.style.left = this.curX_ * 20;
   };
 
+};
+
+
+/**
+ * Genere une piece.
+ * @param {number} id Identifiant de la piece.
+ * @param {number} orientation Nombre de rotation de 90 degres sens horaire.
+ * @return {array<array<boolean>>} La matrice qui represente la piece.
+ */
+tetriweb.Tetris.generatePiece = function(id, orientation) {
+  var piece = new Array(4);
+
+  switch (id) {
+    case 0:
+      piece[0] = new Array(false, false, false, false);
+      piece[1] = new Array(true, true, true, true);
+      piece[2] = new Array(false, false, false, false);
+      piece[3] = new Array(false, false, false, false);
+      break;
+    case 1:
+      piece[0] = new Array(false, false, false, false);
+      piece[1] = new Array(false, true, true, false);
+      piece[2] = new Array(false, true, true, false);
+      piece[3] = new Array(false, false, false, false);
+      break;
+    case 2:
+      piece[0] = new Array(false, true, false, false);
+      piece[1] = new Array(false, true, false, false);
+      piece[2] = new Array(true, true, false, false);
+      piece[3] = new Array(false, false, false, false);
+      break;
+    case 3:
+      piece[0] = new Array(true, false, false, false);
+      piece[1] = new Array(true, false, false, false);
+      piece[2] = new Array(true, true, false, false);
+      piece[3] = new Array(false, false, false, false);
+      break;
+    case 4:
+      piece[0] = new Array(false, false, false, false);
+      piece[1] = new Array(true, true, false, false);
+      piece[2] = new Array(false, true, true, false);
+      piece[3] = new Array(false, false, false, false);
+      break;
+    case 5:
+      piece[0] = new Array(false, false, false, false);
+      piece[1] = new Array(false, true, true, false);
+      piece[2] = new Array(true, true, false, false);
+      piece[3] = new Array(false, false, false, false);
+      break;
+    case 6:
+      piece[0] = new Array(false, true, false, false);
+      piece[1] = new Array(true, true, true, false);
+      piece[2] = new Array(false, false, false, false);
+      piece[3] = new Array(false, false, false, false);
+      break;
+  }
+
+  while (orientation > 0) {
+    piece = tetriweb.Tetris.rotate(piece);
+    orientation--;
+  }
+
+  return piece;
 };
 
 
