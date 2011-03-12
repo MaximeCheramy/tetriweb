@@ -192,12 +192,16 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             tetris.addLine();
             tetris.addLine();
             tetris.addLine();
+          } else if (data[2] == 'b') {
+            tetris.clearSpecialBlocks();
           } else if (data[2] == 'c') {
             tetris.clearLine();
           } else if (data[2] == 'g') {
             tetris.blockGravity();
           } else if (data[2] == 'n') {
             tetris.nukeField();
+          } else if (data[2] == 'r') {
+            tetris.randomClearBlocks();
           }
         }
         break;
@@ -399,6 +403,14 @@ tetriweb.Tetrinet.normalize = function(type) {
  */
 tetriweb.Tetrinet.prototype.playerExists = function(playerNum) {
   return this.players_[playerNum] != undefined;
+};
+
+/**
+ * Returns the player's playernum.
+ * @return {number} The player's playernum.
+ */
+tetriweb.Tetrinet.prototype.getMyPlayerNum = function() {
+  return this.pnum_;
 };
 
 /**

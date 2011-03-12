@@ -388,11 +388,33 @@ tetriweb.Tetris = function(tetrinet) {
     }
 
     // Envoi bonus (touches 1 à 6 haut du clavier)
-    if (e.keyCode >= 49 && e.keyCode <= 54) {
+    if (e.keyCode >= 49 && e.keyCode <= 54 && specialsQueue.length > 0) {
       var convert = tetriweb.Tetris.convert;
       var playerNum = e.keyCode - 48;
       if (this.tetrinet_.playerExists(playerNum)) {
         var specialName = convert(specialsQueue.shift()).substring(3);
+        if (playerNum == this.tetrinet_.getMyPlayerNum()) {
+          switch (specialName) {
+            case 'a':
+              this.addLine();
+              break;
+            case 'b':
+              this.clearSpecialBlocks();
+              break;
+            case 'c':
+              this.clearLine();
+              break;
+            case 'g':
+              this.blockGravity();
+              break;
+            case 'n':
+              this.nukeField();
+              break;
+            case 'r':
+              this.randomClearBlocks();
+              break;
+          }
+        }
         this.tetrinet_.sendSpecial(specialName, playerNum);
         this.updateSpecialBar();
       }
@@ -650,6 +672,31 @@ tetriweb.Tetris.prototype.blockGravity = function() {
   this.updateGrid_();
 };
 
+/**
+ * Deletes 10 random blocks on the field.
+ */
+tetriweb.Tetris.prototype.randomClearBlocks = function() {
+  var randomInt = tetriweb.Tetris.randomInt;
+  for (var i = 0; i < 10; i++) {
+    this.gameArea_[randomInt(0, 21)][randomInt(0, 11)] = 0;
+  }
+  this.updateGrid_();
+};
+
+/**
+ * Clears all special blocks of the field.
+ */
+tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
+  var randomInt = tetriweb.Tetris.randomInt;
+  for (var l = 0; l < 22; l++) {
+    for (var c = 0; c < 12; c++) {
+      if (this.gameArea_[l][c] > 5) {
+        this.gameArea_[l][c] = randomInt(1, 5);
+      }
+    }
+  }
+  this.updateGrid_();
+};
 
 /**
  * Vide la grille !
