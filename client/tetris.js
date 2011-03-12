@@ -13,7 +13,6 @@ goog.provide('tetriweb.Tetris');
 tetriweb.Tetris = function(tetrinet) {
   // TODO: Les variables locales devraient etre def en dehors du constructeur
   // sous la forme: tetriweb.Tetris.variable_.
-  var currentObj = null;
   var montimer = null;
   var pieceDropped = true;
   var piecesFreq = null;
@@ -73,7 +72,7 @@ tetriweb.Tetris = function(tetrinet) {
 
     this.myField_ = goog.dom.getElement('myfield');
 
-    this.updateGrid();
+    this.updateGrid_();
     this.generateRandom();
     this.newPiece_();
     montimer = window.setTimeout(goog.bind(this.step, this), 1000);
@@ -115,65 +114,6 @@ tetriweb.Tetris = function(tetrinet) {
 
 
 
-  this.nukeField = function() {
-    for (var l = 0; l < 22; l++) {
-      for (var c = 0; c < 12; c++) {
-        this.gameArea_[l][c] = 0;
-      }
-    }
-    this.updateGrid();
-  };
-
-  this.updatePiece = function() {
-    var convert = tetriweb.Tetris.convert;
-
-    currentObj = goog.dom.createDom('div', {class: 'piece'});
-    currentObj.style.top = this.curY_ * 20;
-    currentObj.style.left = this.curX_ * 20;
-    goog.dom.appendChild(this.myField_, currentObj);
-    for (var l = 0; l < 4; l++) {
-      for (var c = 0; c < 4; c++) {
-        if (this.current_[l][c]) {
-          var bloc = goog.dom.createDom('div');
-          bloc.style.top = l * 20 + 1;
-          bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + convert(this.currentColor_);
-          goog.dom.appendChild(currentObj, bloc);
-        }
-      }
-    }
-  };
-
-  /**
-   * Met a jour graphiquement la grille a partir de la representation interne
-   * du jeu.
-   */
-  this.updateGrid = function() {
-    var convert = tetriweb.Tetris.convert;
-
-    var fieldContent = goog.array.clone(this.myField_.childNodes);
-    goog.array.forEach(fieldContent, function(n) {
-      if (n != currentObj) {
-        goog.dom.removeNode(n);
-      }
-    }, this);
-
-    // On reconstruit
-    for (var l = 0; l < 22; l++) {
-      for (var c = 0; c < 12; c++) {
-        if (this.gameArea_[l][c] > 0) {
-          var bloc = goog.dom.createDom('div');
-          bloc.style.top = l * 20 + 1;
-          bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + convert(this.gameArea_[l][c]);
-          this.myField_.appendChild(bloc);
-        }
-      }
-    }
-
-    this.sendField_();
-  };
-
 
   /**
    * Vérifie s'il y a des lignes completes pour les supprimer et créer des
@@ -205,7 +145,7 @@ tetriweb.Tetris = function(tetrinet) {
         }
       }
     }
-   this.updateGrid();
+   this.updateGrid_();
     if (nbLines == 4) {
       this.tetrinet_.sendLines(nbLines);
     } else if (nbLines > 1) {
@@ -288,7 +228,7 @@ tetriweb.Tetris = function(tetrinet) {
     }
 
     if (blocksToPlace > 0) {
-      this.updateGrid();
+      this.updateGrid_();
     }
   };
 
@@ -311,7 +251,7 @@ tetriweb.Tetris = function(tetrinet) {
     }
     if (!stop) {
       this.curY_++;
-      currentObj.style.top = this.curY_ * 20;
+      this.currentObj_.style.top = this.curY_ * 20;
     } else {
       var convert = tetriweb.Tetris.convert;
 
@@ -332,7 +272,7 @@ tetriweb.Tetris = function(tetrinet) {
           }
         }
       }
-      goog.dom.removeNode(currentObj);
+      goog.dom.removeNode(this.currentObj_);
       pieceDropped = true;
       this.checkLine();
       this.sendField_();
@@ -392,8 +332,8 @@ tetriweb.Tetris = function(tetrinet) {
       if (ok) {
         this.curX_ += delta_x[dx];
         this.current_ = piece;
-        goog.dom.removeNode(currentObj);
-        this.updatePiece();
+        goog.dom.removeNode(this.currentObj_);
+        this.updatePiece_();
       }
     }
 
@@ -465,7 +405,7 @@ tetriweb.Tetris = function(tetrinet) {
     }
 
     // Actualise la position de la piece.
-    currentObj.style.left = this.curX_ * 20;
+    this.currentObj_.style.left = this.curX_ * 20;
   };
 
 };
@@ -666,7 +606,7 @@ tetriweb.Tetris.prototype.addLine = function() {
       // TODO: Algo trop approximatif choisi pour sa simplicité. A recoder.
       this.gameArea_[21][c] = randomInt(0, 5);
     }
-    this.updateGrid();
+    this.updateGrid_();
   }
 };
 
@@ -681,7 +621,7 @@ tetriweb.Tetris.prototype.clearLine = function() {
       this.gameArea_[l][c] = this.gameArea_[l - 1][c];
     }
   }
-  this.updateGrid();
+  this.updateGrid_();
 };
 
 
@@ -707,11 +647,21 @@ tetriweb.Tetris.prototype.blockGravity = function() {
       }
     }
   }
-  this.updateGrid();
+  this.updateGrid_();
 };
 
 
-
+/**
+ * Vide la grille !
+ */
+tetriweb.Tetris.prototype.nukeField = function() {
+  for (var l = 0; l < 22; l++) {
+    for (var c = 0; c < 12; c++) {
+      this.gameArea_[l][c] = 0;
+    }
+  }
+  this.updateGrid_();
+};
 
 
 /**
@@ -725,7 +675,7 @@ tetriweb.Tetris.prototype.fillRandomly_ = function() {
       this.gameArea_[l][c] = randomInt(1, 5);
     }
   }
-  this.updateGrid();
+  this.updateGrid_();
 };
 
 /**
@@ -755,7 +705,7 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
     }
   }
 
-  this.updatePiece();
+  this.updatePiece_();
 };
 
 
@@ -784,6 +734,61 @@ tetriweb.Tetris.prototype.sendField_ = function() {
     this.oldGameArea_[l] = new Array(12);
     for (var c = 0; c < 12; c++) {
       this.oldGameArea_[l][c] = this.gameArea_[l][c];
+    }
+  }
+};
+
+
+/**
+ * Met a jour graphiquement la grille a partir de la representation interne
+ * du jeu.
+ */
+tetriweb.Tetris.prototype.updateGrid_ = function() {
+  var convert = tetriweb.Tetris.convert;
+
+  var fieldContent = goog.array.clone(this.myField_.childNodes);
+  goog.array.forEach(fieldContent, function(n) {
+    if (n != this.currentObj_) {
+      goog.dom.removeNode(n);
+    }
+  }, this);
+
+  // On reconstruit
+  for (var l = 0; l < 22; l++) {
+    for (var c = 0; c < 12; c++) {
+      if (this.gameArea_[l][c] > 0) {
+        var bloc = goog.dom.createDom('div');
+        bloc.style.top = l * 20 + 1;
+        bloc.style.left = c * 20 + 1;
+        bloc.className = 'block ' + convert(this.gameArea_[l][c]);
+        this.myField_.appendChild(bloc);
+      }
+    }
+  }
+
+  this.sendField_();
+};
+
+
+/**
+ * Met a jour la piece courante en la creant et l'ajoutant au field.
+ */
+tetriweb.Tetris.prototype.updatePiece_ = function() {
+  var convert = tetriweb.Tetris.convert;
+
+  this.currentObj_ = goog.dom.createDom('div', {class: 'piece'});
+  this.currentObj_.style.top = this.curY_ * 20;
+  this.currentObj_.style.left = this.curX_ * 20;
+  goog.dom.appendChild(this.myField_, this.currentObj_);
+  for (var l = 0; l < 4; l++) {
+    for (var c = 0; c < 4; c++) {
+      if (this.current_[l][c]) {
+        var bloc = goog.dom.createDom('div');
+        bloc.style.top = l * 20 + 1;
+        bloc.style.left = c * 20 + 1;
+        bloc.className = 'block ' + convert(this.currentColor_);
+        goog.dom.appendChild(this.currentObj_, bloc);
+      }
     }
   }
 };
@@ -835,6 +840,11 @@ tetriweb.Tetris.prototype.current_ = null;
  */
 tetriweb.Tetris.prototype.currentColor_ = null;
 
+/**
+ * @type {object}
+ * @private
+ */
+tetriweb.Tetris.prototype.currentObj_ = null;
 
 /**
  * @type {object}
