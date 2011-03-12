@@ -14,8 +14,6 @@ tetriweb.Tetris = function(tetrinet) {
   // TODO: Les variables locales devraient etre def en dehors du constructeur
   // sous la forme: tetriweb.Tetris.variable_.
   var myField = null;
-  var cur_x = 6;
-  var cur_y = 0;
   var current = null;
   var currentObj = null;
   var currentColor = null;
@@ -175,8 +173,8 @@ tetriweb.Tetris = function(tetrinet) {
 
   this.newPiece = function() {
     // temp.
-    cur_x = 5;
-    cur_y = 0;
+    this.curX_ = 5;
+    this.curY_ = 0;
 
     current = this.generatePiece(next_id, next_o);
     currentColor = this.getColor(next_id);
@@ -189,7 +187,7 @@ tetriweb.Tetris = function(tetrinet) {
         vide = vide && !current[l][c];
       }
       if (vide) {
-        cur_y--;
+        this.curY_--;
       } else {
         break;
       }
@@ -209,8 +207,8 @@ tetriweb.Tetris = function(tetrinet) {
 
   this.updatePiece = function() {
     currentObj = goog.dom.createDom('div', {class: 'piece'});
-    currentObj.style.top = cur_y * 20;
-    currentObj.style.left = cur_x * 20;
+    currentObj.style.top = this.curY_ * 20;
+    currentObj.style.left = this.curX_ * 20;
     goog.dom.appendChild(myField, currentObj);
     for (var l = 0; l < 4; l++) {
       for (var c = 0; c < 4; c++) {
@@ -491,9 +489,9 @@ tetriweb.Tetris = function(tetrinet) {
     debug.innerHTML = '';
     for (var l = 0; l < 22; l++) {
       for (var c = 0; c < 12; c++) {
-        if (l >= cur_y && l < cur_y + 4 &&
-            c >= cur_x && c < cur_x + 4 &&
-            current[l - cur_y][c - cur_x]) {
+        if (l >= this.curY_ && l < this.curY_ + 4 &&
+            c >= this.curX_ && c < this.curX_ + 4 &&
+            current[l - this.curY_][c - this.curX_]) {
           debug.innerHTML += '#';
         } else {
           if (this.gameArea_[l][c] > 0)
@@ -546,17 +544,17 @@ tetriweb.Tetris = function(tetrinet) {
     for (var l = 0; l < 4 && !stop; l++) {
       for (var c = 0; c < 4 && !stop; c++) {
         if (current[l][c]) {
-          if (l + cur_y + 1 >= 22 || this.gameArea_[l + cur_y + 1][c + cur_x] > 0) {
+          if (l + this.curY_ + 1 >= 22 || this.gameArea_[l + this.curY_ + 1][c + this.curX_] > 0) {
             stop = true;
           }
         }
       }
     }
     if (!stop) {
-      cur_y++;
-      currentObj.style.top = cur_y * 20;
+      this.curY_++;
+      currentObj.style.top = this.curY_ * 20;
     } else {
-      if (cur_y <= 0) {
+      if (this.curY_ <= 0) {
         gameLost = true;
       }
 
@@ -564,10 +562,10 @@ tetriweb.Tetris = function(tetrinet) {
       for (var l = 0; l < 4; l++) {
         for (var c = 0; c < 4; c++) {
           if (current[l][c]) {
-            this.gameArea_[l + cur_y][c + cur_x] = currentColor;
+            this.gameArea_[l + this.curY_][c + this.curX_] = currentColor;
             var bloc = goog.dom.createDom('div');
-            bloc.style.top = (cur_y + l) * 20 + 1;
-            bloc.style.left = (cur_x + c) * 20 + 1;
+            bloc.style.top = (this.curY_ + l) * 20 + 1;
+            bloc.style.left = (this.curX_ + c) * 20 + 1;
             bloc.className = 'block ' + this.convert(currentColor);
             goog.dom.appendChild(myField, bloc);
           }
@@ -618,11 +616,11 @@ tetriweb.Tetris = function(tetrinet) {
         for (var l = 0; l < 4 && ok; l++) {
           for (var c = 0; c < 4 && ok; c++) {
             if (piece[l][c]) {
-              ok = (cur_x + delta_x[dx] + c) >= 0 &&
-                   (cur_x + delta_x[dx] + c) < 12 &&
-                   (cur_y + l) >= 0 &&
-                   (cur_y + l) < 22 &&
-                   this.gameArea_[cur_y + l][cur_x + delta_x[dx] + c] == 0;
+              ok = (this.curX_ + delta_x[dx] + c) >= 0 &&
+                   (this.curX_ + delta_x[dx] + c) < 12 &&
+                   (this.curY_ + l) >= 0 &&
+                   (this.curY_ + l) < 22 &&
+                   this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
             }
           }
         }
@@ -631,7 +629,7 @@ tetriweb.Tetris = function(tetrinet) {
       //console.log("dx = " + dx + " delta_x = " + delta_x[dx]);
 
       if (ok) {
-        cur_x += delta_x[dx];
+        this.curX_ += delta_x[dx];
         current = piece;
         goog.dom.removeNode(currentObj);
         this.updatePiece();
@@ -644,15 +642,15 @@ tetriweb.Tetris = function(tetrinet) {
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
           if (current[l][c]) {
-            if (c + cur_x + 1 >= 12 ||
-                this.gameArea_[l + cur_y][c + cur_x + 1] > 0) {
+            if (c + this.curX_ + 1 >= 12 ||
+                this.gameArea_[l + this.curY_][c + this.curX_ + 1] > 0) {
               ok = false;
             }
           }
         }
       }
       if (ok) {
-        cur_x++;
+        this.curX_++;
       }
     }
 
@@ -662,14 +660,14 @@ tetriweb.Tetris = function(tetrinet) {
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
           if (current[l][c]) {
-            if (c + cur_x - 1 < 0 || this.gameArea_[l + cur_y][c + cur_x - 1] > 0) {
+            if (c + this.curX_ - 1 < 0 || this.gameArea_[l + this.curY_][c + this.curX_ - 1] > 0) {
               ok = false;
             }
           }
         }
       }
       if (ok) {
-        cur_x--;
+        this.curX_--;
       }
     }
 
@@ -704,7 +702,7 @@ tetriweb.Tetris = function(tetrinet) {
     }
 
     // Actualise la position de la piece.
-    currentObj.style.left = cur_x * 20;
+    currentObj.style.left = this.curX_ * 20;
   };
 
   /**
@@ -765,14 +763,31 @@ tetriweb.Tetris.randomInt = function(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+
+
 /**
  * @type {Array<Array<number>>}
  * @private
  */
 tetriweb.Tetris.prototype.gameArea_ = null;
 
+
 /**
  * @type {tetriweb.Tetrinet}
  * @private
  */
 tetriweb.Tetris.prototype.tetrinet_ = null;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.curX_ = 6;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.curY_ = 0;
