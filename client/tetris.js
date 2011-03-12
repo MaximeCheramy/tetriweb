@@ -287,32 +287,6 @@ tetriweb.Tetris = function(tetrinet) {
 
 
   /**
-   * Fait tomber les blocs par gravité.
-   */
-  this.blockGravity = function() {
-    for (var l = 20; l >= 0; l--) {
-      var g = false;
-      for (var c = 0; c < 12; c++) {
-        if (this.gameArea_[l][c] > 0 && this.gameArea_[l + 1][c] == 0) {
-          this.gameArea_[l + 1][c] = this.gameArea_[l][c];
-          this.gameArea_[l][c] = 0;
-          g = true;
-        }
-      }
-      if (g) {
-        l += 2;
-        // Un peu crade je trouve, peut-etre remplacer le for sur les lignes
-        // par un while ou alors inserer un while pour faire tomber les blocks.
-        if (l > 20) {
-          l = 21;
-        }
-      }
-    }
-    this.updateGrid();
-  };
-
-
-  /**
    * Vérifie s'il y a des lignes completes pour les supprimer et créer des
    * bonus ou envoyer des lignes a l'adversaire.
    */
@@ -721,6 +695,32 @@ tetriweb.Tetris.rotate_ = function(piece) {
  */
 tetriweb.Tetris.randomInt = function(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+
+/**
+ * Fait tomber les blocs par gravité.
+ */
+tetriweb.Tetris.prototype.blockGravity = function() {
+  for (var l = 20; l >= 0; l--) {
+    var g = false;
+    for (var c = 0; c < 12; c++) {
+      if (this.gameArea_[l][c] > 0 && this.gameArea_[l + 1][c] == 0) {
+        this.gameArea_[l + 1][c] = this.gameArea_[l][c];
+        this.gameArea_[l][c] = 0;
+        g = true;
+      }
+    }
+    if (g) {
+      l += 2;
+      // Un peu crade je trouve, peut-etre remplacer le for sur les lignes
+      // par un while ou alors inserer un while pour faire tomber les blocks.
+      if (l > 20) {
+        l = 21;
+      }
+    }
+  }
+  this.updateGrid();
 };
 
 
