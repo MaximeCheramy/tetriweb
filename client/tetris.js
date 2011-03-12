@@ -21,7 +21,6 @@ tetriweb.Tetris = function(tetrinet) {
   var gameLost = false;
   var next_id = null;
   var next_o = null;
-  var oldField = null;
   var piecesFreq = null;
   var specialsFreq = null;
   var specialLines = null;
@@ -77,15 +76,15 @@ tetriweb.Tetris = function(tetrinet) {
     currentSpecialLines = 0;
     specialsQueue = [];
 
-    this.myField = goog.dom.getElement('myfield');
+    this.myField_ = goog.dom.getElement('myfield');
 
     this.updateGrid();
     this.generateRandom();
     this.newPiece();
     montimer = window.setTimeout(goog.bind(this.step, this), 1000);
 
-    goog.events.removeAll(this.myField);
-    var keyHandler = new goog.events.KeyHandler(this.myField);
+    goog.events.removeAll(this.myField_);
+    var keyHandler = new goog.events.KeyHandler(this.myField_);
     goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
         goog.bind(this.keyHandler, this));
   };
@@ -209,7 +208,7 @@ tetriweb.Tetris = function(tetrinet) {
     currentObj = goog.dom.createDom('div', {class: 'piece'});
     currentObj.style.top = this.curY_ * 20;
     currentObj.style.left = this.curX_ * 20;
-    goog.dom.appendChild(this.myField, currentObj);
+    goog.dom.appendChild(this.myField_, currentObj);
     for (var l = 0; l < 4; l++) {
       for (var c = 0; c < 4; c++) {
         if (current[l][c]) {
@@ -263,7 +262,7 @@ tetriweb.Tetris = function(tetrinet) {
    * du jeu.
    */
   this.updateGrid = function() {
-    var fieldContent = goog.array.clone(this.myField.childNodes);
+    var fieldContent = goog.array.clone(this.myField_.childNodes);
     goog.array.forEach(fieldContent, function(n) {
       if (n != currentObj) {
         goog.dom.removeNode(n);
@@ -278,7 +277,7 @@ tetriweb.Tetris = function(tetrinet) {
           bloc.style.top = l * 20 + 1;
           bloc.style.left = c * 20 + 1;
           bloc.className = 'block ' + this.convert(this.gameArea_[l][c]);
-          this.myField.appendChild(bloc);
+          this.myField_.appendChild(bloc);
         }
       }
     }
@@ -509,25 +508,25 @@ tetriweb.Tetris = function(tetrinet) {
    */
   this.sendField = function() {
     // Si c'est le premier appel.
-    if (oldField == null) {
-      oldField = new Array(22);
+    if (this.oldGameArea_ == null) {
+      this.oldGameArea_ = new Array(22);
       for (var l = 0; l < 22; l++) {
-        oldField[l] = new Array(12);
+        this.oldGameArea_[l] = new Array(12);
         for (var c = 0; c < 12; c++) {
-          oldField[l][c] = 0;
+          this.oldGameArea_[l][c] = 0;
         }
       }
     }
 
     // On envoie la nouvelle grille.
-    this.tetrinet_.sendField(this.gameArea_, oldField);
+    this.tetrinet_.sendField(this.gameArea_, this.oldGameArea_);
 
     // Copie de la grille actuelle.
-    oldField = new Array(22);
+    this.oldGameArea_ = new Array(22);
     for (var l = 0; l < 22; l++) {
-      oldField[l] = new Array(12);
+      this.oldGameArea_[l] = new Array(12);
       for (var c = 0; c < 12; c++) {
-        oldField[l][c] = this.gameArea_[l][c];
+        this.oldGameArea_[l][c] = this.gameArea_[l][c];
       }
     }
   };
@@ -567,7 +566,7 @@ tetriweb.Tetris = function(tetrinet) {
             bloc.style.top = (this.curY_ + l) * 20 + 1;
             bloc.style.left = (this.curX_ + c) * 20 + 1;
             bloc.className = 'block ' + this.convert(currentColor);
-            goog.dom.appendChild(this.myField, bloc);
+            goog.dom.appendChild(this.myField_, bloc);
           }
         }
       }
@@ -773,6 +772,11 @@ tetriweb.Tetris.randomInt = function(min, max) {
  */
 tetriweb.Tetris.prototype.gameArea_ = null;
 
+/**
+ * @type {Array<Array<number>>}
+ * @private
+ */
+tetriweb.Tetris.prototype.oldGameArea_ = null;
 
 /**
  * @type {tetriweb.Tetrinet}
@@ -796,7 +800,7 @@ tetriweb.Tetris.prototype.curY_ = 0;
 
 
 /**
- * @type {number}
+ * @type {object}
  * @private
  */
-tetriweb.Tetris.prototype.myField = null;
+tetriweb.Tetris.prototype.myField_ = null;
