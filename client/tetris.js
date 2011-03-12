@@ -62,7 +62,7 @@ tetriweb.Tetris = function(tetrinet) {
       n += piecesFreq[i];
       piecesFreq[i] = n;
     }
-    console.log(piecesFreq);
+    //console.log(piecesFreq);
 
     // fréquence des specials
     specialsFreq = goog.array.repeat(0, 9);
@@ -604,22 +604,33 @@ tetriweb.Tetris = function(tetrinet) {
     // Touche haut ou 8.
     if (e.keyCode == 38 || e.keyCode == 56) {
       piece = this.rotate(current);
+      
       // verifie si new ok.
-      var ok = true;
-
-      for (var l = 0; l < 4 && ok; l++) {
-        for (var c = 0; c < 4 && ok; c++) {
-          if (piece[l][c]) {
-            ok = (cur_x + c) >= 0 &&
-                 (cur_x + c) < 12 &&
-                 (cur_y + l) >= 0 &&
-                 (cur_y + l) < 22 &&
-                 gameArea[cur_y + l][cur_x + c] == 0;
+      var ok = false;
+      // TODO: visiblement 2 ne sert jamais, et 3 que pour les linebar.
+      // Optimisable donc...
+      var delta_x = [0, 1, -1, 2, -2, 3, -3];
+      var dx = 0;
+      for (dx = 0; dx < delta_x.length && !ok; dx++) {
+        //console.log("trying dx = " + delta_x[dx]);
+        ok = true;
+        for (var l = 0; l < 4 && ok; l++) {
+          for (var c = 0; c < 4 && ok; c++) {
+            if (piece[l][c]) {
+              ok = (cur_x + delta_x[dx] + c) >= 0 &&
+                   (cur_x + delta_x[dx] + c) < 12 &&
+                   (cur_y + l) >= 0 &&
+                   (cur_y + l) < 22 &&
+                   gameArea[cur_y + l][cur_x + delta_x[dx] + c] == 0;
+            }
           }
         }
       }
+      dx--;
+      //console.log("dx = " + dx + " delta_x = " + delta_x[dx]);
 
       if (ok) {
+        cur_x += delta_x[dx];
         current = piece;
         goog.dom.removeNode(currentObj);
         this.updatePiece();
