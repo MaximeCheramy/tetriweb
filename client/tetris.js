@@ -24,7 +24,6 @@ tetriweb.Tetris = function(tetrinet) {
   var gameLost = false;
   var next_id = null;
   var next_o = null;
-  var tetrinet_ = null;
   var oldField = null;
   var piecesFreq = null;
   var specialsFreq = null;
@@ -34,8 +33,8 @@ tetriweb.Tetris = function(tetrinet) {
   var currentSpecialLines = null;
   var specialsQueue = null;
 
-  tetrinet_ = tetrinet;
-  tetrinet_.tetris = this;
+  this.tetrinet_ = tetrinet;
+  this.tetrinet_.tetris = this;
   this.gameArea_ = new Array(22);
 
   // TODO: Deplacer les fonctions vers tetriweb.Tetris.fonction et en dehors du
@@ -403,9 +402,9 @@ tetriweb.Tetris = function(tetrinet) {
     }
     this.updateGrid();
     if (nbLines == 4) {
-      tetrinet_.sendLines(nbLines);
+      this.tetrinet_.sendLines(nbLines);
     } else if (nbLines > 1) {
-      tetrinet_.sendLines(nbLines - 1);
+      this.tetrinet_.sendLines(nbLines - 1);
     }
 
     //console.log(tmpSpecials);
@@ -508,7 +507,7 @@ tetriweb.Tetris = function(tetrinet) {
 
 
   /**
-   * Fonction qui permet l'envoie au serveur tetrinet_ de la grille de jeu.
+   * Fonction qui permet l'envoie au serveur this.tetrinet_ de la grille de jeu.
    */
   this.sendField = function() {
     // Si c'est le premier appel.
@@ -523,7 +522,7 @@ tetriweb.Tetris = function(tetrinet) {
     }
 
     // On envoie la nouvelle grille.
-    tetrinet_.sendField(this.gameArea_, oldField);
+    this.tetrinet_.sendField(this.gameArea_, oldField);
 
     // Copie de la grille actuelle.
     oldField = new Array(22);
@@ -584,7 +583,7 @@ tetriweb.Tetris = function(tetrinet) {
       clearTimeout(montimer);
       montimer = window.setTimeout(goog.bind(this.step, this), 1000);
     } else {
-      tetrinet_.sendPlayerlost();
+      this.tetrinet_.sendPlayerlost();
       this.fillRandomly();
     }
   };
@@ -691,9 +690,9 @@ tetriweb.Tetris = function(tetrinet) {
     // Envoi bonus (touches 1 à 6 haut du clavier)
     if (e.keyCode >= 49 && e.keyCode <= 54) {
       var playerNum = e.keyCode - 48;
-      if (tetrinet_.playerExists(playerNum)) {
+      if (this.tetrinet_.playerExists(playerNum)) {
         var specialName = this.convert(specialsQueue.shift()).substring(3);
-        tetrinet_.sendSpecial(specialName, playerNum);
+        this.tetrinet_.sendSpecial(specialName, playerNum);
         this.updateSpecialBar();
       }
     }
@@ -772,4 +771,8 @@ tetriweb.Tetris.randomInt = function(min, max) {
  */
 tetriweb.Tetris.prototype.gameArea_ = null;
 
-
+/**
+ * @type {tetriweb.Tetrinet}
+ * @private
+ */
+tetriweb.Tetris.prototype.tetrinet_ = null;
