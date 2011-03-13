@@ -13,7 +13,7 @@ tetriweb.init = function() {
   var tetrinet = new tetriweb.Tetrinet();
   var tetris = new tetriweb.Tetris(tetrinet);
 
-  /* For debugging.
+  //* For debugging.
   window['tetrinet'] = tetrinet;
   window['tetris'] = tetris;
   //*/
@@ -36,6 +36,14 @@ tetriweb.init = function() {
   goog.events.listen(goog.dom.getElement('startGame'),
       goog.events.EventType.CLICK, function(e) {
     tetrinet.startGame();
+  });
+
+  goog.events.listen(window, goog.events.EventType.UNLOAD, function(e) {
+    e.preventDefault();
+    if (confirm('Êtes-vous sûr de vouloir quitter ?')) {
+      tetrinet.disconnect();
+      window.close();
+    }
   });
 };
 

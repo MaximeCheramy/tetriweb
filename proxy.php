@@ -132,6 +132,18 @@ while(true) {
 						$tmp_clients--;
 					}
 				}
+        elseif($msg == 'disconnect') {
+          // Demande de déconnexion
+          echo "Le client $client a quitté le jeu.\n";
+          socket_close($clients[$client]['s_server']);
+					if(isset($clients[$client]['s_client_read'])) {
+						socket_close($clients[$client]['s_client_read']);
+					}
+					if(isset($clients[$client]['s_client_write'])) {
+						socket_close($clients[$client]['s_client_write']);
+					}
+					unset($clients[$client]);
+        }
 				elseif(preg_match('#^tmp_#', $client)) {
 					if(preg_match('#^connect ([A-Za-z0-9-_]+)$#', $msg, $results)) {
 						// Nouveau client

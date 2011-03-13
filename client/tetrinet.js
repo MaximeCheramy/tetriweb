@@ -62,9 +62,11 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
 
 /**
  * Disconnects the player from the server.
- * TODO: implement :)
  */
 tetriweb.Tetrinet.prototype.disconnect = function() {
+  if (this.pnum_) {
+    this.sendMessage_("disconnect");
+  }
 };
 
 
