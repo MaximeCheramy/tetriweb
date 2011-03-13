@@ -4,12 +4,15 @@ goog.require('goog.net.XhrIo');
 
 goog.provide('tetriweb.Tetrinet');
 
+
+
 /**
  * Tetrinet.
  * @constructor
  */
 tetriweb.Tetrinet = function() {
 };
+
 
 /**
  * Connects the player to the server and retrieves its playernum.
@@ -25,36 +28,37 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
 
   goog.events.listen(this.xhr_in_, goog.net.EventType.COMPLETE,
       goog.bind(function(e) {
-    if (e.target.isSuccess()) {
-      var response = e.target.getResponseJson();
-      if (!response['error']) {
-        // Reset all
-        goog.dom.removeChildren(goog.dom.getElement('fields'));
-        this.players_ = [];
-        this.teams_ = [];
-        this.fields_ = [];
+        if (e.target.isSuccess()) {
+          var response = e.target.getResponseJson();
+          if (!response['error']) {
+            // Reset all
+            goog.dom.removeChildren(goog.dom.getElement('fields'));
+            this.players_ = [];
+            this.teams_ = [];
+            this.fields_ = [];
 
-        // Init
-        var nick = goog.dom.getElement('nickname').value;
-        var team = goog.dom.getElement('team').value;
-        this.pnum_ = response['pnum'];
-        this.players_[response['pnum']] = nick;
-        this.teams_[response['pnum']] = team;
-        this.initMyField();
-        this.sendMessage_('team ' + this.pnum_ + ' ' + team);
-        this.readFromServer_();
+            // Init
+            var nick = goog.dom.getElement('nickname').value;
+            var team = goog.dom.getElement('team').value;
+            this.pnum_ = response['pnum'];
+            this.players_[response['pnum']] = nick;
+            this.teams_[response['pnum']] = team;
+            this.initMyField();
+            this.sendMessage_('team ' + this.pnum_ + ' ' + team);
+            this.readFromServer_();
 
-        if (this.pnum_ == 1) {
-          goog.dom.getElement('startGame').disabled = false;
+            if (this.pnum_ == 1) {
+              goog.dom.getElement('startGame').disabled = false;
+            }
+          } else {
+            alert('Connexion impossible : ' + response['error']);
+          }
         }
-      } else {
-        alert('Connexion impossible : ' + response['error']);
-      }
-    }
-  }, this));
+      }, this));
 
   this.xhr_in_.send(this.url_ + '?connect=' + nickname);
 };
+
 
 /**
  * Disconnects the player from the server.
@@ -62,6 +66,7 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
  */
 tetriweb.Tetrinet.prototype.disconnect = function() {
 };
+
 
 /**
  * Reads data from server through the proxy.
@@ -72,17 +77,18 @@ tetriweb.Tetrinet.prototype.readFromServer_ = function() {
 
   goog.events.listen(this.xhr_in_, goog.net.EventType.COMPLETE,
       goog.bind(function(e) {
-    if (e.target.isSuccess()) {
-      this.handleResponse_(e.target.getResponseJson());
-      this.readFromServer_();
-    } else {
-      // Wait before reconnecting if there was an error
-      this.timer_ = setTimeout(goog.bind(this.readFromServer_, this), 5000);
-    }
-  }, this));
+        if (e.target.isSuccess()) {
+          this.handleResponse_(e.target.getResponseJson());
+          this.readFromServer_();
+        } else {
+          // Wait before reconnecting if there was an error
+          this.timer_ = setTimeout(goog.bind(this.readFromServer_, this), 5000);
+        }
+      }, this));
 
   this.xhr_in_.send(this.url_ + '?pnum=' + this.pnum_);
 };
+
 
 /**
  * Handles the server messages.
@@ -120,7 +126,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         if (team != undefined) {
           this.teams_[player_id] = team;
           message = '*** ' + this.players_[player_id] +
-            " est dans l'équipe " + team + '.';
+              " est dans l'équipe " + team + '.';
         } else {
           message = '*** ' + this.players_[player_id] + ' est seul.';
         }
@@ -163,7 +169,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             y = Math.floor(i / 12);
             x = i % 12;
             this.setBlock_(player_id, x, y,
-              tetriweb.Tetrinet.normalize(field[i]));
+                tetriweb.Tetrinet.normalize(field[i]));
           }
         } else {
           // Only differences
@@ -211,10 +217,11 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
     }
     if (message.length > 0) {
       goog.dom.getElement('content').innerHTML +=
-        '<div>' + message + '</div>';
+          '<div>' + message + '</div>';
     }
   }
 };
+
 
 /**
  * Sends the given message to the server.
@@ -224,8 +231,9 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
 tetriweb.Tetrinet.prototype.sendMessage_ = function(msg) {
   this.xhr_out_ = new goog.net.XhrIo();
   this.xhr_out_.send(this.url_ + '?' +
-    goog.uri.utils.buildQueryDataFromMap({'pnum': this.pnum_, 'send': msg}));
+      goog.uri.utils.buildQueryDataFromMap({'pnum': this.pnum_, 'send': msg}));
 };
+
 
 /**
  * Notifies the server that we want to start a game.
@@ -234,6 +242,7 @@ tetriweb.Tetrinet.prototype.startGame = function() {
   this.sendMessage_('startgame 1 ' + this.pnum_);
 };
 
+
 /**
  * Sends a message on the partyline.
  * @param {string} msg The message to send.
@@ -241,8 +250,9 @@ tetriweb.Tetrinet.prototype.startGame = function() {
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
   goog.dom.getElement('content').innerHTML += '<div>' + '&lt;' +
-    this.players_[this.pnum_] + '&gt; ' + msg + '</div>';
+      this.players_[this.pnum_] + '&gt; ' + msg + '</div>';
 };
+
 
 /**
  * Notifies the server that the player has lost.
@@ -251,6 +261,7 @@ tetriweb.Tetrinet.prototype.sendPlayerlost = function() {
   this.sendMessage_('playerlost ' + this.pnum_);
 };
 
+
 /**
  * Sends nblines lines to all players.
  * @param {number} nblines The number of lines to send.
@@ -258,6 +269,7 @@ tetriweb.Tetrinet.prototype.sendPlayerlost = function() {
 tetriweb.Tetrinet.prototype.sendLines = function(nblines) {
   this.sendMessage_('sb 0 cs' + nblines + ' ' + this.pnum_);
 };
+
 
 /**
  * Sends a special to the given player.
@@ -268,6 +280,7 @@ tetriweb.Tetrinet.prototype.sendSpecial = function(special, playerDest) {
   this.sendMessage_('sb ' + playerDest + ' ' + special + ' ' + this.pnum_);
 };
 
+
 /**
  * Initializes the player's field.
  */
@@ -277,9 +290,10 @@ tetriweb.Tetrinet.prototype.initMyField = function() {
   var field = goog.dom.createDom('div', {id: 'myfield'});
   field.setAttribute('tabindex', 1);
   var cont = goog.dom.createDom('div', {id: 'mycontainer'},
-    next, field, specialBar);
+      next, field, specialBar);
   goog.dom.appendChild(goog.dom.getElement('fields'), cont);
 };
+
 
 /**
  * Initializes a player's field.
@@ -289,7 +303,7 @@ tetriweb.Tetrinet.prototype.initMyField = function() {
 tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
   // Create a new field div and add it to the fields container
   var field = goog.dom.createDom('div', {className: 'field', id: 'field-' +
-    player_id});
+        player_id});
   goog.dom.appendChild(goog.dom.getElement('fields'), field);
 
   // Fill the field with empty blocks
@@ -309,6 +323,7 @@ tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
   }
 };
 
+
 /**
  * Destroys a player's field.
  * @param {number} player_id The owner of the field we want to destroy.
@@ -318,6 +333,7 @@ tetriweb.Tetrinet.prototype.destroyField_ = function(player_id) {
   goog.dom.removeNode(goog.dom.getElement('field-' + player_id));
   delete this.fields_[player_id];
 };
+
 
 /**
  * Clears a player's field.
@@ -332,6 +348,7 @@ tetriweb.Tetrinet.prototype.clearField_ = function(player_id) {
   }
 };
 
+
 /**
  * Sets a block on a player's field.
  * @param {number} player_id The owner of the block.
@@ -345,6 +362,7 @@ tetriweb.Tetrinet.prototype.setBlock_ = function(player_id, x, y, type) {
   var block = goog.dom.getElement('block-' + player_id + '-' + y + '-' + x);
   block.className = 'block ' + tetriweb.Tetris.convert(type);
 };
+
 
 /**
  * Sends the player's field to the server.
@@ -380,6 +398,7 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
   this.sendMessage_(f);
 };
 
+
 /**
  * Normalizes a block type to the matching integer type.
  * @param {(string|number)} type Block type (integer or string).
@@ -387,7 +406,7 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
  */
 tetriweb.Tetrinet.normalize = function(type) {
   var specials = {'a': 6, 'c': 7, 'n': 8, 'r': 9, 's': 10, 'b': 11, 'g': 12,
-                  'q': 13, 'o': 14};
+    'q': 13, 'o': 14};
   if (type >= '0' && type <= '5') {
     type = parseInt(type);
   } else if (specials[type] != undefined) {
@@ -395,6 +414,7 @@ tetriweb.Tetrinet.normalize = function(type) {
   }
   return type;
 };
+
 
 /**
  * Tells if a player exists.
@@ -405,6 +425,7 @@ tetriweb.Tetrinet.prototype.playerExists = function(playerNum) {
   return this.players_[playerNum] != undefined;
 };
 
+
 /**
  * Returns the player's playernum.
  * @return {number} The player's playernum.
@@ -413,11 +434,13 @@ tetriweb.Tetrinet.prototype.getMyPlayerNum = function() {
   return this.pnum_;
 };
 
+
 /**
  * @type {number}
  * @private
  */
 tetriweb.Tetrinet.prototype.pnum_ = 0;
+
 
 /**
  * @type {string}
@@ -425,11 +448,13 @@ tetriweb.Tetrinet.prototype.pnum_ = 0;
  */
 tetriweb.Tetrinet.prototype.url_ = 'backend.php';
 
+
 /**
  * @type {goog.net.XhrIo}
  * @private
  */
 tetriweb.Tetrinet.prototype.xhr_in_ = null;
+
 
 /**
  * @type {goog.net.XhrIo}
@@ -437,11 +462,13 @@ tetriweb.Tetrinet.prototype.xhr_in_ = null;
  */
 tetriweb.Tetrinet.prototype.xhr_out_ = null;
 
+
 /**
  * @type {number}
  * @private
  */
 tetriweb.Tetrinet.prototype.timer_ = null;
+
 
 /**
  * @type {Array.<string>}
@@ -449,11 +476,13 @@ tetriweb.Tetrinet.prototype.timer_ = null;
  */
 tetriweb.Tetrinet.prototype.players_ = null;
 
+
 /**
  * @type {Array.<string>}
  * @private
  */
 tetriweb.Tetrinet.prototype.teams_ = null;
+
 
 /**
  * @type {Array.<Array.<number>>}

@@ -5,6 +5,8 @@ goog.require('goog.events.KeyHandler');
 
 goog.provide('tetriweb.Tetris');
 
+
+
 /**
  * Tetris.
  * @param {object} tetrinet L'objet tetrinet.
@@ -96,7 +98,7 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
   this.nextDirection_ = randomInt(0, 3); // orientation de la pièce
 
   var nextpiece = tetriweb.Tetris.generatePiece(this.nextId_,
-    this.nextDirection_);
+      this.nextDirection_);
   var nextpieceobj = goog.dom.getElement('nextpiece');
   goog.dom.removeChildren(nextpieceobj);
   for (var l = 0; l < 4; l++) {
@@ -241,6 +243,7 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
   }
 };
 
+
 /**
  * Fonction appelée périodiquement pour faire avancer le jeu.
  * @private
@@ -335,7 +338,7 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
                  (this.curX_ + delta_x[dx] + c) < 12 &&
                  (this.curY_ + l) >= 0 &&
                  (this.curY_ + l) < 22 &&
-             this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
+                this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
           }
         }
       }
@@ -566,6 +569,7 @@ tetriweb.Tetris.randomInt = function(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+
 /**
  * Convertion d'un code couleur vers un nom de couleur.
  * @param {number} color Identifiant de couleur.
@@ -591,6 +595,7 @@ tetriweb.Tetris.convert = function(color) {
     default: alert('unknown block ' + typeof(color) + ' ' + color);
   }
 };
+
 
 /**
  * Retourne le code couleur pour un identifiant de piece donné.
@@ -684,6 +689,7 @@ tetriweb.Tetris.prototype.blockGravity = function() {
   this.updateGrid_();
 };
 
+
 /**
  * Deletes 10 random blocks on the field.
  */
@@ -694,6 +700,7 @@ tetriweb.Tetris.prototype.randomClearBlocks = function() {
   }
   this.updateGrid_();
 };
+
 
 /**
  * Clears all special blocks of the field.
@@ -709,6 +716,7 @@ tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
   }
   this.updateGrid_();
 };
+
 
 /**
  * Vide la grille !
@@ -737,6 +745,7 @@ tetriweb.Tetris.prototype.fillRandomly_ = function() {
   this.updateGrid_();
 };
 
+
 /**
  * Genere une nouvelle piece.
  * @private
@@ -748,7 +757,7 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
   this.curY_ = 0;
 
   this.current_ = tetriweb.Tetris.generatePiece(this.nextId_,
-    this.nextDirection_);
+      this.nextDirection_);
   this.currentColor_ = getColor(this.nextId_);
   this.generateRandom_();
 
@@ -862,11 +871,13 @@ tetriweb.Tetris.prototype.updatePiece_ = function() {
  */
 tetriweb.Tetris.prototype.gameArea_ = null;
 
+
 /**
  * @type {Array.<Array.<number>>}
  * @private
  */
 tetriweb.Tetris.prototype.oldGameArea_ = null;
+
 
 /**
  * @type {tetriweb.Tetrinet}
@@ -902,11 +913,13 @@ tetriweb.Tetris.prototype.current_ = null;
  */
 tetriweb.Tetris.prototype.currentColor_ = null;
 
+
 /**
  * @type {object}
  * @private
  */
 tetriweb.Tetris.prototype.currentObj_ = null;
+
 
 /**
  * @type {object}
@@ -914,11 +927,13 @@ tetriweb.Tetris.prototype.currentObj_ = null;
  */
 tetriweb.Tetris.prototype.myField_ = null;
 
+
 /**
  * @type {number}
  * @private
  */
 tetriweb.Tetris.prototype.nextId_ = null;
+
 
 /**
  * @type {number}
@@ -926,16 +941,19 @@ tetriweb.Tetris.prototype.nextId_ = null;
  */
 tetriweb.Tetris.prototype.nextDirection_ = null;
 
+
 /**
  * @type {boolean}
  * @private
  */
 tetriweb.Tetris.prototype.gameLost_ = false;
 
+
 /**
  * @type {number}
  */
 tetriweb.Tetris.prototype.stepTimer = null;
+
 
 /**
  * @type {boolean}
@@ -943,11 +961,13 @@ tetriweb.Tetris.prototype.stepTimer = null;
  */
 tetriweb.Tetris.prototype.pieceDropped_ = true;
 
+
 /**
  * @type {Array.<number>}
  * @private
  */
 tetriweb.Tetris.prototype.piecesFreq_ = null;
+
 
 /**
  * @type {Array.<number>}
@@ -955,11 +975,13 @@ tetriweb.Tetris.prototype.piecesFreq_ = null;
  */
 tetriweb.Tetris.prototype.specialsFreq_ = null;
 
+
 /**
  * @type {Array.<number>}
  * @private
  */
 tetriweb.Tetris.prototype.specialsQueue_ = null;
+
 
 /**
  * @type {number}
@@ -967,17 +989,20 @@ tetriweb.Tetris.prototype.specialsQueue_ = null;
  */
 tetriweb.Tetris.prototype.specialLines_ = null;
 
+
 /**
  * @type {number}
  * @private
  */
 tetriweb.Tetris.prototype.specialCount_ = null;
 
+
 /**
  * @type {number}
  * @private
  */
 tetriweb.Tetris.prototype.specialCapacity_ = null;
+
 
 /**
  * @type {number}
