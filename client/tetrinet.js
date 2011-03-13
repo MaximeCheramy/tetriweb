@@ -320,10 +320,10 @@ tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
     for (var c = 0; c < 12; c++) {
       this.fields_[player_id][l][c] = '0';
       block = goog.dom.createDom('div');
-      block.className = 'block ' + tetriweb.Tetris.convert(0);
+      block.className = 'small block ' + tetriweb.Tetris.convert(0);
       block.id = 'block-' + player_id + '-' + l + '-' + c;
-      block.style.top = l * 20 + 1;
-      block.style.left = c * 20 + 1;
+      block.style.top = l * tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1;
+      block.style.left = c * tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1;
       goog.dom.appendChild(field, block);
     }
   }
@@ -366,7 +366,7 @@ tetriweb.Tetrinet.prototype.clearField_ = function(player_id) {
 tetriweb.Tetrinet.prototype.setBlock_ = function(player_id, x, y, type) {
   this.fields_[player_id][y][x] = type;
   var block = goog.dom.getElement('block-' + player_id + '-' + y + '-' + x);
-  block.className = 'block ' + tetriweb.Tetris.convert(type);
+  block.className = 'small block ' + tetriweb.Tetris.convert(type);
 };
 
 
@@ -510,3 +510,10 @@ tetriweb.Tetrinet.prototype.teams_ = null;
  * @private
  */
 tetriweb.Tetrinet.prototype.fields_ = null;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetrinet.BLOCK_SIZE_OPP_ = 12;

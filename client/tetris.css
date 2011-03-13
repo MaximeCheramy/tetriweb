@@ -1,7 +1,7 @@
 .field {
   position: relative;
-  width: 240px;
-  height: 440px;
+  width: 144px;
+  height: 264px;
   border: 2px solid #222222;
   float: left;
 }
@@ -11,6 +11,11 @@
 	width: 16px;
 	height: 16px;
 	border: 1px solid #000000;
+}
+
+.block.small {
+  width: 8px;
+  height: 8px;
 }
 
 .block.empty { border: none; }
@@ -33,7 +38,6 @@
 	position: absolute;
 	width: 80px;
 	height: 80px;
-	//border: 1px solid #000000;
 }
 
 #mycontainer {
