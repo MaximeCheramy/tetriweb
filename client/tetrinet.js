@@ -149,14 +149,14 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           this.clearField_(player_id);
         }*/
         // Initialize tetris
-        tetris.init(data[5], data[6], data[7], data[8], data[9]);
+        this.tetris.init(data[5], data[6], data[7], data[8], data[9]);
         break;
       // All players lose except one
       case 'endgame':
         message = '*** La partie est terminée';
         // Stop tetris
         // TODO: disable key events in the field
-        clearTimeout(tetris.stepTimer);
+        clearTimeout(this.tetris.stepTimer);
         break;
       // Field description
       case 'f':
@@ -189,25 +189,25 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
       case 'sb':
         if (data[1] == 0 || data[1] == this.pnum_) {
           if (data[2] == 'cs1' || data[2] == 'a') {
-            tetris.addLine();
+            this.tetris.addLine();
           } else if (data[2] == 'cs2') {
-            tetris.addLine();
-            tetris.addLine();
+            this.tetris.addLine();
+            this.tetris.addLine();
           } else if (data[2] == 'cs4') {
-            tetris.addLine();
-            tetris.addLine();
-            tetris.addLine();
-            tetris.addLine();
+            this.tetris.addLine();
+            this.tetris.addLine();
+            this.tetris.addLine();
+            this.tetris.addLine();
           } else if (data[2] == 'b') {
-            tetris.clearSpecialBlocks();
+            this.tetris.clearSpecialBlocks();
           } else if (data[2] == 'c') {
-            tetris.clearLine();
+            this.tetris.clearLine();
           } else if (data[2] == 'g') {
-            tetris.blockGravity();
+            this.tetris.blockGravity();
           } else if (data[2] == 'n') {
-            tetris.nukeField();
+            this.tetris.nukeField();
           } else if (data[2] == 'r') {
-            tetris.randomClearBlocks();
+            this.tetris.randomClearBlocks();
           }
         }
         break;
@@ -434,6 +434,11 @@ tetriweb.Tetrinet.prototype.getMyPlayerNum = function() {
   return this.pnum_;
 };
 
+
+/**
+ * @type {tetriweb.Tetris}
+ */
+tetriweb.Tetrinet.prototype.tetris = null;
 
 /**
  * @type {number}
