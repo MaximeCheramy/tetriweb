@@ -7,8 +7,8 @@ goog.provide('tetriweb.Tetris');
 
 
 
-/**
- * Tetris.
+/**     
+ * Tetris Class.
  * @param {object} tetrinet L'objet tetrinet.
  * @constructor
  */
@@ -39,7 +39,7 @@ tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
   }
 
   this.gameLost_ = false;
-  // fréquence des pièces
+  // Pieces' frequency.
   this.piecesFreq_ = goog.array.repeat(0, 7);
   for (var i = 0; i < _piecesFreq.length; i++) {
     this.piecesFreq_[parseInt(_piecesFreq[i]) - 1]++;
@@ -50,7 +50,7 @@ tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
     this.piecesFreq_[i] = n;
   }
 
-  // fréquence des specials
+  // Specials' frequency.
   this.specialsFreq_ = goog.array.repeat(0, 9);
   for (var i = 0; i < _specialsFreq.length; i++) {
     this.specialsFreq_[parseInt(_specialsFreq[i]) - 1]++;
@@ -116,8 +116,8 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
 
 
 /**
- * Vérifie s'il y a des lignes completes pour les supprimer et créer des
- * bonus ou envoyer des lignes a l'adversaire.
+ * Checks for complete lines. Complete lines will be removed and create new
+ * bonus or add lines to opponents.
  * @private
  */
 tetriweb.Tetris.prototype.checkLine_ = function() {
@@ -245,7 +245,7 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
 
 
 /**
- * Fonction appelée périodiquement pour faire avancer le jeu.
+ * Game Engine. This function is called periodicaly.
  * @private
  */
 tetriweb.Tetris.prototype.step_ = function() {
@@ -302,13 +302,13 @@ tetriweb.Tetris.prototype.step_ = function() {
 
 
 /**
- * Fonction appelée lors de l'appuie d'une touche sur le tetris.
- * @param {object} e L'event.
+ * Key handler used to move the pieces or send actions.
+ * @param {object} e The key event.
  * @private
  */
 tetriweb.Tetris.prototype.keyHandler_ = function(e) {
   //console.log(e.keyCode);
-  // TODO: Séparer en plusieurs fonctions ? Oui/Non ?
+  // TODO: Séparer en plusieurs fonctions.
 
   // Stop la propagation de l'event.
   e.preventDefault();
