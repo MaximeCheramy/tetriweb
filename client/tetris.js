@@ -11,425 +11,437 @@ goog.provide('tetriweb.Tetris');
  * @constructor
  */
 tetriweb.Tetris = function(tetrinet) {
-  // TODO: Les variables locales devraient etre def en dehors du constructeur
-  // sous la forme: tetriweb.Tetris.variable_.
-  var montimer = null;
-  var pieceDropped = true;
-  var piecesFreq = null;
-  var specialsFreq = null;
-  var specialLines = null;
-  var specialCount = null;
-  var specialCapacity = null;
-  var currentSpecialLines = null;
-  var specialsQueue = null;
-
   this.tetrinet_ = tetrinet;
   this.tetrinet_.tetris = this;
   this.gameArea_ = new Array(22);
-
-  // TODO: Deplacer les fonctions vers tetriweb.Tetris.fonction et en dehors du
-  // constructeur.
-  this.init = function(_specialLines, _specialCount, _specialCapacity,
-      _piecesFreq, _specialsFreq) {
-    // init the game area : all empty.
-    for (var l = 0; l < 22; l++) {
-      this.gameArea_[l] = new Array(12);
-      for (var c = 0; c < 12; c++) {
-        this.gameArea_[l][c] = 0;
-      }
-    }
-
-    this.gameLost_ = false;
-    // fréquence des pièces
-    piecesFreq = goog.array.repeat(0, 7);
-    for (var i = 0; i < _piecesFreq.length; i++) {
-      piecesFreq[parseInt(_piecesFreq[i]) - 1]++;
-    }
-    var n = 0;
-    for (var i = 0; i < 7; i++) {
-      n += piecesFreq[i];
-      piecesFreq[i] = n;
-    }
-    //console.log(piecesFreq);
-
-    // fréquence des specials
-    specialsFreq = goog.array.repeat(0, 9);
-    for (var i = 0; i < _specialsFreq.length; i++) {
-      specialsFreq[parseInt(_specialsFreq[i]) - 1]++;
-    }
-    n = 0;
-    for (var i = 0; i < 9; i++) {
-      n += specialsFreq[i];
-      specialsFreq[i] = n;
-    }
-    //console.log(specialsFreq);
-
-    specialLines = _specialLines;
-    specialCount = _specialCount;
-    specialCapacity = _specialCapacity;
-    currentSpecialLines = 0;
-    specialsQueue = [];
-
-    this.myField_ = goog.dom.getElement('myfield');
-
-    this.updateGrid_();
-    this.generateRandom();
-    this.newPiece_();
-    montimer = window.setTimeout(goog.bind(this.step, this), 1000);
-
-    goog.events.removeAll(this.myField_);
-    var keyHandler = new goog.events.KeyHandler(this.myField_);
-    goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
-        goog.bind(this.keyHandler, this));
-  };
-
-  this.generateRandom = function() {
-    var convert = tetriweb.Tetris.convert;
-    var getColor = tetriweb.Tetris.getColor;
-    var randomInt = tetriweb.Tetris.randomInt;
-
-    var n = randomInt(0, 99);
-    this.nextId_ = 0; // prochaine pièce
-    while (n >= piecesFreq[this.nextId_]) {
-      this.nextId_++;
-    }
-    this.nextDirection_ = randomInt(0, 3); // orientation de la pièce
-
-    var nextpiece = tetriweb.Tetris.generatePiece(this.nextId_, this.nextDirection_);
-    var nextpieceobj = goog.dom.getElement('nextpiece');
-    goog.dom.removeChildren(nextpieceobj);
-    for (var l = 0; l < 4; l++) {
-      for (var c = 0; c < 4; c++) {
-        if (nextpiece[l][c]) {
-          var bloc = goog.dom.createDom('div');
-          bloc.style.top = l * 20 + 1;
-          bloc.style.left = c * 20 + 1;
-          bloc.className = 'block ' + convert(getColor(this.nextId_));
-          goog.dom.appendChild(nextpieceobj, bloc);
-        }
-      }
-    }
-  };
+};
 
 
-
-
-
-  /**
-   * Vérifie s'il y a des lignes completes pour les supprimer et créer des
-   * bonus ou envoyer des lignes a l'adversaire.
-   */
-  this.checkLine = function() {
-    var nbLines = 0;
-    var tmpSpecials = [];
-    for (var l = 0; l < 22; l++) {
-      var tetris = true;
-      for (var c = 0; c < 12; c++) {
-        tetris = tetris && (this.gameArea_[l][c] > 0);
-      }
-      if (tetris) {
-        nbLines++;
-        // Take specials
-        for (var c = 0; c < 12; c++) {
-          if (this.gameArea_[l][c] > 5) {
-            tmpSpecials.push(this.gameArea_[l][c]);
-          }
-        }
-        for (var ll = l; ll > 0; ll--) {
-          for (var c = 0; c < 12; c++) {
-            this.gameArea_[ll][c] = this.gameArea_[ll - 1][c];
-          }
-        }
-        for (var c = 0; c < 12; c++) {
-          this.gameArea_[0][c] = 0;
-        }
-      }
-    }
-   this.updateGrid_();
-    if (nbLines == 4) {
-      this.tetrinet_.sendLines(nbLines);
-    } else if (nbLines > 1) {
-      this.tetrinet_.sendLines(nbLines - 1);
-    }
-
-    //console.log(tmpSpecials);
-
-    for (var i = 0; i < tmpSpecials.length &&
-        specialsQueue.length < specialCapacity; i++) {
-      for (var j = 0; j < nbLines &&
-          specialsQueue.length < specialCapacity; j++) {
-        specialsQueue.push(tmpSpecials[i]);
-      }
-    }
-    this.updateSpecialBar();
-
-    // Special handling
-    currentSpecialLines += nbLines;
-    this.placeSpecials((currentSpecialLines / specialLines) * specialCount);
-    currentSpecialLines %= specialLines;
-  };
-
-
-  /**
-   * TODO: Comment.
-   */
-  this.updateSpecialBar = function() {
-    var convert = tetriweb.Tetris.convert;
-
-    var specialBar = goog.dom.getElement('specialbar');
-    goog.dom.removeChildren(specialBar);
-    for (var i = 0; i < specialsQueue.length; i++) {
-      var special = goog.dom.createDom('div');
-      special.className = 'block ' + convert(specialsQueue[i]);
-      special.style.top = 0;
-      special.style.left = i * 20 + 1;
-      goog.dom.appendChild(specialBar, special);
+/**
+ * Initializes the game.
+ * @param {number} _specialLines The number of lines required to get a special.
+ * @param {number} _specialCount The number of specials added each time
+ * _specialLines are completed.
+ * @param {number} _specialCapacity The capacity of the specials queue.
+ * @param {number} _piecesFreq Occurence frequencies of each block.
+ * @param {number} _specialsFreq Occurence frequencies of each special.
+ */
+tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
+    _specialCapacity, _piecesFreq, _specialsFreq) {
+  // init the game area : all empty.
+  for (var l = 0; l < 22; l++) {
+    this.gameArea_[l] = new Array(12);
+    for (var c = 0; c < 12; c++) {
+      this.gameArea_[l][c] = 0;
     }
   }
 
+  this.gameLost_ = false;
+  // fréquence des pièces
+  this.piecesFreq_ = goog.array.repeat(0, 7);
+  for (var i = 0; i < _piecesFreq.length; i++) {
+    this.piecesFreq_[parseInt(_piecesFreq[i]) - 1]++;
+  }
+  var n = 0;
+  for (var i = 0; i < 7; i++) {
+    n += this.piecesFreq_[i];
+    this.piecesFreq_[i] = n;
+  }
 
-  /**
-   * TODO: Comment.
-   */
-  this.placeSpecials = function(nb) {
-    var randomInt = tetriweb.Tetris.randomInt;
-    var availBlocks = 0;
-    for (var l = 0; l < 22; l++) {
+  // fréquence des specials
+  this.specialsFreq_ = goog.array.repeat(0, 9);
+  for (var i = 0; i < _specialsFreq.length; i++) {
+    this.specialsFreq_[parseInt(_specialsFreq[i]) - 1]++;
+  }
+  n = 0;
+  for (var i = 0; i < 9; i++) {
+    n += this.specialsFreq_[i];
+    this.specialsFreq_[i] = n;
+  }
+
+  this.specialLines_ = _specialLines;
+  this.specialCount_ = _specialCount;
+  this.specialCapacity_ = _specialCapacity;
+  this.currentSpecialLines_ = 0;
+  this.specialsQueue_ = [];
+
+  this.myField_ = goog.dom.getElement('myfield');
+
+  this.updateGrid_();
+  this.generateRandom_();
+  this.newPiece_();
+  this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
+
+  goog.events.removeAll(this.myField_);
+  var keyHandler = new goog.events.KeyHandler(this.myField_);
+  goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
+      goog.bind(this.keyHandler_, this));
+};
+
+
+/**
+ * Generates a random block.
+ * @private
+ */
+tetriweb.Tetris.prototype.generateRandom_ = function() {
+  var convert = tetriweb.Tetris.convert;
+  var getColor = tetriweb.Tetris.getColor;
+  var randomInt = tetriweb.Tetris.randomInt;
+
+  var n = randomInt(0, 99);
+  this.nextId_ = 0; // prochaine pièce
+  while (n >= this.piecesFreq_[this.nextId_]) {
+    this.nextId_++;
+  }
+  this.nextDirection_ = randomInt(0, 3); // orientation de la pièce
+
+  var nextpiece = tetriweb.Tetris.generatePiece(this.nextId_,
+    this.nextDirection_);
+  var nextpieceobj = goog.dom.getElement('nextpiece');
+  goog.dom.removeChildren(nextpieceobj);
+  for (var l = 0; l < 4; l++) {
+    for (var c = 0; c < 4; c++) {
+      if (nextpiece[l][c]) {
+        var bloc = goog.dom.createDom('div');
+        bloc.style.top = l * 20 + 1;
+        bloc.style.left = c * 20 + 1;
+        bloc.className = 'block ' + convert(getColor(this.nextId_));
+        goog.dom.appendChild(nextpieceobj, bloc);
+      }
+    }
+  }
+};
+
+
+/**
+ * Vérifie s'il y a des lignes completes pour les supprimer et créer des
+ * bonus ou envoyer des lignes a l'adversaire.
+ * @private
+ */
+tetriweb.Tetris.prototype.checkLine_ = function() {
+  var nbLines = 0;
+  var tmpSpecials = [];
+  for (var l = 0; l < 22; l++) {
+    var tetris = true;
+    for (var c = 0; c < 12; c++) {
+      tetris = tetris && (this.gameArea_[l][c] > 0);
+    }
+    if (tetris) {
+      nbLines++;
+      // Take specials
       for (var c = 0; c < 12; c++) {
+        if (this.gameArea_[l][c] > 5) {
+          tmpSpecials.push(this.gameArea_[l][c]);
+        }
+      }
+      for (var ll = l; ll > 0; ll--) {
+        for (var c = 0; c < 12; c++) {
+          this.gameArea_[ll][c] = this.gameArea_[ll - 1][c];
+        }
+      }
+      for (var c = 0; c < 12; c++) {
+        this.gameArea_[0][c] = 0;
+      }
+    }
+  }
+  this.updateGrid_();
+  if (nbLines == 4) {
+    this.tetrinet_.sendLines(nbLines);
+  } else if (nbLines > 1) {
+    this.tetrinet_.sendLines(nbLines - 1);
+  }
+
+  // Take each special nbLines times
+  for (var i = 0; i < tmpSpecials.length &&
+      this.specialsQueue_.length < this.specialCapacity_; i++) {
+    for (var j = 0; j < nbLines &&
+        this.specialsQueue_.length < this.specialCapacity_; j++) {
+      this.specialsQueue_.push(tmpSpecials[i]);
+    }
+  }
+  this.updateSpecialBar_();
+
+  // Increment counters and place special blocks on the field
+  this.currentSpecialLines_ += nbLines;
+  var nbSpecials = this.currentSpecialLines_ / this.specialLines_;
+  this.placeSpecials_(nbSpecials * this.specialCount_);
+  this.currentSpecialLines_ %= this.specialLines_;
+};
+
+
+/**
+ * Updates the special bar displayed under the game field.
+ * @private
+ */
+tetriweb.Tetris.prototype.updateSpecialBar_ = function() {
+  var convert = tetriweb.Tetris.convert;
+
+  // Clear the bar...
+  var specialBar = goog.dom.getElement('specialbar');
+  goog.dom.removeChildren(specialBar);
+  // And fill it again !
+  for (var i = 0; i < this.specialsQueue_.length; i++) {
+    var special = goog.dom.createDom('div');
+    special.className = 'block ' + convert(this.specialsQueue_[i]);
+    special.style.top = 0;
+    special.style.left = i * 20 + 1;
+    goog.dom.appendChild(specialBar, special);
+  }
+};
+
+
+/**
+ * Places nb special blocks on the field.
+ * @param {number} nb The number of blocks to place.
+ * @private
+ */
+tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
+  var randomInt = tetriweb.Tetris.randomInt;
+
+  // Count number of blocks available
+  var availBlocks = 0;
+  for (var l = 0; l < 22; l++) {
+    for (var c = 0; c < 12; c++) {
+      if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
+        availBlocks++;
+      }
+    }
+  }
+
+  // Can't place more blocks than available
+  var blocksToPlace = Math.min(nb, availBlocks);
+
+  // Generate and place blocks randomly
+  for (var i = 0; i < blocksToPlace; i++) {
+    // Choose special type
+    var n = randomInt(0, 99);
+    var special = 0;
+    while (n >= this.specialsFreq_[special]) {
+      special++;
+    }
+    special += 6;
+
+    // Choose place on the field (nth available block)
+    var place = randomInt(0, availBlocks - i - 1);
+    for (var l = 0; place >= 0 && l < 22; l++) {
+      for (var c = 0; place >= 0 && c < 12; c++) {
         if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
-          availBlocks++;
-        }
-      }
-    }
-    var blocksToPlace = Math.min(nb, availBlocks);
-
-    //console.log('availBlocks : ' + availBlocks);
-    //console.log('blocksToPlace : ' + blocksToPlace);
-
-    for (var i = 0; i < blocksToPlace; i++) {
-      var n = randomInt(0, 99);
-      var special = 0;
-      while (n >= specialsFreq[special]) {
-        special++;
-      }
-      special += 6;
-      var place = randomInt(0, availBlocks - i - 1);
-      //console.log('place : ' + place);
-      for (var l = 0; place >= 0 && l < 22; l++) {
-        for (var c = 0; place >= 0 && c < 12; c++) {
-          if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
-            if (place == 0) {
-              this.gameArea_[l][c] = special;
-            }
-            place--;
+          if (place == 0) {
+            this.gameArea_[l][c] = special;
           }
+          place--;
         }
       }
     }
+  }
 
-    if (blocksToPlace > 0) {
-      this.updateGrid_();
+  // Update the grid if it has changed
+  if (blocksToPlace > 0) {
+    this.updateGrid_();
+  }
+};
+
+/**
+ * Fonction appelée périodiquement pour faire avancer le jeu.
+ * @private
+ */
+tetriweb.Tetris.prototype.step_ = function() {
+  //TODO: Commenter le workflow du moteur de jeu.
+
+  var stop = false;
+  for (var l = 0; l < 4 && !stop; l++) {
+    for (var c = 0; c < 4 && !stop; c++) {
+      if (this.current_[l][c]) {
+        if (l + this.curY_ + 1 >= 22 ||
+            this.gameArea_[l + this.curY_ + 1][c + this.curX_] > 0) {
+          stop = true;
+        }
+      }
     }
-  };
+  }
+  if (!stop) {
+    this.curY_++;
+    this.currentObj_.style.top = this.curY_ * 20;
+  } else {
+    var convert = tetriweb.Tetris.convert;
 
+    if (this.curY_ <= 0) {
+      this.gameLost_ = true;
+    }
 
-  /**
-   * Fonction appelée périodiquement pour faire avancer le jeu.
-   */
-  this.step = function() {
-    //TODO: Commenter le workflow du moteur de jeu.
-
-    var stop = false;
-    for (var l = 0; l < 4 && !stop; l++) {
-      for (var c = 0; c < 4 && !stop; c++) {
+    // On dépose les pièces
+    for (var l = 0; l < 4; l++) {
+      for (var c = 0; c < 4; c++) {
         if (this.current_[l][c]) {
-          if (l + this.curY_ + 1 >= 22 || this.gameArea_[l + this.curY_ + 1][c + this.curX_] > 0) {
-            stop = true;
+          this.gameArea_[l + this.curY_][c + this.curX_] = this.currentColor_;
+          var bloc = goog.dom.createDom('div');
+          bloc.style.top = (this.curY_ + l) * 20 + 1;
+          bloc.style.left = (this.curX_ + c) * 20 + 1;
+          bloc.className = 'block ' + convert(this.currentColor_);
+          goog.dom.appendChild(this.myField_, bloc);
+        }
+      }
+    }
+    goog.dom.removeNode(this.currentObj_);
+    this.pieceDropped_ = true;
+    this.checkLine_();
+    this.sendField_();
+    this.newPiece_();
+  }
+  if (this.gameLost_) {
+    this.tetrinet_.sendPlayerlost();
+    this.fillRandomly_();
+  } else {
+    clearTimeout(this.stepTimer);
+    this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
+  }
+};
+
+
+/**
+ * Fonction appelée lors de l'appuie d'une touche sur le tetris.
+ * @param {object} e L'event.
+ * @private
+ */
+tetriweb.Tetris.prototype.keyHandler_ = function(e) {
+  //console.log(e.keyCode);
+  // TODO: Séparer en plusieurs fonctions ? Oui/Non ?
+
+  // Stop la propagation de l'event.
+  e.preventDefault();
+
+  // Si la partie est perdue alors on ne fait rien.
+  if (this.gameLost_) return;
+
+  // Touche haut ou 8.
+  if (e.keyCode == 38 || e.keyCode == 56) {
+    var piece = tetriweb.Tetris.rotate_(this.current_);
+
+    // verifie si new ok.
+    var ok = false;
+    // On tente plusieurs décalages en x pour tourner contre des obstacles
+    // 0 = pas de décalage, 1 = un cran à droite, -1 = un cran à gauche...
+    // TODO: visiblement 2 ne sert jamais, et 3 que pour les linebar.
+    // Optimisable donc...
+    var delta_x = [0, 1, -1, 2, -2, 3, -3];
+    var dx = 0;
+    for (dx = 0; dx < delta_x.length && !ok; dx++) {
+      //console.log("trying dx = " + delta_x[dx]);
+      ok = true;
+      for (var l = 0; l < 4 && ok; l++) {
+        for (var c = 0; c < 4 && ok; c++) {
+          if (piece[l][c]) {
+            ok = (this.curX_ + delta_x[dx] + c) >= 0 &&
+                 (this.curX_ + delta_x[dx] + c) < 12 &&
+                 (this.curY_ + l) >= 0 &&
+                 (this.curY_ + l) < 22 &&
+             this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
           }
         }
       }
     }
-    if (!stop) {
-      this.curY_++;
-      this.currentObj_.style.top = this.curY_ * 20;
-    } else {
-      var convert = tetriweb.Tetris.convert;
+    dx--;
+    //console.log("dx = " + dx + " delta_x = " + delta_x[dx]);
 
-      if (this.curY_ <= 0) {
-        this.gameLost_ = true;
-      }
-
-      // On dépose les pièces
-      for (var l = 0; l < 4; l++) {
-        for (var c = 0; c < 4; c++) {
-          if (this.current_[l][c]) {
-            this.gameArea_[l + this.curY_][c + this.curX_] = this.currentColor_;
-            var bloc = goog.dom.createDom('div');
-            bloc.style.top = (this.curY_ + l) * 20 + 1;
-            bloc.style.left = (this.curX_ + c) * 20 + 1;
-            bloc.className = 'block ' + convert(this.currentColor_);
-            goog.dom.appendChild(this.myField_, bloc);
-          }
-        }
-      }
+    if (ok) {
+      this.curX_ += delta_x[dx];
+      this.current_ = piece;
       goog.dom.removeNode(this.currentObj_);
-      pieceDropped = true;
-      this.checkLine();
-      this.sendField_();
-      this.newPiece_();
+      this.updatePiece_();
     }
-    if (this.gameLost_) {
-      this.tetrinet_.sendPlayerlost();
-      this.fillRandomly_();
-    } else {
-      clearTimeout(montimer);
-      montimer = window.setTimeout(goog.bind(this.step, this), 1000);
-    }
-  };
+  }
 
-  /**
-   * Fonction appelée lors de l'appuie d'une touche sur le tetris.
-   * @param {object} e L'event.
-   */
-  this.keyHandler = function(e) {
-    //console.log(e.keyCode);
-    // TODO: Séparer en plusieurs fonctions ? Oui/Non ?
-
-    // Stop la propagation de l'event.
-    e.preventDefault();
-
-    // Si la partie est perdue alors on ne fait rien.
-    if (this.gameLost_) return;
-
-    // Touche haut ou 8.
-    if (e.keyCode == 38 || e.keyCode == 56) {
-      piece = tetriweb.Tetris.rotate_(this.current_);
-
-      // verifie si new ok.
-      var ok = false;
-      // TODO: visiblement 2 ne sert jamais, et 3 que pour les linebar.
-      // Optimisable donc...
-      var delta_x = [0, 1, -1, 2, -2, 3, -3];
-      var dx = 0;
-      for (dx = 0; dx < delta_x.length && !ok; dx++) {
-        //console.log("trying dx = " + delta_x[dx]);
-        ok = true;
-        for (var l = 0; l < 4 && ok; l++) {
-          for (var c = 0; c < 4 && ok; c++) {
-            if (piece[l][c]) {
-              ok = (this.curX_ + delta_x[dx] + c) >= 0 &&
-                   (this.curX_ + delta_x[dx] + c) < 12 &&
-                   (this.curY_ + l) >= 0 &&
-                   (this.curY_ + l) < 22 &&
-                   this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
-            }
+  // Touche droite.
+  if (e.keyCode == 39 || e.keyCode == 54) {
+    var ok = true;
+    for (var l = 0; l < 4 && ok; l++) {
+      for (var c = 0; c < 4 && ok; c++) {
+        if (this.current_[l][c]) {
+          if (c + this.curX_ + 1 >= 12 ||
+              this.gameArea_[l + this.curY_][c + this.curX_ + 1] > 0) {
+            ok = false;
           }
         }
       }
-      dx--;
-      //console.log("dx = " + dx + " delta_x = " + delta_x[dx]);
-
-      if (ok) {
-        this.curX_ += delta_x[dx];
-        this.current_ = piece;
-        goog.dom.removeNode(this.currentObj_);
-        this.updatePiece_();
-      }
     }
+    if (ok) {
+      this.curX_++;
+    }
+  }
 
-    // Touche droite.
-    if (e.keyCode == 39 || e.keyCode == 54) {
-      var ok = true;
-      for (var l = 0; l < 4 && ok; l++) {
-        for (var c = 0; c < 4 && ok; c++) {
-          if (this.current_[l][c]) {
-            if (c + this.curX_ + 1 >= 12 ||
-                this.gameArea_[l + this.curY_][c + this.curX_ + 1] > 0) {
-              ok = false;
-            }
+  // Touche gauche.
+  if (e.keyCode == 37 || e.keyCode == 52) {
+    var ok = true;
+    for (var l = 0; l < 4 && ok; l++) {
+      for (var c = 0; c < 4 && ok; c++) {
+        if (this.current_[l][c]) {
+          if (c + this.curX_ - 1 < 0 ||
+              this.gameArea_[l + this.curY_][c + this.curX_ - 1] > 0) {
+            ok = false;
           }
         }
       }
-      if (ok) {
-        this.curX_++;
-      }
     }
+    if (ok) {
+      this.curX_--;
+    }
+  }
 
-    // Touche gauche.
-    if (e.keyCode == 37 || e.keyCode == 52) {
-      var ok = true;
-      for (var l = 0; l < 4 && ok; l++) {
-        for (var c = 0; c < 4 && ok; c++) {
-          if (this.current_[l][c]) {
-            if (c + this.curX_ - 1 < 0 ||
-                this.gameArea_[l + this.curY_][c + this.curX_ - 1] > 0) {
-              ok = false;
-            }
-          }
+  // Touche bas.
+  if (e.keyCode == 40 || e.keyCode == 50) {
+    clearTimeout(this.stepTimer);
+    this.step_();
+  }
+
+  // Touche espace.
+  if (e.charCode == 32) {
+    this.pieceDropped_ = false;
+    while (!this.pieceDropped_) {
+      this.step_();
+    }
+  }
+
+  // Envoi bonus (touches 1 à 6 haut du clavier)
+  if (e.keyCode >= 49 && e.keyCode <= 54 && this.specialsQueue_.length > 0) {
+    var convert = tetriweb.Tetris.convert;
+    var playerNum = e.keyCode - 48;
+    if (this.tetrinet_.playerExists(playerNum)) {
+      var specialName = convert(this.specialsQueue_.shift()).substring(3);
+      if (playerNum == this.tetrinet_.getMyPlayerNum()) {
+        switch (specialName) {
+          case 'a':
+            this.addLine();
+            break;
+          case 'b':
+            this.clearSpecialBlocks();
+            break;
+          case 'c':
+            this.clearLine();
+            break;
+          case 'g':
+            this.blockGravity();
+            break;
+          case 'n':
+            this.nukeField();
+            break;
+          case 'r':
+            this.randomClearBlocks();
+            break;
         }
       }
-      if (ok) {
-        this.curX_--;
-      }
+      this.tetrinet_.sendSpecial(specialName, playerNum);
+      this.updateSpecialBar_();
     }
+  }
 
-    // Touche bas.
-    if (e.keyCode == 40 || e.keyCode == 50) {
-      clearTimeout(montimer);
-      this.step();
-    }
+  // Delete bonus (d)
+  if (e.keyCode == 68) {
+    this.specialsQueue_.shift();
+    this.updateSpecialBar_();
+  }
 
-    // Touche espace.
-    if (e.charCode == 32) {
-      pieceDropped = false;
-      while (!pieceDropped) {
-        this.step();
-      }
-    }
-
-    // Envoi bonus (touches 1 à 6 haut du clavier)
-    if (e.keyCode >= 49 && e.keyCode <= 54 && specialsQueue.length > 0) {
-      var convert = tetriweb.Tetris.convert;
-      var playerNum = e.keyCode - 48;
-      if (this.tetrinet_.playerExists(playerNum)) {
-        var specialName = convert(specialsQueue.shift()).substring(3);
-        if (playerNum == this.tetrinet_.getMyPlayerNum()) {
-          switch (specialName) {
-            case 'a':
-              this.addLine();
-              break;
-            case 'b':
-              this.clearSpecialBlocks();
-              break;
-            case 'c':
-              this.clearLine();
-              break;
-            case 'g':
-              this.blockGravity();
-              break;
-            case 'n':
-              this.nukeField();
-              break;
-            case 'r':
-              this.randomClearBlocks();
-              break;
-          }
-        }
-        this.tetrinet_.sendSpecial(specialName, playerNum);
-        this.updateSpecialBar();
-      }
-    }
-
-    // Delete bonus (d)
-    if (e.keyCode == 68) {
-      specialsQueue.shift();
-      this.updateSpecialBar();
-    }
-
-    // Actualise la position de la piece.
-    this.currentObj_.style.left = this.curX_ * 20;
-  };
-
+  // Actualise la position de la piece.
+  this.currentObj_.style.left = this.curX_ * 20;
 };
 
 
@@ -735,9 +747,10 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
   this.curX_ = 5;
   this.curY_ = 0;
 
-  this.current_ = tetriweb.Tetris.generatePiece(this.nextId_, this.nextDirection_);
+  this.current_ = tetriweb.Tetris.generatePiece(this.nextId_,
+    this.nextDirection_);
   this.currentColor_ = getColor(this.nextId_);
-  this.generateRandom();
+  this.generateRandom_();
 
   // Remonte un peu l'objet si commence par du vide.
   for (var l = 0; l < 4; l++) {
@@ -789,6 +802,7 @@ tetriweb.Tetris.prototype.sendField_ = function() {
 /**
  * Met a jour graphiquement la grille a partir de la representation interne
  * du jeu.
+ * @private
  */
 tetriweb.Tetris.prototype.updateGrid_ = function() {
   var convert = tetriweb.Tetris.convert;
@@ -819,6 +833,7 @@ tetriweb.Tetris.prototype.updateGrid_ = function() {
 
 /**
  * Met a jour la piece courante en la creant et l'ajoutant au field.
+ * @private
  */
 tetriweb.Tetris.prototype.updatePiece_ = function() {
   var convert = tetriweb.Tetris.convert;
@@ -916,3 +931,56 @@ tetriweb.Tetris.prototype.nextDirection_ = null;
  * @private
  */
 tetriweb.Tetris.prototype.gameLost_ = false;
+
+/**
+ * @type {number}
+ */
+tetriweb.Tetris.prototype.stepTimer = null;
+
+/**
+ * @type {boolean}
+ * @private
+ */
+tetriweb.Tetris.prototype.pieceDropped_ = true;
+
+/**
+ * @type {Array.<number>}
+ * @private
+ */
+tetriweb.Tetris.prototype.piecesFreq_ = null;
+
+/**
+ * @type {Array.<number>}
+ * @private
+ */
+tetriweb.Tetris.prototype.specialsFreq_ = null;
+
+/**
+ * @type {Array.<number>}
+ * @private
+ */
+tetriweb.Tetris.prototype.specialsQueue_ = null;
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.specialLines_ = null;
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.specialCount_ = null;
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.specialCapacity_ = null;
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.currentSpecialLines_ = null;

@@ -150,7 +150,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         message = '*** La partie est terminée';
         // Stop tetris
         // TODO: disable key events in the field
-        clearTimeout(tetris.montimer);
+        clearTimeout(tetris.stepTimer);
         break;
       // Field description
       case 'f':
@@ -241,7 +241,7 @@ tetriweb.Tetrinet.prototype.startGame = function() {
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
   goog.dom.getElement('content').innerHTML += '<div>' + '&lt;' +
-    this.players_[pnum] + '&gt; ' + msg + '</div>';
+    this.players_[this.pnum_] + '&gt; ' + msg + '</div>';
 };
 
 /**
