@@ -145,9 +145,11 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
       case 'newgame':
         message = '*** La partie a débuté';
         // Clear all fields
-        /**for (player_id in this.players_) {
-          this.clearField_(player_id);
-        }*/
+        for (player_id in this.players_) {
+          if (player_id != this.pnum_) {
+            this.clearField_(player_id);
+          }
+        }
         // Initialize tetris
         this.tetris.init(data[5], data[6], data[7], data[8], data[9]);
         break;
@@ -349,7 +351,7 @@ tetriweb.Tetrinet.prototype.destroyField_ = function(player_id) {
 tetriweb.Tetrinet.prototype.clearField_ = function(player_id) {
   for (var l = 0; l < 22; l++) {
     for (var c = 0; c < 12; c++) {
-      this.setBlock_(player_id, l, c, 0);
+      this.setBlock_(player_id, c, l, 0);
     }
   }
 };

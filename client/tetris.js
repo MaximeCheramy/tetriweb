@@ -39,6 +39,9 @@ tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
       this.gameArea_[l][c] = 0;
     }
   }
+  
+  this.myField_ = goog.dom.getElement('myfield');
+  goog.dom.removeChildren(this.myField_);
 
   this.gameLost_ = false;
   // Pieces' frequency.
@@ -68,8 +71,6 @@ tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
   this.specialCapacity_ = _specialCapacity;
   this.currentSpecialLines_ = 0;
   this.specialsQueue_ = [];
-
-  this.myField_ = goog.dom.getElement('myfield');
 
   this.updateGridAndSendField_();
   this.generateRandom_();
@@ -878,7 +879,7 @@ tetriweb.Tetris.prototype.updateGrid_ = function() {
 tetriweb.Tetris.prototype.updateGridAndSendField_ = function() {
   this.updateGrid_();
   this.sendField_();
-}
+};
 
 
 /**
