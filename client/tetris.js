@@ -637,9 +637,10 @@ tetriweb.Tetris.prototype.addLine = function() {
     }
 
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      // TODO: Algo trop approximatif choisi pour sa simplicité. A recoder.
-      this.gameArea_[21][c] = randomInt(0, 5);
+      this.gameArea_[tetriweb.Tetris.HEIGHT_ - 1][c] = randomInt(1, 5);
     }
+    var r = randomInt(0, tetriweb.Tetris.WIDTH_ - 1);
+    this.gameArea_[tetriweb.Tetris.HEIGHT_ - 1][r] = 0;
     this.updateGridAndSendField_();
   }
 };
