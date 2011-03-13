@@ -209,7 +209,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           } else if (data[2] == 'n') {
             this.tetris.nukeField();
           } else if (data[2] == 'o') {
-            // TODO
+            this.tetris.blockBomb();
           } else if (data[2] == 'q') {
             this.tetris.blockQuake();
           } else if (data[2] == 'r') {

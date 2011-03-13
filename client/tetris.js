@@ -39,7 +39,7 @@ tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
       this.gameArea_[l][c] = 0;
     }
   }
-  
+
   this.myField_ = goog.dom.getElement('myfield');
   goog.dom.removeChildren(this.myField_);
 
@@ -415,7 +415,7 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
             this.nukeField();
             break;
           case 'o':
-            // TODO
+            this.blockBomb();
             break;
           case 'q':
             this.blockQuake();
@@ -743,6 +743,41 @@ tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (this.gameArea_[l][c] > 5) {
         this.gameArea_[l][c] = randomInt(1, 5);
+      }
+    }
+  }
+  this.updateGridAndSendField_();
+};
+
+
+/**
+ * Explodes O blocks on the field.
+ */
+tetriweb.Tetris.prototype.blockBomb = function() {
+  // Relative coordinates of the 8 blocks around a block
+  var dep = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1],
+      [1, -1], [1, 0], [1, 1]];
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+      // Look for block bombs
+      if (this.gameArea_[l][c] == 14) { // TODO: constant
+        // Remove bomb
+        this.gameArea_[l][c] = 0;
+        // Explode the blocks around
+        for (var d = 0; d < dep.length; d++) {
+          var ll = l + dep[d][0];
+          var cc = c + dep[d][1];
+          if (ll >= 0 && ll < tetriweb.Tetris.HEIGHT_ &&
+              cc >= 0 && cc < tetriweb.Tetris.WIDTH_) {
+            if (this.gameArea_[ll][cc] != 14) {
+              // New random coordinates
+              var randomInt = tetriweb.Tetris.randomInt;
+              var newL = randomInt(6, tetriweb.Tetris.HEIGHT_ - 1);
+              var newC = randomInt(0, tetriweb.Tetris.WIDTH_ - 1);
+              this.gameArea_[newL][newC] = this.gameArea_[ll][cc];
+            }
+          }
+        }
       }
     }
   }
