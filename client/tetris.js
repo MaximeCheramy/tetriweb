@@ -71,7 +71,7 @@ tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
 
   this.myField_ = goog.dom.getElement('myfield');
 
-  this.updateGrid_();
+  this.updateGridAndSendField_();
   this.generateRandom_();
   this.newPiece_();
   this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
@@ -148,7 +148,7 @@ tetriweb.Tetris.prototype.checkLine_ = function() {
       }
     }
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
   if (nbLines == 4) {
     this.tetrinet_.sendLines(nbLines);
   } else if (nbLines > 1) {
@@ -241,7 +241,7 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
 
   // Update the grid if it has changed
   if (blocksToPlace > 0) {
-    this.updateGrid_();
+    this.updateGridAndSendField_();
   }
 };
 
@@ -640,7 +640,7 @@ tetriweb.Tetris.prototype.addLine = function() {
       // TODO: Algo trop approximatif choisi pour sa simplicité. A recoder.
       this.gameArea_[21][c] = randomInt(0, 5);
     }
-    this.updateGrid_();
+    this.updateGridAndSendField_();
   }
 };
 
@@ -655,7 +655,7 @@ tetriweb.Tetris.prototype.clearLine = function() {
       this.gameArea_[l][c] = this.gameArea_[l - 1][c];
     }
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
 };
 
 
@@ -681,7 +681,7 @@ tetriweb.Tetris.prototype.blockGravity = function() {
       }
     }
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
 };
 
 
@@ -693,7 +693,7 @@ tetriweb.Tetris.prototype.randomClearBlocks = function() {
   for (var i = 0; i < 10; i++) {
     this.gameArea_[randomInt(0, 21)][randomInt(0, 11)] = 0;
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
 };
 
 
@@ -713,7 +713,7 @@ tetriweb.Tetris.prototype.blockQuake = function() {
           oldLine[goog.math.modulo(c - shift, tetriweb.Tetris.HEIGHT_)];
     }
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
 };
 
 
@@ -728,7 +728,7 @@ tetriweb.Tetris.prototype.switchFields = function(playerNum) {
       this.gameArea_[l][c] = (l < 6) ? 0 : playerField[l][c];
     }
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
 };
 
 
@@ -744,7 +744,7 @@ tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
       }
     }
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
 };
 
 
@@ -757,7 +757,7 @@ tetriweb.Tetris.prototype.nukeField = function() {
       this.gameArea_[l][c] = 0;
     }
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
 };
 
 
@@ -772,7 +772,7 @@ tetriweb.Tetris.prototype.fillRandomly_ = function() {
       this.gameArea_[l][c] = randomInt(1, 5);
     }
   }
-  this.updateGrid_();
+  this.updateGridAndSendField_();
 };
 
 
@@ -867,10 +867,17 @@ tetriweb.Tetris.prototype.updateGrid_ = function() {
     }
   }
 
-  // TODO: Bouger cet appel de fonction: Ici on modifie le DOM. on ne fait pas
-  // des appels ajax...
-  this.sendField_();
 };
+
+
+/**
+ * Update the graphical field and send it to the tetrinet server.
+ * @private
+ */
+tetriweb.Tetris.prototype.updateGridAndSendField_ = function() {
+  this.updateGrid_();
+  this.sendField_();
+}
 
 
 /**
