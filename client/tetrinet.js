@@ -165,21 +165,21 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         var x, y;
         // Complete field
         if (field[0] >= '0') {
-          for (var i = 0; i < field.length; i++) {
-            y = Math.floor(i / 12);
-            x = i % 12;
+          for (var j = 0; j < field.length; j++) {
+            y = Math.floor(j / 12);
+            x = j % 12;
             this.setBlock_(player_id, x, y,
-                tetriweb.Tetrinet.normalize(field[i]));
+                tetriweb.Tetrinet.normalize(field[j]));
           }
         } else {
           // Only differences
           var block;
-          for (var i = 0; i < field.length; i++) {
-            if (field[i] < '0') {
-              block = field.charCodeAt(i) - '!'.charCodeAt(0);
+          for (var j = 0; j < field.length; j++) {
+            if (field[j] < '0') {
+              block = field.charCodeAt(j) - '!'.charCodeAt(0);
             } else {
-              x = field.charCodeAt(i) - '3'.charCodeAt(0);
-              y = field.charCodeAt(++i) - '3'.charCodeAt(0);
+              x = field.charCodeAt(j) - '3'.charCodeAt(0);
+              y = field.charCodeAt(++j) - '3'.charCodeAt(0);
               this.setBlock_(player_id, x, y, block);
             }
           }
