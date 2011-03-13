@@ -214,7 +214,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             this.tetris.randomClearBlocks();
           } else if (data[2] == 's') {
             this.tetris.switchFields(data[3]);
-          } 
+          }
         }
         break;
       // Fallback
@@ -443,7 +443,7 @@ tetriweb.Tetrinet.prototype.getMyPlayerNum = function() {
 
 /**
  * Returns the given player's field.
- * @param {number} The player we want to get the field.
+ * @param {number} playerNum The player we want to get the field.
  * @return {Array.<Array.<number>>} The player's field.
  */
 tetriweb.Tetrinet.prototype.getPlayerField = function(playerNum) {

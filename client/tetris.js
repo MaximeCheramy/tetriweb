@@ -8,7 +8,7 @@ goog.provide('tetriweb.Tetris');
 
 
 
-/**     
+/**
  * Tetris Class.
  * @param {object} tetrinet L'objet tetrinet.
  * @constructor
@@ -317,8 +317,10 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
   // Si la partie est perdue alors on ne fait rien.
   if (this.gameLost_) return;
 
-  // Touche haut ou 8.
-  if (e.keyCode == 38 || e.keyCode == 56) {
+  var keys = goog.events.KeyCodes;
+
+  // Touche haut
+  if (e.keyCode == keys.UP) {
     var piece = tetriweb.Tetris.rotate_(this.current_);
 
     // verifie si new ok.
@@ -336,10 +338,10 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
         for (var c = 0; c < 4 && ok; c++) {
           if (piece[l][c]) {
             ok = (this.curX_ + delta_x[dx] + c) >= 0 &&
-                 (this.curX_ + delta_x[dx] + c) < 12 &&
+                 (this.curX_ + delta_x[dx] + c) < tetriweb.Tetris.WIDTH_ &&
                  (this.curY_ + l) >= 0 &&
-                 (this.curY_ + l) < 22 &&
-                this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
+                 (this.curY_ + l) < tetriweb.Tetris.HEIGHT_ &&
+              this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
           }
         }
       }
@@ -355,50 +357,31 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
     }
   }
 
-  // Touche droite.
-  if (e.keyCode == 39 || e.keyCode == 54) {
+  // Touche droite ou gauche
+  if (e.keyCode == keys.RIGHT || e.keyCode == keys.LEFT) {
+    var shift = (e.keyCode == keys.RIGHT) ? 1 : -1; // sens de déplacement
     var ok = true;
     for (var l = 0; l < 4 && ok; l++) {
       for (var c = 0; c < 4 && ok; c++) {
-        if (this.current_[l][c]) {
-          if (c + this.curX_ + 1 >= 12 ||
-              this.gameArea_[l + this.curY_][c + this.curX_ + 1] > 0) {
-            ok = false;
-          }
-        }
+        ok = !this.current_[l][c] ||
+            (c + this.curX_ + shift >= 0 &&
+            c + this.curX_ + shift < tetriweb.Tetris.WIDTH_ &&
+            !this.gameArea_[l + this.curY_][c + this.curX_ + shift]);
       }
     }
     if (ok) {
-      this.curX_++;
-    }
-  }
-
-  // Touche gauche.
-  if (e.keyCode == 37 || e.keyCode == 52) {
-    var ok = true;
-    for (var l = 0; l < 4 && ok; l++) {
-      for (var c = 0; c < 4 && ok; c++) {
-        if (this.current_[l][c]) {
-          if (c + this.curX_ - 1 < 0 ||
-              this.gameArea_[l + this.curY_][c + this.curX_ - 1] > 0) {
-            ok = false;
-          }
-        }
-      }
-    }
-    if (ok) {
-      this.curX_--;
+      this.curX_ += shift;
     }
   }
 
   // Touche bas.
-  if (e.keyCode == 40 || e.keyCode == 50) {
+  if (e.keyCode == keys.DOWN) {
     clearTimeout(this.stepTimer);
     this.step_();
   }
 
   // Touche espace.
-  if (e.charCode == 32) {
+  if (e.charCode == keys.SPACE) {
     this.pieceDropped_ = false;
     while (!this.pieceDropped_) {
       this.step_();
@@ -406,9 +389,10 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
   }
 
   // Envoi bonus (touches 1 à 6 haut du clavier)
-  if (e.keyCode >= 49 && e.keyCode <= 54 && this.specialsQueue_.length > 0) {
+  if (e.keyCode >= keys.ONE && e.keyCode <= keys.SIX &&
+      this.specialsQueue_.length > 0) {
     var convert = tetriweb.Tetris.convert;
-    var playerNum = e.keyCode - 48;
+    var playerNum = e.keyCode - keys.ZERO;
     if (this.tetrinet_.playerExists(playerNum)) {
       var specialName = convert(this.specialsQueue_.shift()).substring(3);
       if (playerNum == this.tetrinet_.getMyPlayerNum()) {
@@ -448,7 +432,7 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
   }
 
   // Delete bonus (d)
-  if (e.keyCode == 68) {
+  if (e.keyCode == keys.D) {
     this.specialsQueue_.shift();
     this.updateSpecialBar_();
   }
@@ -637,7 +621,7 @@ tetriweb.Tetris.getColor = function(id) {
  * Ajoute une ligne (incomplete) tout en bas de l'air de jeu.
  */
 tetriweb.Tetris.prototype.addLine = function() {
-  for (var c = 0; c < 12; c++) {
+  for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
     if (this.gameArea_[0][c] > 0) {
       this.gameLost_ = true;
     }
@@ -716,15 +700,16 @@ tetriweb.Tetris.prototype.randomClearBlocks = function() {
  * Shifts all the lines of the field.
  */
 tetriweb.Tetris.prototype.blockQuake = function() {
-  for (var l = 0; l < 22; l++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     var oldLine = goog.array.clone(this.gameArea_[l]);
     var shift = tetriweb.Tetris.randomInt(1, 3);
     var sign = tetriweb.Tetris.randomInt(0, 1);
     if (sign) {
       shift *= -1;
     }
-    for (var c = 0; c < 12; c++) {
-      this.gameArea_[l][c] = oldLine[goog.math.modulo(c -shift, 12)];
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+      this.gameArea_[l][c] =
+          oldLine[goog.math.modulo(c - shift, tetriweb.Tetris.HEIGHT_)];
     }
   }
   this.updateGrid_();
@@ -737,8 +722,8 @@ tetriweb.Tetris.prototype.blockQuake = function() {
  */
 tetriweb.Tetris.prototype.switchFields = function(playerNum) {
   var playerField = this.tetrinet_.getPlayerField(playerNum);
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       this.gameArea_[l][c] = (l < 6) ? 0 : playerField[l][c];
     }
   }
@@ -920,7 +905,7 @@ tetriweb.Tetris.WIDTH_ = 12;
  * @type {number}
  * @private
  */
-tetriweb.Tetris.HEIGHT = 22;
+tetriweb.Tetris.HEIGHT_ = 22;
 
 
 /**
