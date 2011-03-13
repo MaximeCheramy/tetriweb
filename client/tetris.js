@@ -449,7 +449,7 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
  * Genere une piece.
  * @param {number} id Identifiant de la piece.
  * @param {number} orientation Nombre de rotation de 90 degres sens horaire.
- * @return {array<array<boolean>>} La matrice qui represente la piece.
+ * @return {Array.<Array.<boolean>>} La matrice qui represente la piece.
  */
 tetriweb.Tetris.generatePiece = function(id, orientation) {
   var piece = new Array(4);
@@ -510,8 +510,8 @@ tetriweb.Tetris.generatePiece = function(id, orientation) {
 
 /**
  * Rotation d'une piece de 90° dans le sens horaire.
- * @param {Array.<Array<number>>} piece La piece que l'on veut faire pivoter.
- * @return {Array.<Array<number>>} La piece retournée.
+ * @param {Array.<Array.<number>>} piece La piece que l'on veut faire pivoter.
+ * @return {Array.<Array.<number>>} La piece retournée.
  * @private
  */
 tetriweb.Tetris.rotate_ = function(piece) {
@@ -838,7 +838,7 @@ tetriweb.Tetris.prototype.updateGrid_ = function() {
 tetriweb.Tetris.prototype.updatePiece_ = function() {
   var convert = tetriweb.Tetris.convert;
 
-  this.currentObj_ = goog.dom.createDom('div', {class: 'piece'});
+  this.currentObj_ = goog.dom.createDom('div', {className: 'piece'});
   this.currentObj_.style.top = this.curY_ * 20;
   this.currentObj_.style.left = this.curX_ * 20;
   goog.dom.appendChild(this.myField_, this.currentObj_);
@@ -857,13 +857,13 @@ tetriweb.Tetris.prototype.updatePiece_ = function() {
 
 
 /**
- * @type {Array<Array<number>>}
+ * @type {Array.<Array.<number>>}
  * @private
  */
 tetriweb.Tetris.prototype.gameArea_ = null;
 
 /**
- * @type {Array<Array<number>>}
+ * @type {Array.<Array.<number>>}
  * @private
  */
 tetriweb.Tetris.prototype.oldGameArea_ = null;

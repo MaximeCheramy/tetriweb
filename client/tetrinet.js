@@ -224,7 +224,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
 tetriweb.Tetrinet.prototype.sendMessage_ = function(msg) {
   this.xhr_out_ = new goog.net.XhrIo();
   this.xhr_out_.send(this.url_ + '?' +
-    goog.uri.utils.buildQueryDataFromMap({pnum: this.pnum_, send: msg}));
+    goog.uri.utils.buildQueryDataFromMap({'pnum': this.pnum_, 'send': msg}));
 };
 
 /**
@@ -288,7 +288,7 @@ tetriweb.Tetrinet.prototype.initMyField = function() {
  */
 tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
   // Create a new field div and add it to the fields container
-  var field = goog.dom.createDom('div', {class: 'field', id: 'field-' +
+  var field = goog.dom.createDom('div', {className: 'field', id: 'field-' +
     player_id});
   goog.dom.appendChild(goog.dom.getElement('fields'), field);
 
@@ -351,8 +351,8 @@ tetriweb.Tetrinet.prototype.setBlock_ = function(player_id, x, y, type) {
  * TODO: should send the difference between field and oldfield only if the
  * number of differences if less than FIELD_WIDTH*FIELD_HEIGHT/2
  * (otherwise should send the whole field)
- * @param {Array.<Array<number>>} field Current field to send.
- * @param {Array.<Array<number>>} oldfield The old field.
+ * @param {Array.<Array.<number>>} field Current field to send.
+ * @param {Array.<Array.<number>>} oldfield The old field.
  */
 tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
   // Only sends the differences between field and oldfield
