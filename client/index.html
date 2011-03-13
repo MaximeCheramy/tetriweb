@@ -1,70 +1,34 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Tetrinet !</title>
-	<link type="text/css" rel="stylesheet" href="tetris.css" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Tetrinet !</title>
+  <link type="text/css" rel="stylesheet" href="tetris.css" />
   <script src="closure-library/closure/goog/base.js"></script>
-	<script type="text/javascript" src="tetrinet.js"></script>
-	<script type="text/javascript" src="tetris.js"></script>
-	<script type="text/javascript">
-	<!--
-	var tetrinet = new tetriweb.Tetrinet();
-	var tetris = new tetriweb.Tetris(tetrinet);
-	-->
-	</script>
-
-	<style type="text/css">
-	<!--
-	.field {
-		position: relative;
-		width: 240px;
-		height: 440px;
-		border: 2px solid #222222;
-		float: left;
-	}
-	-->
-	</style>
+  <script type="text/javascript" src="tetrinet.js"></script>
+  <script type="text/javascript" src="tetris.js"></script>
+  <script type="text/javascript" src="tetriweb.js"></script>
 </head>
 
-<body>
+<body onload="tetriweb.init()">
 
 <form action="" method="get" id="connectForm">
-	<input type="text" name="nickname" id="nickname" value="" />
-	<input type="text" name="team" id="team" value="" />
-	<input type="submit" name="submit" value="Connect !" />
+  <input type="text" name="nickname" id="nickname" value="" />
+  <input type="text" name="team" id="team" value="" />
+  <input type="submit" name="submit" value="Connect !" />
 </form>
 
 <div id="content"></div>
- 
+
 <p>
-	<form action="" method="get" id="partylineForm">
-		<input type="text" name="msg" id="msg" value="" />
-		<input type="submit" name="submit" value="Send" />
-	</form>
+  <form action="" method="get" id="partylineForm">
+    <input type="text" name="msg" id="msg" value="" />
+    <input type="submit" name="submit" value="Send" />
+  </form>
 
-	<p><input type="button" id="startGame" value="Commencer la partie" disabled="disabled" /></p>
+  <p><input type="button" id="startGame" value="Commencer la partie" disabled="disabled" /></p>
 
-	<div id="fields"></div>
+  <div id="fields"></div>
 </p>
 
 </body>
-<script type="text/javascript">
-<!--
-goog.events.listen(goog.dom.getElement('connectForm'), goog.events.EventType.SUBMIT, function(e) {
-  e.preventDefault();
-  tetrinet.connect(goog.dom.getElement('nickname').value, goog.dom.getElement('team').value);
-});
-
-goog.events.listen(goog.dom.getElement('partylineForm'), goog.events.EventType.SUBMIT, function(e) {
-  e.preventDefault();
-  var msg = goog.dom.getElement('msg');
-  tetrinet.sayPline(msg.value);
-  msg.value = '';
-});
-
-goog.events.listen(goog.dom.getElement('startGame'), goog.events.EventType.CLICK, function(e) {
-  tetrinet.startGame();
-});
--->
-</script>
 </html>

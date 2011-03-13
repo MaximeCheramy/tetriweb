@@ -1,3 +1,11 @@
+.field {
+  position: relative;
+  width: 240px;
+  height: 440px;
+  border: 2px solid #222222;
+  float: left;
+}
+
 .block {
 	position: absolute;
 	width: 16px;
