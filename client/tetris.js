@@ -2,6 +2,7 @@ goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.KeyHandler');
+goog.require('goog.math');
 
 goog.provide('tetriweb.Tetris');
 
@@ -427,8 +428,17 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
           case 'n':
             this.nukeField();
             break;
+          case 'o':
+            // TODO
+            break;
+          case 'q':
+            this.blockQuake();
+            break;
           case 'r':
             this.randomClearBlocks();
+            break;
+          case 's':
+            this.switchFields(playerNum);
             break;
         }
       }
@@ -697,6 +707,40 @@ tetriweb.Tetris.prototype.randomClearBlocks = function() {
   var randomInt = tetriweb.Tetris.randomInt;
   for (var i = 0; i < 10; i++) {
     this.gameArea_[randomInt(0, 21)][randomInt(0, 11)] = 0;
+  }
+  this.updateGrid_();
+};
+
+
+/**
+ * Shifts all the lines of the field.
+ */
+tetriweb.Tetris.prototype.blockQuake = function() {
+  for (var l = 0; l < 22; l++) {
+    var oldLine = goog.array.clone(this.gameArea_[l]);
+    var shift = tetriweb.Tetris.randomInt(1, 3);
+    var sign = tetriweb.Tetris.randomInt(0, 1);
+    if (sign) {
+      shift *= -1;
+    }
+    for (var c = 0; c < 12; c++) {
+      this.gameArea_[l][c] = oldLine[goog.math.modulo(c -shift, 12)];
+    }
+  }
+  this.updateGrid_();
+};
+
+
+/**
+ * Switch fields with another player.
+ * @param {number} playerNum The player to switch fields with.
+ */
+tetriweb.Tetris.prototype.switchFields = function(playerNum) {
+  var playerField = this.tetrinet_.getPlayerField(playerNum);
+  for (var l = 0; l < 22; l++) {
+    for (var c = 0; c < 12; c++) {
+      this.gameArea_[l][c] = (l < 6) ? 0 : playerField[l][c];
+    }
   }
   this.updateGrid_();
 };

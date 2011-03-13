@@ -13,6 +13,11 @@ tetriweb.init = function() {
   var tetrinet = new tetriweb.Tetrinet();
   var tetris = new tetriweb.Tetris(tetrinet);
 
+  /* For debugging.
+  window['tetrinet'] = tetrinet;
+  window['tetris'] = tetris;
+  //*/
+
   goog.events.listen(goog.dom.getElement('connectForm'),
       goog.events.EventType.SUBMIT, function(e) {
     e.preventDefault();

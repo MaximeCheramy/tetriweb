@@ -206,9 +206,15 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             this.tetris.blockGravity();
           } else if (data[2] == 'n') {
             this.tetris.nukeField();
+          } else if (data[2] == 'o') {
+            // TODO
+          } else if (data[2] == 'q') {
+            this.tetris.blockQuake();
           } else if (data[2] == 'r') {
             this.tetris.randomClearBlocks();
-          }
+          } else if (data[2] == 's') {
+            this.tetris.switchFields(data[3]);
+          } 
         }
         break;
       // Fallback
@@ -432,6 +438,16 @@ tetriweb.Tetrinet.prototype.playerExists = function(playerNum) {
  */
 tetriweb.Tetrinet.prototype.getMyPlayerNum = function() {
   return this.pnum_;
+};
+
+
+/**
+ * Returns the given player's field.
+ * @param {number} The player we want to get the field.
+ * @return {Array.<Array.<number>>} The player's field.
+ */
+tetriweb.Tetrinet.prototype.getPlayerField = function(playerNum) {
+  return this.fields_[playerNum];
 };
 
 
