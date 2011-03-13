@@ -15,7 +15,7 @@ goog.provide('tetriweb.Tetris');
 tetriweb.Tetris = function(tetrinet) {
   this.tetrinet_ = tetrinet;
   this.tetrinet_.tetris = this;
-  this.gameArea_ = new Array(22);
+  this.gameArea_ = new Array(tetriweb.Tetris.HEIGHT_);
 };
 
 
@@ -31,9 +31,9 @@ tetriweb.Tetris = function(tetrinet) {
 tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
     _specialCapacity, _piecesFreq, _specialsFreq) {
   // init the game area : all empty.
-  for (var l = 0; l < 22; l++) {
-    this.gameArea_[l] = new Array(12);
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    this.gameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       this.gameArea_[l][c] = 0;
     }
   }
@@ -123,25 +123,25 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
 tetriweb.Tetris.prototype.checkLine_ = function() {
   var nbLines = 0;
   var tmpSpecials = [];
-  for (var l = 0; l < 22; l++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     var tetris = true;
-    for (var c = 0; c < 12; c++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       tetris = tetris && (this.gameArea_[l][c] > 0);
     }
     if (tetris) {
       nbLines++;
       // Take specials
-      for (var c = 0; c < 12; c++) {
+      for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
         if (this.gameArea_[l][c] > 5) {
           tmpSpecials.push(this.gameArea_[l][c]);
         }
       }
       for (var ll = l; ll > 0; ll--) {
-        for (var c = 0; c < 12; c++) {
+        for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
           this.gameArea_[ll][c] = this.gameArea_[ll - 1][c];
         }
       }
-      for (var c = 0; c < 12; c++) {
+      for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
         this.gameArea_[0][c] = 0;
       }
     }
@@ -202,8 +202,8 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
 
   // Count number of blocks available
   var availBlocks = 0;
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
         availBlocks++;
       }
@@ -225,8 +225,8 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
 
     // Choose place on the field (nth available block)
     var place = randomInt(0, availBlocks - i - 1);
-    for (var l = 0; place >= 0 && l < 22; l++) {
-      for (var c = 0; place >= 0 && c < 12; c++) {
+    for (var l = 0; place >= 0 && l < tetriweb.Tetris.HEIGHT_; l++) {
+      for (var c = 0; place >= 0 && c < tetriweb.Tetris.WIDTH_; c++) {
         if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
           if (place == 0) {
             this.gameArea_[l][c] = special;
@@ -255,7 +255,7 @@ tetriweb.Tetris.prototype.step_ = function() {
   for (var l = 0; l < 4 && !stop; l++) {
     for (var c = 0; c < 4 && !stop; c++) {
       if (this.current_[l][c]) {
-        if (l + this.curY_ + 1 >= 22 ||
+        if (l + this.curY_ + 1 >= tetriweb.Tetris.HEIGHT_ ||
             this.gameArea_[l + this.curY_ + 1][c + this.curX_] > 0) {
           stop = true;
         }
@@ -635,13 +635,13 @@ tetriweb.Tetris.prototype.addLine = function() {
   if (!this.gameLost_) {
     var randomInt = tetriweb.Tetris.randomInt;
     // On decale tout vers le haut.
-    for (var l = 1; l < 22; l++) {
-      for (var c = 0; c < 12; c++) {
+    for (var l = 1; l < tetriweb.Tetris.HEIGHT_; l++) {
+      for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
         this.gameArea_[l - 1][c] = this.gameArea_[l][c];
       }
     }
 
-    for (var c = 0; c < 12; c++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       // TODO: Algo trop approximatif choisi pour sa simplicité. A recoder.
       this.gameArea_[21][c] = randomInt(0, 5);
     }
@@ -655,8 +655,8 @@ tetriweb.Tetris.prototype.addLine = function() {
  */
 tetriweb.Tetris.prototype.clearLine = function() {
   // On décale tout vers le bas.
-  for (var l = 21; l > 0; l--) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = tetriweb.Tetris.HEIGHT_ - 1; l > 0; l--) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       this.gameArea_[l][c] = this.gameArea_[l - 1][c];
     }
   }
@@ -668,9 +668,9 @@ tetriweb.Tetris.prototype.clearLine = function() {
  * Fait tomber les blocs par gravité.
  */
 tetriweb.Tetris.prototype.blockGravity = function() {
-  for (var l = 20; l >= 0; l--) {
+  for (var l = tetriweb.Tetris.HEIGHT_ - 2; l >= 0; l--) {
     var g = false;
-    for (var c = 0; c < 12; c++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (this.gameArea_[l][c] > 0 && this.gameArea_[l + 1][c] == 0) {
         this.gameArea_[l + 1][c] = this.gameArea_[l][c];
         this.gameArea_[l][c] = 0;
@@ -681,8 +681,8 @@ tetriweb.Tetris.prototype.blockGravity = function() {
       l += 2;
       // Un peu crade je trouve, peut-etre remplacer le for sur les lignes
       // par un while ou alors inserer un while pour faire tomber les blocks.
-      if (l > 20) {
-        l = 21;
+      if (l > tetriweb.Tetris.HEIGHT_ - 2) {
+        l = tetriweb.Tetris.HEIGHT_ - 1;
       }
     }
   }
@@ -707,8 +707,8 @@ tetriweb.Tetris.prototype.randomClearBlocks = function() {
  */
 tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
   var randomInt = tetriweb.Tetris.randomInt;
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (this.gameArea_[l][c] > 5) {
         this.gameArea_[l][c] = randomInt(1, 5);
       }
@@ -722,8 +722,8 @@ tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
  * Vide la grille !
  */
 tetriweb.Tetris.prototype.nukeField = function() {
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       this.gameArea_[l][c] = 0;
     }
   }
@@ -737,8 +737,8 @@ tetriweb.Tetris.prototype.nukeField = function() {
  */
 tetriweb.Tetris.prototype.fillRandomly_ = function() {
   var randomInt = tetriweb.Tetris.randomInt;
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       this.gameArea_[l][c] = randomInt(1, 5);
     }
   }
@@ -785,10 +785,10 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
 tetriweb.Tetris.prototype.sendField_ = function() {
   // Si c'est le premier appel.
   if (this.oldGameArea_ == null) {
-    this.oldGameArea_ = new Array(22);
-    for (var l = 0; l < 22; l++) {
-      this.oldGameArea_[l] = new Array(12);
-      for (var c = 0; c < 12; c++) {
+    this.oldGameArea_ = new Array(tetriweb.Tetris.HEIGHT_);
+    for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+      this.oldGameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
+      for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
         this.oldGameArea_[l][c] = 0;
       }
     }
@@ -798,10 +798,10 @@ tetriweb.Tetris.prototype.sendField_ = function() {
   this.tetrinet_.sendField(this.gameArea_, this.oldGameArea_);
 
   // Copie de la grille actuelle.
-  this.oldGameArea_ = new Array(22);
-  for (var l = 0; l < 22; l++) {
-    this.oldGameArea_[l] = new Array(12);
-    for (var c = 0; c < 12; c++) {
+  this.oldGameArea_ = new Array(tetriweb.Tetris.HEIGHT_);
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    this.oldGameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       this.oldGameArea_[l][c] = this.gameArea_[l][c];
     }
   }
@@ -824,8 +824,8 @@ tetriweb.Tetris.prototype.updateGrid_ = function() {
   }, this);
 
   // On reconstruit
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (this.gameArea_[l][c] > 0) {
         var bloc = goog.dom.createDom('div');
         bloc.style.top = l * 20 + 1;
@@ -863,6 +863,20 @@ tetriweb.Tetris.prototype.updatePiece_ = function() {
     }
   }
 };
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.WIDTH_ = 12;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.HEIGHT = 22;
 
 
 /**
