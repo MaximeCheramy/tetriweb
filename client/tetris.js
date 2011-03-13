@@ -10,7 +10,8 @@ goog.provide('tetriweb.Tetris');
 
 /**
  * Tetris Class.
- * @param {object} tetrinet L'objet tetrinet.
+ * @param {object} tetrinet The tetrinet objet used to communicate with the
+ * tetrinet server.
  * @constructor
  */
 tetriweb.Tetris = function(tetrinet) {
@@ -618,7 +619,7 @@ tetriweb.Tetris.getColor = function(id) {
 
 
 /**
- * Ajoute une ligne (incomplete) tout en bas de l'air de jeu.
+ * Add a line at the bottom of the grid.
  */
 tetriweb.Tetris.prototype.addLine = function() {
   for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
@@ -645,7 +646,7 @@ tetriweb.Tetris.prototype.addLine = function() {
 
 
 /**
- * Supprime la ligne la plus en bas de l'air de jeu.
+ * Removes the last line.
  */
 tetriweb.Tetris.prototype.clearLine = function() {
   // On décale tout vers le bas.
@@ -659,7 +660,7 @@ tetriweb.Tetris.prototype.clearLine = function() {
 
 
 /**
- * Fait tomber les blocs par gravité.
+ * Block gravity (The blocks fall).
  */
 tetriweb.Tetris.prototype.blockGravity = function() {
   for (var l = tetriweb.Tetris.HEIGHT_ - 2; l >= 0; l--) {
@@ -748,7 +749,7 @@ tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
 
 
 /**
- * Vide la grille !
+ * Empty the field (nuke).
  */
 tetriweb.Tetris.prototype.nukeField = function() {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
@@ -761,7 +762,7 @@ tetriweb.Tetris.prototype.nukeField = function() {
 
 
 /**
- * Rempli la grille de cases aléatoires. Utilisé lors d'une partie perdue.
+ * Fills the field with random blocks. To be used when the game is lost.
  * @private
  */
 tetriweb.Tetris.prototype.fillRandomly_ = function() {
@@ -776,7 +777,7 @@ tetriweb.Tetris.prototype.fillRandomly_ = function() {
 
 
 /**
- * Genere une nouvelle piece.
+ * Generates a new piece.
  * @private
  */
 tetriweb.Tetris.prototype.newPiece_ = function() {
@@ -792,11 +793,11 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
 
   // Remonte un peu l'objet si commence par du vide.
   for (var l = 0; l < 4; l++) {
-    var vide = true;
+    var empty = true;
     for (var c = 0; c < 4; c++) {
-      vide = vide && !this.current_[l][c];
+      empty = empty && !this.current_[l][c];
     }
-    if (vide) {
+    if (empty) {
       this.curY_--;
     } else {
       break;
@@ -808,11 +809,11 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
 
 
 /**
- * Fonction qui permet l'envoie au serveur tetrinet de la grille de jeu.
+ * Sends to the tetrinet server the current field.
  * @private
  */
 tetriweb.Tetris.prototype.sendField_ = function() {
-  // Si c'est le premier appel.
+  // First call to this function.
   if (this.oldGameArea_ == null) {
     this.oldGameArea_ = new Array(tetriweb.Tetris.HEIGHT_);
     for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
@@ -823,10 +824,10 @@ tetriweb.Tetris.prototype.sendField_ = function() {
     }
   }
 
-  // On envoie la nouvelle grille.
+  // Sends the current field.
   this.tetrinet_.sendField(this.gameArea_, this.oldGameArea_);
 
-  // Copie de la grille actuelle.
+  // Backup of the current field.
   this.oldGameArea_ = new Array(tetriweb.Tetris.HEIGHT_);
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     this.oldGameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
@@ -838,13 +839,14 @@ tetriweb.Tetris.prototype.sendField_ = function() {
 
 
 /**
- * Met a jour graphiquement la grille a partir de la representation interne
- * du jeu.
+ * Updates graphically the field using the internal matrix representing the
+ * game.
  * @private
  */
 tetriweb.Tetris.prototype.updateGrid_ = function() {
   var convert = tetriweb.Tetris.convert;
 
+  // Removes all the elements in the container.
   var fieldContent = goog.array.clone(this.myField_.childNodes);
   goog.array.forEach(fieldContent, function(n) {
     if (n != this.currentObj_) {
@@ -852,7 +854,7 @@ tetriweb.Tetris.prototype.updateGrid_ = function() {
     }
   }, this);
 
-  // On reconstruit
+  // Rebuild the field.
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (this.gameArea_[l][c] > 0) {
@@ -865,12 +867,14 @@ tetriweb.Tetris.prototype.updateGrid_ = function() {
     }
   }
 
+  // TODO: Bouger cet appel de fonction: Ici on modifie le DOM. on ne fait pas
+  // des appels ajax...
   this.sendField_();
 };
 
 
 /**
- * Met a jour la piece courante en la creant et l'ajoutant au field.
+ * Updates the current piece by creating it and adding it to the field.
  * @private
  */
 tetriweb.Tetris.prototype.updatePiece_ = function() {
