@@ -121,9 +121,10 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
 /**
  * Checks for complete lines. Complete lines will be removed and create new
  * bonus or add lines to opponents.
+ * @param {boolean} cleanupOnly If true, do not take specials nor send lines.
  * @private
  */
-tetriweb.Tetris.prototype.checkLine_ = function() {
+tetriweb.Tetris.prototype.checkLine_ = function(cleanupOnly) {
   var nbLines = 0;
   var tmpSpecials = [];
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
@@ -150,18 +151,32 @@ tetriweb.Tetris.prototype.checkLine_ = function() {
     }
   }
   this.updateGridAndSendField_();
-  if (nbLines == 4) {
-    this.tetrinet_.sendLines(nbLines);
-  } else if (nbLines > 1) {
-    this.tetrinet_.sendLines(nbLines - 1);
-  }
 
+  if (!cleanupOnly) {
+    if (nbLines == 4) {
+      this.tetrinet_.sendLines(nbLines);
+    } else if (nbLines > 1) {
+      this.tetrinet_.sendLines(nbLines - 1);
+    }
+
+    this.handleSpecials_(nbLines, tmpSpecials);
+  }
+};
+
+
+/**
+ * Handles specials after complete lines cleanup.
+ * @param {number} nbLines The number of complete lines.
+ * @param {Array.<number>} specials The special blocks of these lines.
+ * @private
+ */
+tetriweb.Tetris.prototype.handleSpecials_ = function(nbLines, specials) {
   // Take each special nbLines times
-  for (var i = 0; i < tmpSpecials.length &&
+  for (var i = 0; i < specials.length &&
       this.specialsQueue_.length < this.specialCapacity_; i++) {
     for (var j = 0; j < nbLines &&
         this.specialsQueue_.length < this.specialCapacity_; j++) {
-      this.specialsQueue_.push(tmpSpecials[i]);
+      this.specialsQueue_.push(specials[i]);
     }
   }
   this.updateSpecialBar_();
@@ -662,24 +677,19 @@ tetriweb.Tetris.prototype.clearLine = function() {
  * Block gravity (The blocks fall).
  */
 tetriweb.Tetris.prototype.blockGravity = function() {
-  for (var l = tetriweb.Tetris.HEIGHT_ - 2; l >= 0; l--) {
-    var g = false;
-    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      if (this.gameArea_[l][c] > 0 && this.gameArea_[l + 1][c] == 0) {
-        this.gameArea_[l + 1][c] = this.gameArea_[l][c];
-        this.gameArea_[l][c] = 0;
-        g = true;
-      }
-    }
-    if (g) {
-      l += 2;
-      // Un peu crade je trouve, peut-etre remplacer le for sur les lignes
-      // par un while ou alors inserer un while pour faire tomber les blocks.
-      if (l > tetriweb.Tetris.HEIGHT_ - 2) {
-        l = tetriweb.Tetris.HEIGHT_ - 1;
+  for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+    var curLine = tetriweb.Tetris.HEIGHT_ - 1;
+    for (var l = tetriweb.Tetris.HEIGHT_ - 1; l >= 0; l--) {
+      if (this.gameArea_[l][c] > 0) {
+        if (l != curLine) {
+          this.gameArea_[curLine][c] = this.gameArea_[l][c];
+          this.gameArea_[l][c] = 0;
+        }
+        curLine--;
       }
     }
   }
+  this.checkLine_(true);
   this.updateGridAndSendField_();
 };
 
