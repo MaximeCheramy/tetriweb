@@ -223,16 +223,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             this.tetris.switchFields(data[3]);
           }
         }
-        // TODO: constant
-        var specials = {'cs1': '1 line', 'cs2': '2 lines', 'cs4' : '4 lines',
-            'a': 'Add line', 'c': 'Clear line', 'n': 'Nuke field',
-            'r': 'Random clear blocks', 's': 'Switch fields',
-            'b': 'Clear special blocks', 'g': 'Block gravity',
-            'q': 'Block quake', 'o': 'Block bomb'};
-        var evMsg = specials[data[2]];
-        evMsg += (data[1] == 0) ? ' to all' : ' to ' + this.players_[data[1]];
-        evMsg += ' from ' + this.players_[data[3]];
-        tetriweb.Tetrinet.logEvent(evMsg);
+        this.logEvent(data[2], data[1], data[3]);
         break;
       // Fallback
       default:
@@ -249,9 +240,14 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
  * Logs an event.
  * TODO: more precise events? Colour depending on the event type (good/bad
  * special...)?
- * @param {string} message The message to display in the event log window.
+ * @param {string} special The special sent or received.
+ * @param {number} to The target of the special.
+ * @param {number} from The sender of the special.
  */
-tetriweb.Tetrinet.logEvent = function(message) {
+tetriweb.Tetrinet.prototype.logEvent = function(special, to, from) {
+  var message = tetriweb.Tetrinet.SPECIALS[special];
+  message += (to == 0) ? ' to all' : ' to ' + this.players_[to];
+  message += ' from ' + this.players_[from];
   var eventLog = goog.dom.getElement('eventLog');
   var cont = goog.dom.createDom('div');
   goog.dom.setTextContent(cont, message);
@@ -316,6 +312,7 @@ tetriweb.Tetrinet.prototype.sendPlayerlost = function() {
  * @param {number} nblines The number of lines to send.
  */
 tetriweb.Tetrinet.prototype.sendLines = function(nblines) {
+  this.logEvent('cs' + nblines, 0, this.pnum_);
   this.sendMessage_('sb 0 cs' + nblines + ' ' + this.pnum_);
 };
 
@@ -326,6 +323,7 @@ tetriweb.Tetrinet.prototype.sendLines = function(nblines) {
  * @param {number} playerDest The player to whom the special is sent (0 = all).
  */
 tetriweb.Tetrinet.prototype.sendSpecial = function(special, playerDest) {
+  this.logEvent(special, playerDest, this.pnum_);
   this.sendMessage_('sb ' + playerDest + ' ' + special + ' ' + this.pnum_);
 };
 
@@ -336,13 +334,13 @@ tetriweb.Tetrinet.prototype.sendSpecial = function(special, playerDest) {
 tetriweb.Tetrinet.prototype.initMyField = function() {
   var next = goog.dom.createDom('div', {id: 'nextpiece'});
   var specialBar = goog.dom.createDom('div', {id: 'specialbar'});
-  var name = goog.dom.createDom('div', {className: 'fieldName'});
+  var name = goog.dom.createDom('div', {id: 'myName'});
   goog.dom.setTextContent(name, this.pnum_ + ' - ' +
       this.players_[this.pnum_]);
-  var field = goog.dom.createDom('div', {id: 'myfield'}, name);
+  var field = goog.dom.createDom('div', {id: 'myfield'});
   field.setAttribute('tabindex', 1);
   var cont = goog.dom.createDom('div', {id: 'mycontainer'},
-      next, field, specialBar);
+      name, next, field, specialBar);
   goog.dom.appendChild(goog.dom.getElement('fields'), cont);
 };
 
@@ -573,3 +571,13 @@ tetriweb.Tetrinet.eventLog_ = null;
  * @private
  */
 tetriweb.Tetrinet.BLOCK_SIZE_OPP_ = 10;
+
+
+/**
+ * @type {Object.<string, string>}
+ */
+tetriweb.Tetrinet.SPECIALS = {'cs1': '1 line', 'cs2': '2 lines',
+    'cs4' : '4 lines', 'a': 'Add line', 'c': 'Clear line', 'n': 'Nuke field',
+    'r': 'Random clear blocks', 's': 'Switch fields',
+    'b': 'Clear special blocks', 'g': 'Block gravity',
+    'q': 'Block quake', 'o': 'Block bomb'};
