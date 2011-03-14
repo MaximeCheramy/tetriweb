@@ -310,7 +310,6 @@ tetriweb.Tetris.prototype.step_ = function() {
  * @private
  */
 tetriweb.Tetris.prototype.keyHandler_ = function(e) {
-  //console.log(e.keyCode);
   // TODO: Séparer en plusieurs fonctions.
 
   // Stop la propagation de l'event.
@@ -334,7 +333,6 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
     var delta_x = [0, 1, -1, 2, -2, 3, -3];
     var dx = 0;
     for (dx = 0; dx < delta_x.length && !ok; dx++) {
-      //console.log("trying dx = " + delta_x[dx]);
       ok = true;
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
@@ -349,7 +347,6 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
       }
     }
     dx--;
-    //console.log("dx = " + dx + " delta_x = " + delta_x[dx]);
 
     if (ok) {
       this.curX_ += delta_x[dx];
@@ -397,7 +394,8 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
     var playerNum = e.keyCode - keys.ZERO;
     if (this.tetrinet_.playerExists(playerNum)) {
       var specialName = convert(this.specialsQueue_.shift()).substring(3);
-      if (playerNum == this.tetrinet_.getMyPlayerNum()) {
+      this.tetrinet_.sendSpecial(specialName, playerNum);
+      if (playerNum == this.tetrinet_.getMyPlayerNum() || specialName == 's') {
         switch (specialName) {
           case 'a':
             this.addLine();
@@ -428,7 +426,6 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
             break;
         }
       }
-      this.tetrinet_.sendSpecial(specialName, playerNum);
       this.updateSpecialBar_();
     }
   }
@@ -724,7 +721,8 @@ tetriweb.Tetris.prototype.blockQuake = function() {
  * @param {number} playerNum The player to switch fields with.
  */
 tetriweb.Tetris.prototype.switchFields = function(playerNum) {
-  var playerField = this.tetrinet_.getPlayerField(playerNum);
+  playerField = (playerNum == this.tetrinet_.getMyPlayerNum()) ?
+      this.gameArea_ : this.tetrinet_.getPlayerField(playerNum);
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       this.gameArea_[l][c] = (l < 6) ? 0 : playerField[l][c];
