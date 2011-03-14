@@ -32,7 +32,10 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
           var response = e.target.getResponseJson();
           if (!response['error']) {
             // Reset all
-            goog.dom.removeChildren(goog.dom.getElement('fields'));
+            var fields = goog.dom.getElement('fields');
+            goog.dom.removeChildren(fields);
+            this.eventLog_ = goog.dom.createDom('div', {id: 'eventLog'});
+            goog.dom.appendChild(fields, this.eventLog_);
             this.players_ = [];
             this.teams_ = [];
             this.fields_ = [];
@@ -65,7 +68,7 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
  */
 tetriweb.Tetrinet.prototype.disconnect = function() {
   if (this.pnum_) {
-    this.sendMessage_("disconnect");
+    this.sendMessage_('disconnect');
   }
 };
 
@@ -140,7 +143,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         if (player_id == 0) {
           message = '*** ' + m;
         } else {
-          message = '&lt;' + this.players_[player_id] + '&gt; ' + m;
+          message = '<' + this.players_[player_id] + '> ' + m;
         }
         break;
       // Starting a new game
@@ -220,16 +223,40 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             this.tetris.switchFields(data[3]);
           }
         }
+        // TODO: constant
+        var specials = {'cs1': '1 line', 'cs2': '2 lines', 'cs4' : '4 lines',
+            'a': 'Add line', 'c': 'Clear line', 'n': 'Nuke field',
+            'r': 'Random clear blocks', 's': 'Switch fields',
+            'b': 'Clear special blocks', 'g': 'Block gravity',
+            'q': 'Block quake', 'o': 'Block bomb'};
+        var evMsg = specials[data[2]];
+        evMsg += (data[1] == 0) ? ' to all' : ' to ' + this.players_[data[1]];
+        evMsg += ' from ' + this.players_[data[3]];
+        tetriweb.Tetrinet.logEvent(evMsg);
         break;
       // Fallback
       default:
         message = msg;
     }
     if (message.length > 0) {
-      goog.dom.getElement('partyline').innerHTML +=
-          '<div>' + message + '</div>';
+      tetriweb.Tetrinet.writePline(message);
     }
   }
+};
+
+
+/**
+ * Logs an event.
+ * TODO: more precise events? Colour depending on the event type (good/bad
+ * special...)?
+ * @param {string} message The message to display in the event log window.
+ */
+tetriweb.Tetrinet.logEvent = function(message) {
+  var eventLog = goog.dom.getElement('eventLog');
+  var cont = goog.dom.createDom('div');
+  goog.dom.setTextContent(cont, message);
+  goog.dom.appendChild(eventLog, cont);
+  eventLog.scrollTop = eventLog.scrollHeight; // scroll to bottom
 };
 
 
@@ -259,8 +286,20 @@ tetriweb.Tetrinet.prototype.startGame = function() {
  */
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
-  goog.dom.getElement('partyline').innerHTML += '<div>' + '&lt;' +
-      this.players_[this.pnum_] + '&gt; ' + msg + '</div>';
+  tetriweb.Tetrinet.writePline('<' + this.players_[this.pnum_] + '> ' + msg);
+};
+
+
+/**
+ * Writes a message on the partyline DOM element.
+ * @param {string} msg The message to write.
+ */
+tetriweb.Tetrinet.writePline = function(msg) {
+  var pline = goog.dom.getElement('partyline');
+  var cont = goog.dom.createDom('div');
+  goog.dom.setTextContent(cont, msg);
+  goog.dom.appendChild(pline, cont);
+  pline.scrollTop = pline.scrollHeight; // scroll to bottom
 };
 
 
@@ -319,7 +358,7 @@ tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
         player_id});
   goog.dom.appendChild(goog.dom.getElement('fields'), field);
   var name = goog.dom.createDom('div', {className: 'fieldName'});
-  goog.dom.setTextContent(name, player_id + " - " + this.players_[player_id]);
+  goog.dom.setTextContent(name, player_id + ' - ' + this.players_[player_id]);
   goog.dom.appendChild(field, name);
 
   // Fill the field with empty blocks
@@ -332,8 +371,8 @@ tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
       block = goog.dom.createDom('div');
       block.className = 'small block ' + tetriweb.Tetris.convert(0);
       block.id = 'block-' + player_id + '-' + l + '-' + c;
-      block.style.top = l * tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1;
-      block.style.left = c * tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1;
+      block.style.top = l * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1) + 1;
+      block.style.left = c * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1) + 1;
       goog.dom.appendChild(field, block);
     }
   }
@@ -523,7 +562,14 @@ tetriweb.Tetrinet.prototype.fields_ = null;
 
 
 /**
+ * @type {!Element}
+ * @private
+ */
+tetriweb.Tetrinet.eventLog_ = null;
+
+
+/**
  * @type {number}
  * @private
  */
-tetriweb.Tetrinet.BLOCK_SIZE_OPP_ = 12;
+tetriweb.Tetrinet.BLOCK_SIZE_OPP_ = 10;

@@ -1,9 +1,44 @@
+body {
+  font-size: 12px;
+}
+
+#partyline {
+  border: 1px solid #222222;
+  height: 200px;
+  overflow: auto;
+  clear: both;
+}
+
+#fields {
+  position: relative;
+  margin-top: 10px;
+  padding-top: 20px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+#eventLog {
+  position: absolute;
+  bottom: 2px;
+  left: 410px;
+  border: 2px solid #000000;
+  width: 500px;
+  height: 175px;
+  overflow: auto;
+}
+
 .field {
   position: relative;
-  width: 144px;
-  height: 264px;
+  width: 133px; /* 12*(10+1)+1 */
+  height: 243px; /* 22*(10+1)+1 */
   border: 2px solid #222222;
+  margin-right: 10px;
   float: left;
+}
+
+.fieldName {
+  margin-top: -20px;
+  font-size: 12px;
 }
 
 .block {
@@ -43,7 +78,8 @@
 #mycontainer {
 	position: relative;
 	width: 400px;
-	height: 440px;
+	height: 480px;
+  margin-right: 10px;
 	float: left;
 }
 
@@ -63,6 +99,7 @@
 
 #specialbar {
   position: relative;
+  margin-top: 10px;
   height: 20px;
   border: 2px solid #222222;
 }
