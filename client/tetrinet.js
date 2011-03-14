@@ -226,7 +226,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         message = msg;
     }
     if (message.length > 0) {
-      goog.dom.getElement('content').innerHTML +=
+      goog.dom.getElement('partyline').innerHTML +=
           '<div>' + message + '</div>';
     }
   }
@@ -259,7 +259,7 @@ tetriweb.Tetrinet.prototype.startGame = function() {
  */
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
-  goog.dom.getElement('content').innerHTML += '<div>' + '&lt;' +
+  goog.dom.getElement('partyline').innerHTML += '<div>' + '&lt;' +
       this.players_[this.pnum_] + '&gt; ' + msg + '</div>';
 };
 
@@ -297,7 +297,10 @@ tetriweb.Tetrinet.prototype.sendSpecial = function(special, playerDest) {
 tetriweb.Tetrinet.prototype.initMyField = function() {
   var next = goog.dom.createDom('div', {id: 'nextpiece'});
   var specialBar = goog.dom.createDom('div', {id: 'specialbar'});
-  var field = goog.dom.createDom('div', {id: 'myfield'});
+  var name = goog.dom.createDom('div', {className: 'fieldName'});
+  goog.dom.setTextContent(name, this.pnum_ + ' - ' +
+      this.players_[this.pnum_]);
+  var field = goog.dom.createDom('div', {id: 'myfield'}, name);
   field.setAttribute('tabindex', 1);
   var cont = goog.dom.createDom('div', {id: 'mycontainer'},
       next, field, specialBar);
@@ -315,6 +318,9 @@ tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
   var field = goog.dom.createDom('div', {className: 'field', id: 'field-' +
         player_id});
   goog.dom.appendChild(goog.dom.getElement('fields'), field);
+  var name = goog.dom.createDom('div', {className: 'fieldName'});
+  goog.dom.setTextContent(name, player_id + " - " + this.players_[player_id]);
+  goog.dom.appendChild(field, name);
 
   // Fill the field with empty blocks
   var block;
