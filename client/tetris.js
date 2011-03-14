@@ -344,9 +344,6 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
                  (this.curY_ + l) >= 0 &&
                  (this.curY_ + l) < tetriweb.Tetris.HEIGHT_ &&
               this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
-            if (!ok) {
-              console.log("Je bloque à " + this.curY_ + " " + l + ", " + this.curX_ + " " + delta_x[dx] + " " + c + " == " + this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c]);
-            }
           }
         }
       }
@@ -837,7 +834,7 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
     for (var c = 0; c < 4; c++) {
       empty = empty && !this.current_[l][c];
     }
-    if (empty) {
+    if (empty && this.curY_ > 0) {
       this.curY_--;
     } else {
       break;
