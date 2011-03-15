@@ -50,6 +50,13 @@ if(!empty($_GET['pnum'])) {
 		socket_write($sock, "read $pnum\n");
 		$msg = socket_read($sock, 1024*1024); // blocking
 		socket_close($sock);
+
+    if(empty($msg)) {
+      // Le proxy nous a fermé la connexion au nez : quelque chose ne va pas.
+      header('HTTP/1.1 400 Bad Request');
+      die();
+    }
+
 		//file_put_contents('log_recu', $msg, FILE_APPEND);
 		$response = array();
 		$response['msg'] = explode("\n", trim($msg));
