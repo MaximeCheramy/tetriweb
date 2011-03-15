@@ -419,36 +419,54 @@ tetriweb.Tetrinet.prototype.setBlock_ = function(player_id, x, y, type) {
 
 /**
  * Sends the player's field to the server.
- * TODO: should send the difference between field and oldfield only if the
- * number of differences if less than FIELD_WIDTH*FIELD_HEIGHT/2
- * (otherwise should send the whole field)
  * @param {Array.<Array.<number>>} field Current field to send.
  * @param {Array.<Array.<number>>} oldfield The old field.
  */
 tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
-  // Only sends the differences between field and oldfield
-  var seen;
-  var f = 'f ' + this.pnum_ + ' ';
-  // For each block type...
+  // Initialize an array of differences indexed by block type
+  var diff = [];
+  var nbdiff = 0;
   for (var b = 0; b < 15; b++) {
-    seen = false;
-    // For each block of this type on the field which has changed...
-    for (var l = 0; l < 22; l++) {
-      for (var c = 0; c < 12; c++) {
-        if (field[l][c] == b && field[l][c] != oldfield[l][c]) {
-          // First time seen : output block type
-          if (!seen) {
-            f += String.fromCharCode(b + '!'.charCodeAt(0));
-            seen = true;
-          }
-          // Output new coordinates of the block
-          f += String.fromCharCode(c + '3'.charCodeAt(0));
-          f += String.fromCharCode(l + '3'.charCodeAt(0));
-        }
+    diff[b] = [];
+  }
+
+  // Find differences
+  for (var l = 0; l < 22; l++) {
+    for (var c = 0; c < 12; c++) {
+      if (field[l][c] != oldfield[l][c]) {
+        diff[field[l][c]].push({'l': l, 'c': c});
+        nbdiff++;
       }
     }
   }
-  this.sendMessage_(f);
+
+  if (nbdiff > 0) {
+    var f = 'f ' + this.pnum_ + ' ';
+
+    // Incremental send
+    if (nbdiff < (tetriweb.Tetris.WIDTH_ * tetriweb.Tetris.HEIGHT_)/2) {
+      for (var b = 0; b < diff.length; b++) {
+        if (diff[b].length > 0) {
+          // Output block type
+          f += String.fromCharCode(b + '!'.charCodeAt(0));
+          // Output new coordinates
+          for (var i = 0; i < diff[b].length; i++) {
+            f += String.fromCharCode(diff[b][i]['c'] + '3'.charCodeAt(0));
+            f += String.fromCharCode(diff[b][i]['l'] + '3'.charCodeAt(0));
+          }
+        }
+      }
+    }
+    // Send complete field
+    else {
+      for (var l = 0; l < 22; l++) {
+        for (var c = 0; c < 12; c++) {
+          f += field[l][c];
+        }
+      }
+    }
+    this.sendMessage_(f);
+  }
 };
 
 
