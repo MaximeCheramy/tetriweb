@@ -155,8 +155,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             this.clearField_(player_id);
           }
         }
-        // Initialize tetris
-        this.tetris.init(data[5], data[6], data[7], data[8], data[9]);
+        // Start tetris
+        this.tetris.startGame(data[5], data[6], data[7], data[8], data[9]);
         break;
       // All players lose except one
       case 'endgame':

@@ -29,8 +29,9 @@ tetriweb.Tetris = function(tetrinet) {
  * @param {number} _specialCapacity The capacity of the specials queue.
  * @param {string} _piecesFreq Occurence frequencies of each block.
  * @param {string} _specialsFreq Occurence frequencies of each special.
+ * @private
  */
-tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
+tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
     _specialCapacity, _piecesFreq, _specialsFreq) {
   // init the game area : all empty.
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
@@ -61,6 +62,22 @@ tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
   this.specialCapacity_ = _specialCapacity;
   this.currentSpecialLines_ = 0;
   this.specialsQueue_ = [];
+};
+
+
+/**
+ * Starts a new game.
+ * @param {number} _specialLines The number of lines required to get a special.
+ * @param {number} _specialCount The number of specials added each time
+ * _specialLines are completed.
+ * @param {number} _specialCapacity The capacity of the specials queue.
+ * @param {string} _piecesFreq Occurence frequencies of each block.
+ * @param {string} _specialsFreq Occurence frequencies of each special.
+ */
+tetriweb.Tetris.prototype.startGame = function(_specialLines, _specialCount,
+    _specialCapacity, _piecesFreq, _specialsFreq) {
+  this.init_(_specialLines, _specialCount, _specialCapacity, _piecesFreq,
+      _specialsFreq);
 
   this.updateGridAndSendField_();
   this.generateRandom_();
