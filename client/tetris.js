@@ -27,8 +27,8 @@ tetriweb.Tetris = function(tetrinet) {
  * @param {number} _specialCount The number of specials added each time
  * _specialLines are completed.
  * @param {number} _specialCapacity The capacity of the specials queue.
- * @param {number} _piecesFreq Occurence frequencies of each block.
- * @param {number} _specialsFreq Occurence frequencies of each special.
+ * @param {string} _piecesFreq Occurence frequencies of each block.
+ * @param {string} _specialsFreq Occurence frequencies of each special.
  */
 tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
     _specialCapacity, _piecesFreq, _specialsFreq) {
@@ -49,21 +49,11 @@ tetriweb.Tetris.prototype.init = function(_specialLines, _specialCount,
   for (var i = 0; i < _piecesFreq.length; i++) {
     this.piecesFreq_[parseInt(_piecesFreq[i]) - 1]++;
   }
-  var n = 0;
-  for (var i = 0; i < 7; i++) {
-    n += this.piecesFreq_[i];
-    this.piecesFreq_[i] = n;
-  }
 
   // Specials' frequency.
   this.specialsFreq_ = goog.array.repeat(0, 9);
   for (var i = 0; i < _specialsFreq.length; i++) {
     this.specialsFreq_[parseInt(_specialsFreq[i]) - 1]++;
-  }
-  n = 0;
-  for (var i = 0; i < 9; i++) {
-    n += this.specialsFreq_[i];
-    this.specialsFreq_[i] = n;
   }
 
   this.specialLines_ = _specialLines;
@@ -96,6 +86,7 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
   var n = randomInt(0, 99);
   this.nextId_ = 0; // prochaine pièce
   while (n >= this.piecesFreq_[this.nextId_]) {
+    n -= this.piecesFreq_[this.nextId_];
     this.nextId_++;
   }
   this.nextDirection_ = randomInt(0, 3); // orientation de la pièce
@@ -237,6 +228,7 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
     var n = randomInt(0, 99);
     var special = 0;
     while (n >= this.specialsFreq_[special]) {
+      n -= this.specialsFreq_[special];
       special++;
     }
     special += 6;
@@ -352,11 +344,13 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
       for (var l = 0; l < 4 && ok; l++) {
         for (var c = 0; c < 4 && ok; c++) {
           if (piece[l][c]) {
-            ok = (this.curX_ + delta_x[dx] + c) >= 0 &&
-                 (this.curX_ + delta_x[dx] + c) < tetriweb.Tetris.WIDTH_ &&
-                 (this.curY_ + l) >= 0 &&
-                 (this.curY_ + l) < tetriweb.Tetris.HEIGHT_ &&
-              this.gameArea_[this.curY_ + l][this.curX_ + delta_x[dx] + c] == 0;
+            var newL = this.curY_ + l;
+            var newC = this.curX_ + delta_x[dx] + c;
+            ok = newC >= 0 &&
+                 newC < tetriweb.Tetris.WIDTH_ &&
+                 newL >= 0 &&
+                 newL < tetriweb.Tetris.HEIGHT_ &&
+                 this.gameArea_[newL][newC] == 0;
           }
         }
       }
@@ -764,7 +758,7 @@ tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
 tetriweb.Tetris.prototype.blockBomb = function() {
   // Relative coordinates of the 8 blocks around a block
   var dep = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1],
-      [1, -1], [1, 0], [1, 1]];
+        [1, -1], [1, 0], [1, 1]];
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       // Look for block bombs

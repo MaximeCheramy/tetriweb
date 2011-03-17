@@ -444,7 +444,7 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
     var f = 'f ' + this.pnum_ + ' ';
 
     // Incremental send
-    if (nbdiff < (tetriweb.Tetris.WIDTH_ * tetriweb.Tetris.HEIGHT_)/2) {
+    if (nbdiff < (tetriweb.Tetris.WIDTH_ * tetriweb.Tetris.HEIGHT_) / 2) {
       for (var b = 0; b < diff.length; b++) {
         if (diff[b].length > 0) {
           // Output block type
@@ -521,6 +521,7 @@ tetriweb.Tetrinet.prototype.getPlayerField = function(playerNum) {
  */
 tetriweb.Tetrinet.prototype.tetris = null;
 
+
 /**
  * @type {number}
  * @private
@@ -595,7 +596,7 @@ tetriweb.Tetrinet.BLOCK_SIZE_OPP_ = 10;
  * @type {Object.<string, string>}
  */
 tetriweb.Tetrinet.SPECIALS = {'cs1': '1 line', 'cs2': '2 lines',
-    'cs4' : '4 lines', 'a': 'Add line', 'c': 'Clear line', 'n': 'Nuke field',
-    'r': 'Random clear blocks', 's': 'Switch fields',
-    'b': 'Clear special blocks', 'g': 'Block gravity',
-    'q': 'Block quake', 'o': 'Block bomb'};
+  'cs4' : '4 lines', 'a': 'Add line', 'c': 'Clear line', 'n': 'Nuke field',
+  'r': 'Random clear blocks', 's': 'Switch fields',
+  'b': 'Clear special blocks', 'g': 'Block gravity',
+  'q': 'Block quake', 'o': 'Block bomb'};

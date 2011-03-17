@@ -5,6 +5,7 @@ goog.require('tetriweb.Tetris');
 
 goog.provide('tetriweb');
 
+
 /**
  * Initializes Tetriweb.
  * Creates Tetrinet and Tetris objects, and sets up listeners.
@@ -20,23 +21,23 @@ tetriweb.init = function() {
 
   goog.events.listen(goog.dom.getElement('connectForm'),
       goog.events.EventType.SUBMIT, function(e) {
-    e.preventDefault();
-    tetrinet.connect(goog.dom.getElement('nickname').value,
-      goog.dom.getElement('team').value);
-  });
+        e.preventDefault();
+        tetrinet.connect(goog.dom.getElement('nickname').value,
+            goog.dom.getElement('team').value);
+      });
 
   goog.events.listen(goog.dom.getElement('partylineForm'),
       goog.events.EventType.SUBMIT, function(e) {
-    e.preventDefault();
-    var msg = goog.dom.getElement('msg');
-    tetrinet.sayPline(msg.value);
-    msg.value = '';
-  });
+        e.preventDefault();
+        var msg = goog.dom.getElement('msg');
+        tetrinet.sayPline(msg.value);
+        msg.value = '';
+      });
 
   goog.events.listen(goog.dom.getElement('startGame'),
       goog.events.EventType.CLICK, function(e) {
-    tetrinet.startGame();
-  });
+        tetrinet.startGame();
+      });
 
   goog.events.listen(window, goog.events.EventType.UNLOAD, function(e) {
     e.preventDefault();
