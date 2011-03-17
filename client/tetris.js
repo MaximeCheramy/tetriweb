@@ -21,6 +21,14 @@ tetriweb.Tetris = function(tetrinet) {
 };
 
 
+tetriweb.Tetris.prototype.setKeyEvent_ = function() {
+  goog.events.removeAll(this.myField_);
+  var keyHandler = new goog.events.KeyHandler(this.myField_);
+  goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
+      goog.bind(this.keyHandler_, this));
+};
+
+
 /**
  * Initializes the game.
  * @param {number} _specialLines The number of lines required to get a special.
@@ -40,9 +48,8 @@ tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
       this.gameArea_[l][c] = 0;
     }
   }
-
-  this.myField_ = goog.dom.getElement('myfield');
-  goog.dom.removeChildren(this.myField_);
+  // TODO: To move.
+  this.emptyField_();
 
   this.gameLost_ = false;
   // Pieces' frequency.
@@ -84,10 +91,8 @@ tetriweb.Tetris.prototype.startGame = function(_specialLines, _specialCount,
   this.newPiece_();
   this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
 
-  goog.events.removeAll(this.myField_);
-  var keyHandler = new goog.events.KeyHandler(this.myField_);
-  goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
-      goog.bind(this.keyHandler_, this));
+  // TODO: To move.
+  this.setKeyEvent_();
 };
 
 
@@ -108,21 +113,11 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
   }
   this.nextDirection_ = randomInt(0, 3); // orientation de la pièce
 
-  var nextpiece = tetriweb.Tetris.generatePiece(this.nextId_,
-      this.nextDirection_);
-  var nextpieceobj = goog.dom.getElement('nextpiece');
-  goog.dom.removeChildren(nextpieceobj);
-  for (var l = 0; l < 4; l++) {
-    for (var c = 0; c < 4; c++) {
-      if (nextpiece[l][c]) {
-        var bloc = goog.dom.createDom('div');
-        bloc.style.top = l * tetriweb.Tetris.BLOCK_SIZE_ + 1;
-        bloc.style.left = c * tetriweb.Tetris.BLOCK_SIZE_ + 1;
-        bloc.className = 'block ' + convert(getColor(this.nextId_));
-        goog.dom.appendChild(nextpieceobj, bloc);
-      }
-    }
-  }
+  var nextPiece = tetriweb.Tetris.generatePiece(
+      this.nextId_, this.nextDirection_);
+
+  // TODO
+  this.updateNextPiece(nextPiece);
 };
 
 
@@ -271,6 +266,24 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
 };
 
 
+tetriweb.Tetris.prototype.layDownPiece = function() {
+  var convert = tetriweb.Tetris.convert;
+  for (var l = 0; l < 4; l++) {
+    for (var c = 0; c < 4; c++) {
+      if (this.current_[l][c]) {
+        this.gameArea_[l + this.curY_][c + this.curX_] = this.currentColor_;
+        var bloc = goog.dom.createDom('div');
+        bloc.style.top = (this.curY_ + l) * tetriweb.Tetris.BLOCK_SIZE_ + 1;
+        bloc.style.left = (this.curX_ + c) * tetriweb.Tetris.BLOCK_SIZE_ + 1;
+        bloc.className = 'block ' + convert(this.currentColor_);
+        goog.dom.appendChild(this.myField_, bloc);
+      }
+    }
+  }
+  goog.dom.removeNode(this.currentObj_);
+};
+
+
 /**
  * Game Engine. This function is called periodicaly.
  * @private
@@ -291,28 +304,14 @@ tetriweb.Tetris.prototype.step_ = function() {
   }
   if (!stop) {
     this.curY_++;
-    this.currentObj_.style.top = this.curY_ * tetriweb.Tetris.BLOCK_SIZE_;
+    this.moveCurPieceV_(this.curY_);
   } else {
-    var convert = tetriweb.Tetris.convert;
-
     if (this.curY_ <= 0) {
       this.gameLost_ = true;
     }
 
-    // On dépose les pièces
-    for (var l = 0; l < 4; l++) {
-      for (var c = 0; c < 4; c++) {
-        if (this.current_[l][c]) {
-          this.gameArea_[l + this.curY_][c + this.curX_] = this.currentColor_;
-          var bloc = goog.dom.createDom('div');
-          bloc.style.top = (this.curY_ + l) * tetriweb.Tetris.BLOCK_SIZE_ + 1;
-          bloc.style.left = (this.curX_ + c) * tetriweb.Tetris.BLOCK_SIZE_ + 1;
-          bloc.className = 'block ' + convert(this.currentColor_);
-          goog.dom.appendChild(this.myField_, bloc);
-        }
-      }
-    }
-    goog.dom.removeNode(this.currentObj_);
+    this.layDownPiece();   
+
     this.pieceDropped_ = true;
     this.checkLine_();
     this.sendField_();
@@ -462,9 +461,9 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
     this.updateSpecialBar_();
   }
 
-  // Actualise la position de la piece.
-  this.currentObj_.style.left = this.curX_ * tetriweb.Tetris.BLOCK_SIZE_;
+  this.moveCurPieceH_(this.curX_);
 };
+
 
 
 /**
@@ -959,6 +958,44 @@ tetriweb.Tetris.prototype.updatePiece_ = function() {
     }
   }
 };
+
+
+tetriweb.Tetris.prototype.updateNextPiece = function(nextPiece) {
+  var convert = tetriweb.Tetris.convert;
+  var getColor = tetriweb.Tetris.getColor;
+
+  var nextPieceObj = goog.dom.getElement('nextpiece');
+  goog.dom.removeChildren(nextPieceObj);
+  for (var l = 0; l < 4; l++) {
+    for (var c = 0; c < 4; c++) {
+      if (nextPiece[l][c]) {
+        var block = goog.dom.createDom('div');
+        block.style.top = l * tetriweb.Tetris.BLOCK_SIZE_ + 1;
+        block.style.left = c * tetriweb.Tetris.BLOCK_SIZE_ + 1;
+        block.className = 'block ' + convert(getColor(this.nextId_));
+        goog.dom.appendChild(nextPieceObj, block);
+      }
+    }
+  }
+};
+
+
+tetriweb.Tetris.prototype.emptyField_ = function() {
+  this.myField_ = goog.dom.getElement('myfield');
+  goog.dom.removeChildren(this.myField_);
+};
+
+
+tetriweb.Tetris.prototype.moveCurPieceH_= function(posX) {
+  // Actualise la position de la piece.
+  this.currentObj_.style.left = posX * tetriweb.Tetris.BLOCK_SIZE_;
+}
+
+
+tetriweb.Tetris.prototype.moveCurPieceV_ = function(posY) {
+  // Actualise la position de la piece.
+  this.currentObj_.style.top = posY * tetriweb.Tetris.BLOCK_SIZE_;
+}
 
 
 /**
