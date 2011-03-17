@@ -1,6 +1,6 @@
-goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.net.XhrIo');
+goog.require('tetriweb.Graphics');
 
 goog.provide('tetriweb.Tetrinet');
 
@@ -44,7 +44,7 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
             this.readFromServer_();
 
             // Init DOM
-            tetriweb.Tetrinet.domInit(this.pnum_, nickname, this.pnum_ == 1);
+            tetriweb.Graphics.domInit(this.pnum_, nickname, this.pnum_ == 1);
           } else {
             alert('Connexion impossible : ' + response['error']);
           }
@@ -222,7 +222,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         message = msg;
     }
     if (message.length > 0) {
-      tetriweb.Tetrinet.domWritePline(message);
+      tetriweb.Graphics.domWritePline(message);
     }
   }
 };
@@ -240,7 +240,7 @@ tetriweb.Tetrinet.prototype.logEvent = function(special, to, from) {
   var message = tetriweb.Tetrinet.SPECIALS[special];
   message += (to == 0) ? ' to all' : ' to ' + this.players_[to];
   message += ' from ' + this.players_[from];
-  tetriweb.Tetrinet.domLogEvent(message);
+  tetriweb.Graphics.domLogEvent(message);
 };
 
 
@@ -270,7 +270,7 @@ tetriweb.Tetrinet.prototype.startGame = function() {
  */
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
-  tetriweb.Tetrinet.domWritePline('<' + this.players_[this.pnum_] + '> ' + msg);
+  tetriweb.Graphics.domWritePline('<' + this.players_[this.pnum_] + '> ' + msg);
 };
 
 
@@ -318,7 +318,7 @@ tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
     }
   }
 
-  tetriweb.Tetrinet.domInitField(player_id, this.players_[player_id]);
+  tetriweb.Graphics.domInitField(player_id, this.players_[player_id]);
 };
 
 
@@ -329,7 +329,7 @@ tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
  */
 tetriweb.Tetrinet.prototype.destroyField_ = function(player_id) {
   delete this.fields_[player_id];
-  tetriweb.Tetrinet.domDestroyField(player_id);
+  tetriweb.Graphics.domDestroyField(player_id);
 };
 
 
@@ -357,7 +357,7 @@ tetriweb.Tetrinet.prototype.clearField_ = function(player_id) {
  */
 tetriweb.Tetrinet.prototype.setBlock_ = function(player_id, x, y, type) {
   this.fields_[player_id][y][x] = type;
-  tetriweb.Tetrinet.domSetBlock(player_id, x, y, type);
+  tetriweb.Graphics.domSetBlock(player_id, x, y, type);
 };
 
 
@@ -477,120 +477,6 @@ tetriweb.Tetrinet.intToChar = function(type) {
 };
 
 
-/*
- * DOM-related functions
- */
-
-
-/**
- * Initializes the DOM elements needed by the game.
- * @param {number} pnum The player's playernum.
- * @param {string} nickname The player's nickname.
- * @param {boolean} moderator True if the player can start or stop games.
- */
-tetriweb.Tetrinet.domInit = function(pnum, nickname, moderator) {
-  // Empty fields container
-  var fields = goog.dom.getElement('fields');
-  goog.dom.removeChildren(fields);
-
-  // Create event log
-  tetriweb.Tetrinet.eventLog = goog.dom.createDom('div', {id: 'eventLog'});
-  goog.dom.appendChild(fields, tetriweb.Tetrinet.eventLog);
-
-  // Enable start button for moderators
-  if (moderator) {
-    goog.dom.getElement('startGame').disabled = false;
-  }
-
-  // Init the player's field
-  var next = goog.dom.createDom('div', {id: 'nextpiece'});
-  var specialBar = goog.dom.createDom('div', {id: 'specialbar'});
-  var name = goog.dom.createDom('div', {id: 'myName'});
-  goog.dom.setTextContent(name, pnum + ' - ' + nickname);
-  var field = goog.dom.createDom('div', {id: 'myfield'});
-  field.setAttribute('tabindex', 1);
-  var cont = goog.dom.createDom('div', {id: 'mycontainer'},
-      name, next, field, specialBar);
-  goog.dom.appendChild(goog.dom.getElement('fields'), cont);
-};
-
-
-/**
- * Displays an event in the event window.
- * @param {string} message The message to display.
- */
-tetriweb.Tetrinet.domLogEvent = function(message) {
-  var eventLog = tetriweb.Tetrinet.eventLog;
-  var cont = goog.dom.createDom('div');
-  goog.dom.setTextContent(cont, message);
-  goog.dom.appendChild(eventLog, cont);
-  eventLog.scrollTop = eventLog.scrollHeight; // scroll to bottom
-};
-
-
-/**
- * Writes a message on the partyline DOM element.
- * @param {string} msg The message to write.
- */
-tetriweb.Tetrinet.domWritePline = function(msg) {
-  var pline = goog.dom.getElement('partyline');
-  var cont = goog.dom.createDom('div');
-  goog.dom.setTextContent(cont, msg);
-  goog.dom.appendChild(pline, cont);
-  pline.scrollTop = pline.scrollHeight; // scroll to bottom
-};
-
-
-/**
- * Creates an empty field in the DOM.
- * @param {number} player_id The field owner's pnum.
- * @param {string} nickname The field owner's nickname.
- */
-tetriweb.Tetrinet.domInitField = function(player_id, nickname) {
-  // Create a new field div and add it to the fields container
-  var field = goog.dom.createDom('div', {className: 'field', id: 'field-' +
-        player_id});
-  goog.dom.appendChild(goog.dom.getElement('fields'), field);
-  var name = goog.dom.createDom('div', {className: 'fieldName'});
-  goog.dom.setTextContent(name, player_id + ' - ' + nickname);
-  goog.dom.appendChild(field, name);
-
-  // Fill the field with empty blocks
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
-      var block = goog.dom.createDom('div');
-      block.className = 'small block ' + tetriweb.Tetris.convert(0);
-      block.id = 'block-' + player_id + '-' + l + '-' + c;
-      block.style.top = l * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1) + 1;
-      block.style.left = c * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1) + 1;
-      goog.dom.appendChild(field, block);
-    }
-  }
-};
-
-
-/**
- * Removes a field from the DOM.
- * @param {number} player_id The field owner.
- */
-tetriweb.Tetrinet.domDestroyField = function(player_id) {
-  goog.dom.removeNode(goog.dom.getElement('field-' + player_id));
-};
-
-
-/**
- * Sets a block on a player's field.
- * @param {number} player_id The owner of the block.
- * @param {number} x The x-coordinate of the block.
- * @param {number} y The y-coordinate of the block.
- * @param {number} type The block type.
- */
-tetriweb.Tetrinet.domSetBlock = function(player_id, x, y, type) {
-  var block = goog.dom.getElement('block-' + player_id + '-' + y + '-' + x);
-  block.className = 'small block ' + tetriweb.Tetris.convert(type);
-};
-
-
 /**
  * @type {tetriweb.Tetris}
  */
@@ -651,12 +537,6 @@ tetriweb.Tetrinet.prototype.teams_ = null;
  * @private
  */
 tetriweb.Tetrinet.prototype.fields_ = null;
-
-
-/**
- * @type {!Element}
- */
-tetriweb.Tetrinet.eventLog = null;
 
 
 /**
