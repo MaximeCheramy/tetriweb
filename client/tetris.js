@@ -22,8 +22,9 @@ tetriweb.Tetris = function(tetrinet) {
 
 
 tetriweb.Tetris.prototype.setKeyEvent_ = function() {
-  goog.events.removeAll(this.myField_);
-  var keyHandler = new goog.events.KeyHandler(this.myField_);
+  var myField_ = tetriweb.Tetris.myField_;
+  goog.events.removeAll(myField_);
+  var keyHandler = new goog.events.KeyHandler(myField_);
   goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
       goog.bind(this.keyHandler_, this));
 };
@@ -49,7 +50,7 @@ tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
     }
   }
   // TODO: To move.
-  this.emptyField_();
+  tetriweb.Tetris.emptyField_();
 
   this.gameLost_ = false;
   // Pieces' frequency.
@@ -116,8 +117,8 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
   var nextPiece = tetriweb.Tetris.generatePiece(
       this.nextId_, this.nextDirection_);
 
-  // TODO
-  this.updateNextPiece(nextPiece);
+  // TODO: move.
+  tetriweb.Tetris.updateNextPiece(nextPiece, this.nextId_);
 };
 
 
@@ -267,6 +268,8 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
 
 
 tetriweb.Tetris.prototype.layDownPiece = function() {
+  var myField_ = tetriweb.Tetris.myField_;
+  var currentObj_ = tetriweb.Tetris.currentObj_;
   var convert = tetriweb.Tetris.convert;
   for (var l = 0; l < 4; l++) {
     for (var c = 0; c < 4; c++) {
@@ -276,11 +279,11 @@ tetriweb.Tetris.prototype.layDownPiece = function() {
         bloc.style.top = (this.curY_ + l) * tetriweb.Tetris.BLOCK_SIZE_ + 1;
         bloc.style.left = (this.curX_ + c) * tetriweb.Tetris.BLOCK_SIZE_ + 1;
         bloc.className = 'block ' + convert(this.currentColor_);
-        goog.dom.appendChild(this.myField_, bloc);
+        goog.dom.appendChild(myField_, bloc);
       }
     }
   }
-  goog.dom.removeNode(this.currentObj_);
+  goog.dom.removeNode(currentObj_);
 };
 
 
@@ -304,7 +307,7 @@ tetriweb.Tetris.prototype.step_ = function() {
   }
   if (!stop) {
     this.curY_++;
-    this.moveCurPieceV_(this.curY_);
+    tetriweb.Tetris.moveCurPieceV_(this.curY_);
   } else {
     if (this.curY_ <= 0) {
       this.gameLost_ = true;
@@ -376,8 +379,10 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
     if (ok) {
       this.curX_ += delta_x[dx];
       this.current_ = piece;
-      goog.dom.removeNode(this.currentObj_);
-      this.updatePiece_();
+      // TODO: move!!!!
+      var currentObj_ = tetriweb.Tetris.currentObj_;
+      goog.dom.removeNode(currentObj_);
+      tetriweb.Tetris.updatePiece_(this.current_, this.curX_, this.curY_, this.currentColor_);
     }
   }
 
@@ -461,7 +466,7 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
     this.updateSpecialBar_();
   }
 
-  this.moveCurPieceH_(this.curX_);
+  tetriweb.Tetris.moveCurPieceH_(this.curX_);
 };
 
 
@@ -841,6 +846,9 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
   this.curX_ = 5;
   this.curY_ = 0;
 
+  // TODO: On devrait recopier nextPiece je pense au lieu de regenerer 
+  // (comme ca on n'a plus besoin de nextId et nextDirection). Et peut etre 
+  // faire une structure qui contient la piece et sa couleur.
   this.current_ = tetriweb.Tetris.generatePiece(this.nextId_,
       this.nextDirection_);
   this.currentColor_ = getColor(this.nextId_);
@@ -859,7 +867,7 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
     }
   }
 
-  this.updatePiece_();
+  tetriweb.Tetris.updatePiece_(this.current_, this.curX_, this.curY_, this.currentColor_);
 };
 
 
@@ -894,17 +902,32 @@ tetriweb.Tetris.prototype.sendField_ = function() {
 
 
 /**
+ * Update the graphical field and send it to the tetrinet server.
+ * @private
+ */
+tetriweb.Tetris.prototype.updateGridAndSendField_ = function() {
+  this.updateGrid_();
+  this.sendField_();
+};
+
+
+
+/*************************/
+
+/**
  * Updates graphically the field using the internal matrix representing the
  * game.
  * @private
  */
 tetriweb.Tetris.prototype.updateGrid_ = function() {
   var convert = tetriweb.Tetris.convert;
+  var myField_ = tetriweb.Tetris.myField_;
+  var currentObj_ = tetriweb.Tetris.currentObj_;
 
   // Removes all the elements in the container.
-  var fieldContent = goog.array.clone(this.myField_.childNodes);
+  var fieldContent = goog.array.clone(myField_.childNodes);
   goog.array.forEach(fieldContent, function(n) {
-    if (n != this.currentObj_) {
+    if (n != currentObj_) {
       goog.dom.removeNode(n);
     }
   }, this);
@@ -917,21 +940,10 @@ tetriweb.Tetris.prototype.updateGrid_ = function() {
         bloc.style.top = l * tetriweb.Tetris.BLOCK_SIZE_ + 1;
         bloc.style.left = c * tetriweb.Tetris.BLOCK_SIZE_ + 1;
         bloc.className = 'block ' + convert(this.gameArea_[l][c]);
-        this.myField_.appendChild(bloc);
+        myField_.appendChild(bloc);
       }
     }
   }
-
-};
-
-
-/**
- * Update the graphical field and send it to the tetrinet server.
- * @private
- */
-tetriweb.Tetris.prototype.updateGridAndSendField_ = function() {
-  this.updateGrid_();
-  this.sendField_();
 };
 
 
@@ -939,28 +951,30 @@ tetriweb.Tetris.prototype.updateGridAndSendField_ = function() {
  * Updates the current piece by creating it and adding it to the field.
  * @private
  */
-tetriweb.Tetris.prototype.updatePiece_ = function() {
+tetriweb.Tetris.updatePiece_ = function(current, curX, curY, currentColor) {
   var convert = tetriweb.Tetris.convert;
+  var myField_ = tetriweb.Tetris.myField_;
 
-  this.currentObj_ = goog.dom.createDom('div', {className: 'piece'});
-  this.currentObj_.style.top = this.curY_ * tetriweb.Tetris.BLOCK_SIZE_;
-  this.currentObj_.style.left = this.curX_ * tetriweb.Tetris.BLOCK_SIZE_;
-  goog.dom.appendChild(this.myField_, this.currentObj_);
+  tetriweb.Tetris.currentObj_ = goog.dom.createDom('div', {className: 'piece'});
+  var currentObj_ = tetriweb.Tetris.currentObj_;
+  tetriweb.Tetris.moveCurPieceH_(curX);
+  tetriweb.Tetris.moveCurPieceV_(curY);
+  goog.dom.appendChild(myField_, currentObj_);
   for (var l = 0; l < 4; l++) {
     for (var c = 0; c < 4; c++) {
-      if (this.current_[l][c]) {
-        var bloc = goog.dom.createDom('div');
-        bloc.style.top = l * tetriweb.Tetris.BLOCK_SIZE_ + 1;
-        bloc.style.left = c * tetriweb.Tetris.BLOCK_SIZE_ + 1;
-        bloc.className = 'block ' + convert(this.currentColor_);
-        goog.dom.appendChild(this.currentObj_, bloc);
+      if (current[l][c]) {
+        var block = goog.dom.createDom('div');
+        block.style.top = l * tetriweb.Tetris.BLOCK_SIZE_ + 1;
+        block.style.left = c * tetriweb.Tetris.BLOCK_SIZE_ + 1;
+        block.className = 'block ' + convert(currentColor);
+        goog.dom.appendChild(currentObj_, block);
       }
     }
   }
 };
 
 
-tetriweb.Tetris.prototype.updateNextPiece = function(nextPiece) {
+tetriweb.Tetris.updateNextPiece = function(nextPiece, nextId) {
   var convert = tetriweb.Tetris.convert;
   var getColor = tetriweb.Tetris.getColor;
 
@@ -972,7 +986,7 @@ tetriweb.Tetris.prototype.updateNextPiece = function(nextPiece) {
         var block = goog.dom.createDom('div');
         block.style.top = l * tetriweb.Tetris.BLOCK_SIZE_ + 1;
         block.style.left = c * tetriweb.Tetris.BLOCK_SIZE_ + 1;
-        block.className = 'block ' + convert(getColor(this.nextId_));
+        block.className = 'block ' + convert(getColor(nextId));
         goog.dom.appendChild(nextPieceObj, block);
       }
     }
@@ -980,22 +994,35 @@ tetriweb.Tetris.prototype.updateNextPiece = function(nextPiece) {
 };
 
 
-tetriweb.Tetris.prototype.emptyField_ = function() {
-  this.myField_ = goog.dom.getElement('myfield');
-  goog.dom.removeChildren(this.myField_);
+tetriweb.Tetris.emptyField_ = function() {
+  // move to a init or constructor...
+  tetriweb.Tetris.myField_ = goog.dom.getElement('myfield');
+  goog.dom.removeChildren(tetriweb.Tetris.myField_);
 };
 
 
-tetriweb.Tetris.prototype.moveCurPieceH_= function(posX) {
+tetriweb.Tetris.moveCurPieceH_= function(posX) {
   // Actualise la position de la piece.
-  this.currentObj_.style.left = posX * tetriweb.Tetris.BLOCK_SIZE_;
+  tetriweb.Tetris.currentObj_.style.left = posX * tetriweb.Tetris.BLOCK_SIZE_;
 }
 
 
-tetriweb.Tetris.prototype.moveCurPieceV_ = function(posY) {
+tetriweb.Tetris.moveCurPieceV_ = function(posY) {
   // Actualise la position de la piece.
-  this.currentObj_.style.top = posY * tetriweb.Tetris.BLOCK_SIZE_;
+  tetriweb.Tetris.currentObj_.style.top = posY * tetriweb.Tetris.BLOCK_SIZE_;
 }
+
+// TODO: Affect in a constructor or init.
+tetriweb.Tetris.myField_ = null;
+
+/**
+ * @type {object}
+ * @private
+ */
+tetriweb.Tetris.currentObj_ = null;
+
+
+/*************************/
 
 
 /**
@@ -1066,20 +1093,6 @@ tetriweb.Tetris.prototype.current_ = null;
  * @private
  */
 tetriweb.Tetris.prototype.currentColor_ = null;
-
-
-/**
- * @type {object}
- * @private
- */
-tetriweb.Tetris.prototype.currentObj_ = null;
-
-
-/**
- * @type {object}
- * @private
- */
-tetriweb.Tetris.prototype.myField_ = null;
 
 
 /**
