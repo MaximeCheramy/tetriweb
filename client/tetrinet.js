@@ -168,7 +168,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             y = Math.floor(j / 12);
             x = j % 12;
             this.setBlock_(player_id, x, y,
-                tetriweb.Tetrinet.normalize(field[j]));
+                tetriweb.Tetrinet.charToInt(field[j]));
           }
         } else {
           // Only differences
@@ -405,7 +405,7 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
     else {
       for (var l = 0; l < 22; l++) {
         for (var c = 0; c < 12; c++) {
-          f += field[l][c];
+          f += tetriweb.Tetrinet.intToChar(field[l][c]);
         }
       }
     }
@@ -444,11 +444,11 @@ tetriweb.Tetrinet.prototype.getPlayerField = function(playerNum) {
 
 
 /**
- * Normalizes a block type to the matching integer type.
- * @param {(string|number)} type Block type (integer or string).
+ * Converts a block type to the matching integer type.
+ * @param {string} type Character block type.
  * @return {number} Matching integer block type.
  */
-tetriweb.Tetrinet.normalize = function(type) {
+tetriweb.Tetrinet.charToInt = function(type) {
   var specials = {'a': 6, 'c': 7, 'n': 8, 'r': 9, 's': 10, 'b': 11, 'g': 12,
     'q': 13, 'o': 14};
   if (type >= '0' && type <= '5') {
@@ -457,6 +457,23 @@ tetriweb.Tetrinet.normalize = function(type) {
     type = specials[type];
   }
   return type;
+};
+
+
+/**
+ * Converts an integer block type to the matching character type.
+ * @param {number} type Integer block type.
+ * @return {string} Matching character block type.
+ */
+tetriweb.Tetrinet.intToChar = function(type) {
+  var specials = {6: 'a', 7: 'c', 8: 'n', 9: 'r', 10: 's', 11: 'b', 12: 'g',
+    13: 'q', 14: 'o'};
+  if (specials[type] != undefined) {
+    type = specials[type];
+  }
+  else {
+    return "" + type;
+  }
 };
 
 
