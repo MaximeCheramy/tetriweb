@@ -72,6 +72,15 @@ body {
 .sb-q { background: url(img/sb-q.png); }
 .sb-r { background: url(img/sb-r.png); }
 .sb-s { background: url(img/sb-s.png); }
+.small.sb-a { background: url(img/sb-a_s.png); }
+.small.sb-b { background: url(img/sb-b_s.png); }
+.small.sb-c { background: url(img/sb-c_s.png); }
+.small.sb-g { background: url(img/sb-g_s.png); }
+.small.sb-n { background: url(img/sb-n_s.png); }
+.small.sb-o { background: url(img/sb-o_s.png); }
+.small.sb-q { background: url(img/sb-q_s.png); }
+.small.sb-r { background: url(img/sb-r_s.png); }
+.small.sb-s { background: url(img/sb-s_s.png); }
 
 .piece {
   height: 80px;
