@@ -148,7 +148,11 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           }
         }
         // Start tetris
-        this.tetris.startGame(data[5], data[6], data[7], data[8], data[9]);
+        var specialLines = data[5], specialCount = data[6],
+            specialCapacity = data[7];
+        var piecesFreq = data[8], specialsFreq = data[9];
+        this.tetris.startGame(specialLines, specialCount, specialCapacity,
+            piecesFreq, specialsFreq);
         break;
       // All players lose except one
       case 'endgame':
@@ -472,7 +476,7 @@ tetriweb.Tetrinet.intToChar = function(type) {
     type = specials[type];
   }
   else {
-    return "" + type;
+    return '' + type;
   }
 };
 
