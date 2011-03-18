@@ -39,12 +39,8 @@ tetriweb.init = function() {
         tetrinet.startGame();
       });
 
-  goog.events.listen(window, goog.events.EventType.UNLOAD, function(e) {
-    e.preventDefault();
-    if (confirm('Êtes-vous sûr de vouloir quitter ?')) {
-      tetrinet.disconnect();
-      window.close();
-    }
+  goog.events.listen(window, 'beforeunload', function(e) {
+    tetrinet.disconnect();
   });
 };
 
