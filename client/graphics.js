@@ -120,7 +120,7 @@ tetriweb.Graphics.domSetBlock = function(player_id, x, y, type) {
  * Lays down a piece.
  * @param {number} curX The x-coordinate of the piece.
  * @param {number} curY The y-coordinate of the piece.
- * @param {Array<Array<number>>} current The current piece matrix to lay down.
+ * @param {Array.<Array.<number>>} current The current piece matrix to lay down.
  * @param {number} currentColor The color of the piece.
  */
 tetriweb.Graphics.layDownPiece = function(curX, curY, current, currentColor) {
@@ -144,7 +144,7 @@ tetriweb.Graphics.layDownPiece = function(curX, curY, current, currentColor) {
 
 /**
  * Updates the special bar displayed under the game field.
- * @param {Array<number>} specialsQueue The specials queue to display.
+ * @param {Array.<number>} specialsQueue The specials queue to display.
  */
 tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
   var convert = tetriweb.Tetris.convert;
@@ -165,7 +165,7 @@ tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
 /**
  * Updates graphically the field using the internal matrix representing the
  * game.
- * @param {Array<Array<number>>} gameArea The game area matrix.
+ * @param {Array.<Array.<number>>} gameArea The game area matrix.
  */
 tetriweb.Graphics.updateGrid = function(gameArea) {
   var convert = tetriweb.Tetris.convert;
@@ -197,7 +197,7 @@ tetriweb.Graphics.updateGrid = function(gameArea) {
 
 /**
  * Updates the current piece by creating it and adding it to the field.
- * @param {Array<Array<number>>} current The current piece matrix to lay down.
+ * @param {Array.<Array.<number>>} current The current piece matrix to lay down.
  * @param {number} curX The x-coordinate of the piece.
  * @param {number} curY The y-coordinate of the piece.
  * @param {number} currentColor The color of the piece.
@@ -230,7 +230,7 @@ tetriweb.Graphics.updatePiece = function(current, curX, curY, currentColor) {
 
 /**
  * Takes the current piece element and update the blocks contained.
- * @param {Array<Array<number>>} nextPiece The next piece matrix.
+ * @param {Array.<Array.<number>>} nextPiece The next piece matrix.
  * @param {number} nextId The next piece ID.
  */
 tetriweb.Graphics.updateNextPiece = function(nextPiece, nextId) {

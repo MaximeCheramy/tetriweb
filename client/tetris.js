@@ -349,7 +349,8 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
     if (ok) {
       this.curX_ += delta_x[dx];
       this.current_ = piece;
-      tetriweb.Graphics.updatePiece(this.current_, this.curX_, this.curY_, this.currentColor_);
+      tetriweb.Graphics.updatePiece(
+          this.current_, this.curX_, this.curY_, this.currentColor_);
     }
   }
 
@@ -813,8 +814,8 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
   this.curX_ = 5;
   this.curY_ = 0;
 
-  // TODO: On devrait recopier nextPiece je pense au lieu de regenerer 
-  // (comme ca on n'a plus besoin de nextId et nextDirection). Et peut etre 
+  // TODO: On devrait recopier nextPiece je pense au lieu de regenerer
+  // (comme ca on n'a plus besoin de nextId et nextDirection). Et peut etre
   // faire une structure qui contient la piece et sa couleur.
   this.current_ = tetriweb.Tetris.generatePiece(
       this.nextId_, this.nextDirection_);
@@ -834,7 +835,8 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
     }
   }
 
-  tetriweb.Graphics.updatePiece(this.current_, this.curX_, this.curY_, this.currentColor_);
+  tetriweb.Graphics.updatePiece(
+      this.current_, this.curX_, this.curY_, this.currentColor_);
 };
 
 
