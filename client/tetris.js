@@ -437,10 +437,10 @@ tetriweb.Tetris.prototype.useSpecial_ = function(playerNum) {
  * Deletes the first special of the queue, when D key is pressed.
  * @private
  */
-tetriweb.Tetris.prototype.deleteSpecial_() {
+tetriweb.Tetris.prototype.deleteSpecial_ = function() {
   this.specialsQueue_.shift();
   tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
-}
+};
 
 
 /**
