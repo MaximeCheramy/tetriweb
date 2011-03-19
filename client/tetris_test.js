@@ -1,3 +1,4 @@
+goog.require('tetriweb.Graphics');
 goog.require('tetriweb.Tetris');
 goog.require('tetriweb.Tetrinet');
 goog.require('goog.testing.jsunit');

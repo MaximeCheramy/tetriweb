@@ -1,7 +1,7 @@
 goog.require('goog.array');
 goog.require('goog.events');
 goog.require('goog.events.KeyHandler');
-
+goog.require('tetriweb.Graphics');
 goog.provide('tetriweb.Tetris');
 
 
