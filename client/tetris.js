@@ -300,140 +300,178 @@ tetriweb.Tetris.prototype.step_ = function() {
 
 
 /**
+ * Rotates the current piece if possible, when UP key is pressed.
+ * @private
+ */
+tetriweb.Tetris.prototype.tryToRotate_ = function() {
+  var piece = tetriweb.Tetris.rotate_(this.current_);
+
+  // verifie si new ok.
+  var ok = false;
+  // On tente plusieurs décalages en x pour tourner contre des obstacles
+  // 0 = pas de décalage, 1 = un cran à droite, -1 = un cran à gauche...
+  // TODO: visiblement 2 ne sert jamais, et 3 que pour les linebar.
+  // Optimisable donc...
+  var delta_x = [0, 1, -1, 2, -2, 3, -3];
+  var dx = 0;
+  for (dx = 0; dx < delta_x.length && !ok; dx++) {
+    ok = true;
+    for (var l = 0; l < 4 && ok; l++) {
+      for (var c = 0; c < 4 && ok; c++) {
+        if (piece[l][c]) {
+          var newL = this.curY_ + l;
+          var newC = this.curX_ + delta_x[dx] + c;
+          ok = newC >= 0 &&
+               newC < tetriweb.Tetris.WIDTH_ &&
+               newL >= 0 &&
+               newL < tetriweb.Tetris.HEIGHT_ &&
+               this.gameArea_[newL][newC] == 0;
+        }
+      }
+    }
+  }
+  dx--;
+
+  if (ok) {
+    this.curX_ += delta_x[dx];
+    this.current_ = piece;
+    tetriweb.Graphics.updatePiece(
+        this.current_, this.curX_, this.curY_, this.currentColor_);
+  }
+};
+
+
+/**
+ * Moves the current piece left or right if possible,
+ * when LEFT or RIGHT key is pressed.
+ * @param {number} shift 1 (right) or -1 (left).
+ * @private
+ */
+tetriweb.Tetris.prototype.moveLeftOrRight_ = function(shift) {
+  var ok = true;
+  for (var l = 0; l < 4 && ok; l++) {
+    for (var c = 0; c < 4 && ok; c++) {
+      ok = !this.current_[l][c] ||
+          (c + this.curX_ + shift >= 0 &&
+          c + this.curX_ + shift < tetriweb.Tetris.WIDTH_ &&
+          !this.gameArea_[l + this.curY_][c + this.curX_ + shift]);
+    }
+  }
+  if (ok) {
+    this.curX_ += shift;
+  }
+  tetriweb.Graphics.moveCurPieceH(this.curX_);
+};
+
+
+/**
+ * Moves the current piece down, when DOWN key is pressed.
+ * @private
+ */
+tetriweb.Tetris.prototype.moveDown_ = function() {
+  clearTimeout(this.stepTimer);
+  this.step_();
+};
+
+
+/**
+ * Drops the current piece when SPACE key is pressed.
+ * @private
+ */
+tetriweb.Tetris.prototype.drop_ = function() {
+  this.pieceDropped_ = false;
+  while (!this.pieceDropped_) {
+    this.step_();
+  }
+};
+
+
+/**
+ * Uses the first special of the queue on the given player,
+ * when a numeric key (1 to 6) is pressed.
+ * @param {number} playerNum The target player.
+ * @private
+ */
+tetriweb.Tetris.prototype.useSpecial_ = function(playerNum) {
+  var convert = tetriweb.Tetris.convert;
+  if (this.tetrinet_.playerExists(playerNum)) {
+    var specialName = convert(this.specialsQueue_.shift()).substring(3);
+    this.tetrinet_.sendSpecial(specialName, playerNum);
+    if (playerNum == this.tetrinet_.getMyPlayerNum() || specialName == 's') {
+      switch (specialName) {
+        case 'a':
+          this.addLine();
+          break;
+        case 'b':
+          this.clearSpecialBlocks();
+          break;
+        case 'c':
+          this.clearLine();
+          break;
+        case 'g':
+          this.blockGravity();
+          break;
+        case 'n':
+          this.nukeField();
+          break;
+        case 'o':
+          this.blockBomb();
+          break;
+        case 'q':
+          this.blockQuake();
+          break;
+        case 'r':
+          this.randomClearBlocks();
+          break;
+        case 's':
+          this.switchFields(playerNum);
+          break;
+      }
+    }
+    tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
+  }
+};
+
+
+/**
+ * Deletes the first special of the queue, when D key is pressed.
+ * @private
+ */
+tetriweb.Tetris.prototype.deleteSpecial_() {
+  this.specialsQueue_.shift();
+  tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
+}
+
+
+/**
  * Key handler used to move the pieces or send actions.
  * @param {object} e The key event.
  * @private
  */
 tetriweb.Tetris.prototype.keyHandler_ = function(e) {
-  // TODO: Séparer en plusieurs fonctions.
-
-  // Stop la propagation de l'event.
+  // Prevent the browser from handling the event
   e.preventDefault();
 
-  // Si la partie est perdue alors on ne fait rien.
+  // Do nothing if game is lost
   if (this.gameLost_) return;
 
+  // Key codes constants
   var keys = goog.events.KeyCodes;
 
-  // Touche haut
   if (e.keyCode == keys.UP) {
-    var piece = tetriweb.Tetris.rotate_(this.current_);
-
-    // verifie si new ok.
-    var ok = false;
-    // On tente plusieurs décalages en x pour tourner contre des obstacles
-    // 0 = pas de décalage, 1 = un cran à droite, -1 = un cran à gauche...
-    // TODO: visiblement 2 ne sert jamais, et 3 que pour les linebar.
-    // Optimisable donc...
-    var delta_x = [0, 1, -1, 2, -2, 3, -3];
-    var dx = 0;
-    for (dx = 0; dx < delta_x.length && !ok; dx++) {
-      ok = true;
-      for (var l = 0; l < 4 && ok; l++) {
-        for (var c = 0; c < 4 && ok; c++) {
-          if (piece[l][c]) {
-            var newL = this.curY_ + l;
-            var newC = this.curX_ + delta_x[dx] + c;
-            ok = newC >= 0 &&
-                 newC < tetriweb.Tetris.WIDTH_ &&
-                 newL >= 0 &&
-                 newL < tetriweb.Tetris.HEIGHT_ &&
-                 this.gameArea_[newL][newC] == 0;
-          }
-        }
-      }
-    }
-    dx--;
-
-    if (ok) {
-      this.curX_ += delta_x[dx];
-      this.current_ = piece;
-      tetriweb.Graphics.updatePiece(
-          this.current_, this.curX_, this.curY_, this.currentColor_);
-    }
-  }
-
-  // Touche droite ou gauche
-  if (e.keyCode == keys.RIGHT || e.keyCode == keys.LEFT) {
-    var shift = (e.keyCode == keys.RIGHT) ? 1 : -1; // sens de déplacement
-    var ok = true;
-    for (var l = 0; l < 4 && ok; l++) {
-      for (var c = 0; c < 4 && ok; c++) {
-        ok = !this.current_[l][c] ||
-            (c + this.curX_ + shift >= 0 &&
-            c + this.curX_ + shift < tetriweb.Tetris.WIDTH_ &&
-            !this.gameArea_[l + this.curY_][c + this.curX_ + shift]);
-      }
-    }
-    if (ok) {
-      this.curX_ += shift;
-    }
-  }
-
-  // Touche bas.
-  if (e.keyCode == keys.DOWN) {
-    clearTimeout(this.stepTimer);
-    this.step_();
-  }
-
-  // Touche espace.
-  if (e.charCode == keys.SPACE) {
-    this.pieceDropped_ = false;
-    while (!this.pieceDropped_) {
-      this.step_();
-    }
-  }
-
-  // Envoi bonus (touches 1 à 6 haut du clavier)
-  if (e.keyCode >= keys.ONE && e.keyCode <= keys.SIX &&
+    this.tryToRotate_();
+  } else if (e.keyCode == keys.RIGHT || e.keyCode == keys.LEFT) {
+    this.moveLeftOrRight_((e.keyCode == keys.RIGHT) ? 1 : -1);
+  } else if (e.keyCode == keys.DOWN) {
+    this.moveDown_();
+  } else if (e.charCode == keys.SPACE) {
+    this.drop_();
+  } else if (e.keyCode >= keys.ONE && e.keyCode <= keys.SIX &&
       this.specialsQueue_.length > 0) {
-    var convert = tetriweb.Tetris.convert;
-    var playerNum = e.keyCode - keys.ZERO;
-    if (this.tetrinet_.playerExists(playerNum)) {
-      var specialName = convert(this.specialsQueue_.shift()).substring(3);
-      this.tetrinet_.sendSpecial(specialName, playerNum);
-      if (playerNum == this.tetrinet_.getMyPlayerNum() || specialName == 's') {
-        switch (specialName) {
-          case 'a':
-            this.addLine();
-            break;
-          case 'b':
-            this.clearSpecialBlocks();
-            break;
-          case 'c':
-            this.clearLine();
-            break;
-          case 'g':
-            this.blockGravity();
-            break;
-          case 'n':
-            this.nukeField();
-            break;
-          case 'o':
-            this.blockBomb();
-            break;
-          case 'q':
-            this.blockQuake();
-            break;
-          case 'r':
-            this.randomClearBlocks();
-            break;
-          case 's':
-            this.switchFields(playerNum);
-            break;
-        }
-      }
-      tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
-    }
+    this.useSpecial_(e.keyCode - keys.ZERO);
+  } else if (e.keyCode == keys.D) {
+    this.deleteSpecial_();
   }
-
-  // Delete bonus (d)
-  if (e.keyCode == keys.D) {
-    this.specialsQueue_.shift();
-    tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
-  }
-
-  tetriweb.Graphics.moveCurPieceH(this.curX_);
 };
 
 
