@@ -3,7 +3,6 @@ goog.require('goog.dom');
 goog.provide('tetriweb.Graphics');
 
 
-
 /**
  * Initializes the DOM elements needed by the game.
  * @param {number} pnum The player's playernum.
@@ -227,6 +226,7 @@ tetriweb.Graphics.updatePiece = function(current, curX, curY, currentColor) {
     }
   }
 };
+
 
 /**
  * Takes the current piece element and update the blocks contained.

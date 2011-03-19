@@ -1,7 +1,6 @@
 goog.require('goog.array');
 goog.require('goog.events');
 goog.require('goog.events.KeyHandler');
-goog.require('goog.math');
 
 goog.provide('tetriweb.Tetris');
 
@@ -424,19 +423,18 @@ tetriweb.Tetris.prototype.keyHandler_ = function(e) {
             break;
         }
       }
-      tetriweb.Graphics.updateSpecialBar();
+      tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
     }
   }
 
   // Delete bonus (d)
   if (e.keyCode == keys.D) {
     this.specialsQueue_.shift();
-    tetriweb.Graphics.updateSpecialBar();
+    tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
   }
 
   tetriweb.Graphics.moveCurPieceH(this.curX_);
 };
-
 
 
 /**
@@ -702,7 +700,8 @@ tetriweb.Tetris.prototype.blockQuake = function() {
     }
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       this.gameArea_[l][c] =
-          oldLine[goog.math.modulo(c - shift, tetriweb.Tetris.WIDTH_)];
+          oldLine[(c - shift + tetriweb.Tetris.WIDTH_) %
+              tetriweb.Tetris.WIDTH_];
     }
   }
   this.updateGridAndSendField_();
@@ -878,7 +877,6 @@ tetriweb.Tetris.prototype.updateGridAndSendField_ = function() {
   tetriweb.Graphics.updateGrid(this.gameArea_);
   this.sendField_();
 };
-
 
 
 /**
