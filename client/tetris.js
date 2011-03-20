@@ -1,6 +1,7 @@
 goog.require('goog.array');
 goog.require('goog.events');
 goog.require('goog.events.KeyHandler');
+goog.require('tetriweb.Events');
 goog.require('tetriweb.Graphics');
 goog.provide('tetriweb.Tetris');
 
@@ -16,18 +17,8 @@ tetriweb.Tetris = function(tetrinet) {
   this.tetrinet_ = tetrinet;
   this.tetrinet_.tetris = this;
   this.gameArea_ = new Array(tetriweb.Tetris.HEIGHT_);
+  this.events_ = new tetriweb.Events(this);
 };
-
-
-tetriweb.Tetris.prototype.setKeyEvent_ = function() {
-  // TODO beurk.
-  var myField_ = tetriweb.Graphics.myField_;
-  goog.events.removeAll(myField_);
-  var keyHandler = new goog.events.KeyHandler(myField_);
-  goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
-      goog.bind(this.keyHandler_, this));
-};
-
 
 /**
  * Initializes the game.
@@ -91,8 +82,7 @@ tetriweb.Tetris.prototype.startGame = function(_specialLines, _specialCount,
   this.newPiece_();
   this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
 
-  // TODO: To move.
-  this.setKeyEvent_();
+  this.events_.setKeyEvent();
 };
 
 
@@ -301,9 +291,8 @@ tetriweb.Tetris.prototype.step_ = function() {
 
 /**
  * Rotates the current piece if possible, when UP key is pressed.
- * @private
  */
-tetriweb.Tetris.prototype.tryToRotate_ = function() {
+tetriweb.Tetris.prototype.tryToRotate = function() {
   var piece = tetriweb.Tetris.rotate_(this.current_);
 
   // verifie si new ok.
@@ -345,9 +334,8 @@ tetriweb.Tetris.prototype.tryToRotate_ = function() {
  * Moves the current piece left or right if possible,
  * when LEFT or RIGHT key is pressed.
  * @param {number} shift 1 (right) or -1 (left).
- * @private
  */
-tetriweb.Tetris.prototype.moveLeftOrRight_ = function(shift) {
+tetriweb.Tetris.prototype.moveLeftOrRight = function(shift) {
   var ok = true;
   for (var l = 0; l < 4 && ok; l++) {
     for (var c = 0; c < 4 && ok; c++) {
@@ -366,9 +354,8 @@ tetriweb.Tetris.prototype.moveLeftOrRight_ = function(shift) {
 
 /**
  * Moves the current piece down, when DOWN key is pressed.
- * @private
  */
-tetriweb.Tetris.prototype.moveDown_ = function() {
+tetriweb.Tetris.prototype.moveDown = function() {
   clearTimeout(this.stepTimer);
   this.step_();
 };
@@ -376,9 +363,8 @@ tetriweb.Tetris.prototype.moveDown_ = function() {
 
 /**
  * Drops the current piece when SPACE key is pressed.
- * @private
  */
-tetriweb.Tetris.prototype.drop_ = function() {
+tetriweb.Tetris.prototype.drop = function() {
   this.pieceDropped_ = false;
   while (!this.pieceDropped_) {
     this.step_();
@@ -390,9 +376,12 @@ tetriweb.Tetris.prototype.drop_ = function() {
  * Uses the first special of the queue on the given player,
  * when a numeric key (1 to 6) is pressed.
  * @param {number} playerNum The target player.
- * @private
  */
-tetriweb.Tetris.prototype.useSpecial_ = function(playerNum) {
+tetriweb.Tetris.prototype.useSpecial = function(playerNum) {
+  if (this.specialsQueue_.length == 0) {
+    return;
+  }
+
   var convert = tetriweb.Tetris.convert;
   if (this.tetrinet_.playerExists(playerNum)) {
     var specialName = convert(this.specialsQueue_.shift()).substring(3);
@@ -435,44 +424,16 @@ tetriweb.Tetris.prototype.useSpecial_ = function(playerNum) {
 
 /**
  * Deletes the first special of the queue, when D key is pressed.
- * @private
  */
-tetriweb.Tetris.prototype.deleteSpecial_ = function() {
+tetriweb.Tetris.prototype.deleteSpecial = function() {
+  if (this.specialsQueue_.length == 0) {
+    return;
+  }
+
   this.specialsQueue_.shift();
   tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
 };
 
-
-/**
- * Key handler used to move the pieces or send actions.
- * @param {object} e The key event.
- * @private
- */
-tetriweb.Tetris.prototype.keyHandler_ = function(e) {
-  // Prevent the browser from handling the event
-  e.preventDefault();
-
-  // Do nothing if game is lost
-  if (this.gameLost_) return;
-
-  // Key codes constants
-  var keys = goog.events.KeyCodes;
-
-  if (e.keyCode == keys.UP) {
-    this.tryToRotate_();
-  } else if (e.keyCode == keys.RIGHT || e.keyCode == keys.LEFT) {
-    this.moveLeftOrRight_((e.keyCode == keys.RIGHT) ? 1 : -1);
-  } else if (e.keyCode == keys.DOWN) {
-    this.moveDown_();
-  } else if (e.charCode == keys.SPACE) {
-    this.drop_();
-  } else if (e.keyCode >= keys.ONE && e.keyCode <= keys.SIX &&
-      this.specialsQueue_.length > 0) {
-    this.useSpecial_(e.keyCode - keys.ZERO);
-  } else if (e.keyCode == keys.D) {
-    this.deleteSpecial_();
-  }
-};
 
 
 /**
@@ -908,12 +869,21 @@ tetriweb.Tetris.prototype.sendField_ = function() {
 
 
 /**
- * Update the graphical field and send it to the tetrinet server.
+ * Updates the graphical field and send it to the tetrinet server.
  * @private
  */
 tetriweb.Tetris.prototype.updateGridAndSendField_ = function() {
   tetriweb.Graphics.updateGrid(this.gameArea_);
   this.sendField_();
+};
+
+
+/**
+ * Gets the game state (lost or not).
+ * @return {boolean} True if the game is lost.
+ */
+tetriweb.Tetris.prototype.isGameLost = function() {
+  return this.gameLost_;
 };
 
 
