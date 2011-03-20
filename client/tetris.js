@@ -1,10 +1,6 @@
 goog.require('goog.array');
-goog.require('goog.events');
-goog.require('goog.events.KeyHandler');
-goog.require('tetriweb.Events');
 goog.require('tetriweb.Graphics');
 goog.provide('tetriweb.Tetris');
-
 
 
 /**
@@ -17,8 +13,8 @@ tetriweb.Tetris = function(tetrinet) {
   this.tetrinet_ = tetrinet;
   this.tetrinet_.tetris = this;
   this.gameArea_ = new Array(tetriweb.Tetris.HEIGHT_);
-  this.events_ = new tetriweb.Events(this);
 };
+
 
 /**
  * Initializes the game.
@@ -81,8 +77,6 @@ tetriweb.Tetris.prototype.startGame = function(_specialLines, _specialCount,
   this.generateRandom_();
   this.newPiece_();
   this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
-
-  this.events_.setKeyEvent();
 };
 
 

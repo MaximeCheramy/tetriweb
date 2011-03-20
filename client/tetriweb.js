@@ -1,5 +1,6 @@
 goog.require('goog.dom');
 goog.require('goog.events');
+goog.require('tetriweb.KeyEvents');
 goog.require('tetriweb.Tetrinet');
 goog.require('tetriweb.Tetris');
 
@@ -13,6 +14,7 @@ goog.provide('tetriweb');
 tetriweb.init = function() {
   var tetrinet = new tetriweb.Tetrinet();
   var tetris = new tetriweb.Tetris(tetrinet);
+  var keyEvents = new tetriweb.KeyEvents(tetris);
 
   //* For debugging.
   window['tetrinet'] = tetrinet;
@@ -42,6 +44,9 @@ tetriweb.init = function() {
   goog.events.listen(window, 'beforeunload', function(e) {
     tetrinet.disconnect();
   });
+
+
+  keyEvents.setKeyEvent();
 };
 
 goog.exportSymbol('tetriweb.init', tetriweb.init);

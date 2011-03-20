@@ -1,18 +1,23 @@
-goog.provide('tetriweb.Events');
+goog.require('goog.events');
+goog.require('goog.events.KeyHandler');
+goog.require('tetriweb.Graphics');
+goog.require('tetriweb.Tetris');
+
+goog.provide('tetriweb.KeyEvents');
 
 
 /**
  * @constructor
  */
-tetriweb.Events = function(tetris) {
+tetriweb.KeyEvents = function(tetris) {
   this.tetris_ = tetris;
 };
 
 
 /**
- *
+ * Sets up the key event handler.
  */
-tetriweb.Events.prototype.setKeyEvent = function() {
+tetriweb.KeyEvents.prototype.setKeyEvent = function() {
   var myField_ = tetriweb.Graphics.myField_;
   goog.events.removeAll(myField_);
   var keyHandler = new goog.events.KeyHandler(myField_);
@@ -26,7 +31,7 @@ tetriweb.Events.prototype.setKeyEvent = function() {
  * @param {object} e The key event.
  * @private
  */
-tetriweb.Events.prototype.keyHandler_ = function(e) {
+tetriweb.KeyEvents.prototype.keyHandler_ = function(e) {
   // Prevent the browser from handling the event
   e.preventDefault();
 
@@ -51,4 +56,8 @@ tetriweb.Events.prototype.keyHandler_ = function(e) {
   }
 };
 
-tetriweb.Events.prototype.tetris_ = null;
+/**
+ * @type tetriweb.Tetris
+ * @private
+ */
+tetriweb.KeyEvents.prototype.tetris_ = null;
