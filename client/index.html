@@ -4,11 +4,10 @@
   <title>Tetrinet !</title>
   <link type="text/css" rel="stylesheet" href="tetris.css" />
   <script src="closure-library/closure/goog/base.js"></script>
-  <script type="text/javascript" src="graphics.js"></script>
-  <script type="text/javascript" src="tetris.js"></script>
-  <script type="text/javascript" src="keyevents.js"></script>
-  <script type="text/javascript" src="tetrinet.js"></script>
-  <script type="text/javascript" src="tetriweb.js"></script>
+  <script type="text/javascript" src="tetriweb-deps.js"></script>
+  <script>
+    goog.require('tetriweb');
+  </script>
 </head>
 
 <body onload="tetriweb.init()">

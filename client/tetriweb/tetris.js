@@ -1,6 +1,7 @@
+goog.provide('tetriweb.Tetris');
+
 goog.require('goog.array');
 goog.require('tetriweb.Graphics');
-goog.provide('tetriweb.Tetris');
 
 
 /**

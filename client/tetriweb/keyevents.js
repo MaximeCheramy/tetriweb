@@ -1,9 +1,10 @@
+goog.provide('tetriweb.KeyEvents');
+
 goog.require('goog.events');
 goog.require('goog.events.KeyHandler');
 goog.require('tetriweb.Graphics');
 goog.require('tetriweb.Tetris');
 
-goog.provide('tetriweb.KeyEvents');
 
 
 /**

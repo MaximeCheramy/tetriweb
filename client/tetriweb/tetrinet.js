@@ -1,10 +1,8 @@
+goog.provide('tetriweb.Tetrinet');
+
 goog.require('goog.events');
 goog.require('goog.net.XhrIo');
 goog.require('tetriweb.Graphics');
-
-goog.provide('tetriweb.Tetrinet');
-
-
 
 /**
  * Tetrinet.

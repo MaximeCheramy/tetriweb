@@ -1,6 +1,6 @@
-goog.require('goog.dom');
-
 goog.provide('tetriweb.Graphics');
+
+goog.require('goog.dom');
 
 
 /**
