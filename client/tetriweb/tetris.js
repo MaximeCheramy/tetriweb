@@ -78,6 +78,9 @@ tetriweb.Tetris.prototype.startGame = function(_specialLines, _specialCount,
   this.generateRandom_();
   this.newPiece_();
   this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
+
+  // Enable key events in game field
+  this.keyEvents.setKeyEvent();
 };
 
 
@@ -915,6 +918,12 @@ tetriweb.Tetris.prototype.oldGameArea_ = null;
  * @private
  */
 tetriweb.Tetris.prototype.tetrinet_ = null;
+
+
+/**
+ * @type {tetriweb.KeyEvents}
+ */
+tetriweb.Tetris.prototype.keyEvents = null;
 
 
 /**

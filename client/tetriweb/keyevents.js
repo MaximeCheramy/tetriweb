@@ -9,9 +9,11 @@ goog.require('tetriweb.Tetris');
 
 /**
  * @constructor
+ * @param {tetriweb.Tetris} tetris The tetris object.
  */
 tetriweb.KeyEvents = function(tetris) {
   this.tetris_ = tetris;
+  this.tetris_.keyEvents = this;
 };
 
 
@@ -19,11 +21,18 @@ tetriweb.KeyEvents = function(tetris) {
  * Sets up the key event handler.
  */
 tetriweb.KeyEvents.prototype.setKeyEvent = function() {
-  var myField_ = tetriweb.Graphics.myField_;
-  goog.events.removeAll(myField_);
-  var keyHandler = new goog.events.KeyHandler(myField_);
+  this.disposeKeyEvent();
+  var keyHandler = new goog.events.KeyHandler(tetriweb.Graphics.myField_);
   goog.events.listen(keyHandler, goog.events.KeyHandler.EventType.KEY,
       goog.bind(this.keyHandler_, this));
+};
+
+
+/**
+ * Disposes the key event handler.
+ */
+tetriweb.KeyEvents.prototype.disposeKeyEvent = function() {
+  goog.events.removeAll(tetriweb.Graphics.myField_);
 };
 
 

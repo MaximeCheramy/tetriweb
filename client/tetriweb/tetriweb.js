@@ -1,6 +1,5 @@
 goog.require('goog.dom');
 goog.require('goog.events');
-goog.require('tetriweb.KeyEvents');
 goog.require('tetriweb.Tetrinet');
 goog.require('tetriweb.Tetris');
 
@@ -44,9 +43,6 @@ tetriweb.init = function() {
   goog.events.listen(window, 'beforeunload', function(e) {
     tetrinet.disconnect();
   });
-
-
-  keyEvents.setKeyEvent();
 };
 
 goog.exportSymbol('tetriweb.init', tetriweb.init);

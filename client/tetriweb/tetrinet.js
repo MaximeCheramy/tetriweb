@@ -156,8 +156,9 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
       case 'endgame':
         message = '*** La partie est terminée';
         // Stop tetris
-        // TODO: disable key events in the field
         clearTimeout(this.tetris.stepTimer);
+        // Disable key events in the field
+        this.tetris.keyEvents.disposeKeyEvent();
         break;
       // Field description
       case 'f':
