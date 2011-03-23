@@ -89,7 +89,7 @@ tetriweb.Graphics.domInitField = function(player_id, nickname) {
   for (var l = 0; l < 22; l++) {
     for (var c = 0; c < 12; c++) {
       var block = goog.dom.createDom('div');
-      block.className = 'small block ' + tetriweb.Tetris.convert(0);
+      goog.dom.classes.set(block, 'small block ' + tetriweb.Tetris.convert(0));
       block.id = 'block-' + player_id + '-' + l + '-' + c;
       block.style.top = l * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1) + 1;
       block.style.left = c * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_ + 1) + 1;
@@ -117,7 +117,7 @@ tetriweb.Graphics.domDestroyField = function(player_id) {
  */
 tetriweb.Graphics.domSetBlock = function(player_id, x, y, type) {
   var block = goog.dom.getElement('block-' + player_id + '-' + y + '-' + x);
-  block.className = 'small block ' + tetriweb.Tetris.convert(type);
+  goog.dom.classes.set(block, 'small block ' + tetriweb.Tetris.convert(type));
 };
 
 
@@ -135,11 +135,11 @@ tetriweb.Graphics.layDownPiece = function(curX, curY, current, currentColor) {
   for (var l = 0; l < 4; l++) {
     for (var c = 0; c < 4; c++) {
       if (current[l][c]) {
-        var bloc = goog.dom.createDom('div');
-        bloc.style.top = (curY + l) * tetriweb.Graphics.BLOCK_SIZE_ + 1;
-        bloc.style.left = (curX + c) * tetriweb.Graphics.BLOCK_SIZE_ + 1;
-        bloc.className = 'block ' + convert(currentColor);
-        goog.dom.appendChild(myField_, bloc);
+        var block = goog.dom.createDom('div');
+        block.style.top = (curY + l) * tetriweb.Graphics.BLOCK_SIZE_ + 1;
+        block.style.left = (curX + c) * tetriweb.Graphics.BLOCK_SIZE_ + 1;
+        goog.dom.classes.set(block, 'block ' + convert(currentColor));
+        goog.dom.appendChild(myField_, block);
       }
     }
   }
@@ -159,7 +159,7 @@ tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
   // And fill it again !
   for (var i = 0; i < specialsQueue.length; i++) {
     var special = goog.dom.createDom('div');
-    special.className = 'block ' + convert(specialsQueue[i]);
+    goog.dom.classes.set(special, 'block ' + convert(specialsQueue[i]));
     special.style.top = 0;
     special.style.left = i * tetriweb.Graphics.BLOCK_SIZE_ + 1;
     goog.dom.appendChild(specialBar, special);
@@ -189,11 +189,11 @@ tetriweb.Graphics.updateGrid = function(gameArea) {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (gameArea[l][c] > 0) {
-        var bloc = goog.dom.createDom('div');
-        bloc.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 1;
-        bloc.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 1;
-        bloc.className = 'block ' + convert(gameArea[l][c]);
-        myField_.appendChild(bloc);
+        var block = goog.dom.createDom('div');
+        block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 1;
+        block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 1;
+        goog.dom.classes.set(block, 'block ' + convert(gameArea[l][c]));
+        myField_.appendChild(block);
       }
     }
   }
@@ -226,7 +226,7 @@ tetriweb.Graphics.updatePiece = function(current, curX, curY, currentColor) {
         var block = goog.dom.createDom('div');
         block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 1;
         block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 1;
-        block.className = 'block ' + convert(currentColor);
+        goog.dom.classes.set(block, 'block ' + convert(currentColor));
         goog.dom.appendChild(currentObj_, block);
       }
     }
@@ -252,7 +252,7 @@ tetriweb.Graphics.updateNextPiece = function(nextPiece, nextId) {
         var block = goog.dom.createDom('div');
         block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 1;
         block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 1;
-        block.className = 'block ' + convert(getColor(nextId));
+        goog.dom.classes.set(block, 'block ' + convert(getColor(nextId)));
         goog.dom.appendChild(nextPieceObj, block);
       }
     }
