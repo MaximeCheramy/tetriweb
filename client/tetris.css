@@ -28,7 +28,6 @@ body {
 }
 
 .field {
-  background-image: url('img/background.png');
   border: 2px solid #222;
   float: left;
   height: 243px; /* 22*(10+1)+1 */
@@ -98,6 +97,7 @@ body {
 }
 
 #myfield {
+  background-image: url('img/background.png');
   border: 2px solid #222;
   height: 440px;
   position: relative;
