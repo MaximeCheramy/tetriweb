@@ -10,32 +10,38 @@ goog.require('goog.dom');
  * @param {boolean} moderator True if the player can start or stop games.
  */
 tetriweb.Graphics.domInit = function(pnum, nickname, moderator) {
-  // Empty fields container
-  var fields = goog.dom.getElement('fields');
-  goog.dom.removeChildren(fields);
-
-  // Create event log
-  tetriweb.Graphics.eventLog = goog.dom.createDom('div', {id: 'eventLog'});
-  goog.dom.appendChild(fields, tetriweb.Graphics.eventLog);
+  // Gets event log
+  tetriweb.Graphics.eventLog = goog.dom.getElement('eventLog');
 
   // Enable start button for moderators
   if (moderator) {
+    // FIXME: If we lose this right the button should be disabled.
     goog.dom.getElement('startGame').disabled = false;
   }
 
   // Init the player's field
-  var next = goog.dom.createDom('div', {id: 'nextpiece'});
-  specialBar = goog.dom.createDom('div', {id: 'specialbar'});
-  var name = goog.dom.createDom('div', {id: 'myName'});
-  goog.dom.setTextContent(name, pnum + ' - ' + nickname);
-  var field = goog.dom.createDom('div', {id: 'myfield'});
-  field.setAttribute('tabindex', 1);
-  var cont = goog.dom.createDom('div', {id: 'mycontainer'},
-      name, next, field, specialBar);
-  goog.dom.appendChild(goog.dom.getElement('fields'), cont);
+  tetriweb.Graphics.myField_ = goog.dom.getElement('myfield');
+  tetriweb.Graphics.specialBar_ = goog.dom.getElement('specialBar');
+};
 
-  tetriweb.Graphics.myField_ = field;
-  tetriweb.Graphics.specialBar_ = specialBar;
+
+/**
+ * Shows the fields and hides the chat area.
+ */
+tetriweb.Graphics.displayFields = function() {
+  goog.dom.classes.remove(goog.dom.getElement('fields'), 'hid');
+  goog.dom.classes.add(goog.dom.getElement('chat-area'), 'hid');
+
+  // TODO: Reroute the incoming messages to the log area.
+};
+
+
+/**
+ * Shows the chat area and hided the fields.
+ */
+tetriweb.Graphics.displayChat = function() {
+  goog.dom.classes.add(goog.dom.getElement('fields'), 'hid');
+  goog.dom.classes.remove(goog.dom.getElement('chat-area'), 'hid');
 };
 
 

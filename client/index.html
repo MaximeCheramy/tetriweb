@@ -20,14 +20,25 @@
 
 <p><input type="button" id="startGame" value="Commencer la partie" disabled="disabled" /></p>
 
-<div id="fields"></div>
+<!-- To display only when a game is launched. -->
+<div id="fields" class="hid">
+  <div id="eventLog"></div>
+  <div id="mycontainer">
+    <div id="myName"></div>
+    <div id="nextpiece"></div>
+    <div id="myfield" tabindex="1"></div>
+    <div id="specialbar"></div>
+  </div>
+</div>
 
-<div id="partyline"></div>
-
-<form action="" method="get" id="partylineForm">
-  <input type="text" name="msg" id="msg" value="" />
-  <input type="submit" name="submit" value="Send" />
-</form>
+<!-- To be displayed only when no game is being played.  -->
+<div id="chat-area">
+  <div id="partyline"></div>
+  <form action="" method="get" id="partylineForm">
+    <input type="text" name="msg" id="msg" value="" />
+    <input type="submit" name="submit" value="Send" />
+  </form>
+</div>
 
 </body>
 </html>

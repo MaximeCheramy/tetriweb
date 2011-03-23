@@ -151,6 +151,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         var piecesFreq = data[8], specialsFreq = data[9];
         this.tetris.startGame(specialLines, specialCount, specialCapacity,
             piecesFreq, specialsFreq);
+        tetriweb.Graphics.displayFields();
         break;
       // All players lose except one
       case 'endgame':
@@ -159,6 +160,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         clearTimeout(this.tetris.stepTimer);
         // Disable key events in the field
         this.tetris.keyEvents.disposeKeyEvent();
+        tetriweb.Graphics.displayChat();
         break;
       // Field description
       case 'f':
