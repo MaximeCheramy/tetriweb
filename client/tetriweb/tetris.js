@@ -389,8 +389,8 @@ tetriweb.Tetris.prototype.useSpecial = function(playerNum) {
   }
 
   var convert = tetriweb.Tetris.convert;
+  var specialName = convert(this.specialsQueue_.shift()).substring(3);
   if (this.tetrinet_.playerExists(playerNum)) {
-    var specialName = convert(this.specialsQueue_.shift()).substring(3);
     this.tetrinet_.sendSpecial(specialName, playerNum);
     if (playerNum == this.tetrinet_.getMyPlayerNum() || specialName == 's') {
       switch (specialName) {
@@ -423,8 +423,8 @@ tetriweb.Tetris.prototype.useSpecial = function(playerNum) {
           break;
       }
     }
-    tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
   }
+  tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
 };
 
 
