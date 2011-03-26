@@ -169,7 +169,15 @@ tetriweb.Tetris.prototype.handleSpecials_ = function(nbLines, specials) {
       this.specialsQueue_.length < this.specialCapacity_; i++) {
     for (var j = 0; j < nbLines &&
         this.specialsQueue_.length < this.specialCapacity_; j++) {
-      this.specialsQueue_.push(specials[i]);
+      // Random position
+      var posMax = this.specialsQueue_.length;
+      var pos = tetriweb.Tetris.randomInt(0, posMax);
+      // Move specials above new position
+      for (var p = posMax; p > pos; p--) {
+        this.specialsQueue_[p] = this.specialsQueue_[p-1];
+      }
+      // Place new special
+      this.specialsQueue_[pos] = specials[i];
     }
   }
   tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
