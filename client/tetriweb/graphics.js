@@ -11,17 +11,17 @@ goog.require('goog.dom');
  */
 tetriweb.Graphics.domInit = function(pnum, nickname, moderator) {
   // Gets event log
-  tetriweb.Graphics.eventLog = goog.dom.getElement('eventLog');
+  tetriweb.Graphics.eventLog = goog.dom.getElement('event-log');
 
   // Enable start button for moderators
   if (moderator) {
     // FIXME: If we lose this right the button should be disabled.
-    goog.dom.getElement('startGame').disabled = false;
+    goog.dom.getElement('start-game').disabled = false;
   }
 
   // Init the player's field
-  tetriweb.Graphics.myField_ = goog.dom.getElement('myfield');
-  tetriweb.Graphics.specialBar_ = goog.dom.getElement('specialBar');
+  tetriweb.Graphics.myField_ = goog.dom.getElement('my-field');
+  tetriweb.Graphics.specialBar_ = goog.dom.getElement('special-bar');
 };
 
 
@@ -81,7 +81,7 @@ tetriweb.Graphics.domInitField = function(player_id, nickname) {
   var field = goog.dom.createDom('div', {className: 'field', id: 'field-' +
         player_id});
   goog.dom.appendChild(goog.dom.getElement('fields'), field);
-  var name = goog.dom.createDom('div', {className: 'fieldName'});
+  var name = goog.dom.createDom('div', {className: 'field-name'});
   goog.dom.setTextContent(name, player_id + ' - ' + nickname);
   goog.dom.appendChild(field, name);
 
@@ -162,7 +162,7 @@ tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
     goog.dom.classes.set(special, 'block ' + convert(specialsQueue[i]));
     special.style.top = 0;
     special.style.left = i * tetriweb.Graphics.BLOCK_SIZE_ + 1;
-    goog.dom.appendChild(specialBar, special);
+    goog.dom.appendChild(tetriweb.Graphics.specialBar_, special);
   }
 };
 
@@ -244,7 +244,7 @@ tetriweb.Graphics.updateNextPiece = function(nextPiece, nextId) {
   // That sucks.
   var getColor = tetriweb.Tetris.getColor;
 
-  var nextPieceObj = goog.dom.getElement('nextpiece');
+  var nextPieceObj = goog.dom.getElement('next-piece');
   goog.dom.removeChildren(nextPieceObj);
   for (var l = 0; l < 4; l++) {
     for (var c = 0; c < 4; c++) {

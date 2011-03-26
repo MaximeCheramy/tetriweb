@@ -12,29 +12,29 @@
 
 <body onload="tetriweb.init()">
 
-<form action="" method="get" id="connectForm">
+<form action="" method="get" id="connect-form">
   <input type="text" name="nickname" id="nickname" value="" />
   <input type="text" name="team" id="team" value="" />
   <input type="submit" name="submit" value="Connect !" />
 </form>
 
-<p><input type="button" id="startGame" value="Commencer la partie" disabled="disabled" /></p>
+<p><input type="button" id="start-game" value="Commencer la partie" disabled="disabled" /></p>
 
 <!-- To display only when a game is launched. -->
 <div id="fields" class="hid">
-  <div id="eventLog"></div>
-  <div id="mycontainer">
-    <div id="myName"></div>
-    <div id="nextpiece"></div>
-    <div id="myfield" tabindex="1"></div>
-    <div id="specialBar"></div>
+  <div id="event-log"></div>
+  <div id="my-container">
+    <div id="my-name"></div>
+    <div id="next-piece"></div>
+    <div id="my-field" tabindex="1"></div>
+    <div id="special-bar"></div>
   </div>
 </div>
 
 <!-- To be displayed only when no game is being played.  -->
 <div id="chat-area">
   <div id="partyline"></div>
-  <form action="" method="get" id="partylineForm">
+  <form action="" method="get" id="partyline-form">
     <input type="text" name="msg" id="msg" value="" />
     <input type="submit" name="submit" value="Send" />
   </form>

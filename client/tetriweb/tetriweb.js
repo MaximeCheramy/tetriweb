@@ -20,14 +20,14 @@ tetriweb.init = function() {
   window['tetris'] = tetris;
   //*/
 
-  goog.events.listen(goog.dom.getElement('connectForm'),
+  goog.events.listen(goog.dom.getElement('connect-form'),
       goog.events.EventType.SUBMIT, function(e) {
         e.preventDefault();
         tetrinet.connect(goog.dom.getElement('nickname').value,
             goog.dom.getElement('team').value);
       });
 
-  goog.events.listen(goog.dom.getElement('partylineForm'),
+  goog.events.listen(goog.dom.getElement('partyline-form'),
       goog.events.EventType.SUBMIT, function(e) {
         e.preventDefault();
         var msg = goog.dom.getElement('msg');
@@ -35,7 +35,7 @@ tetriweb.init = function() {
         msg.value = '';
       });
 
-  goog.events.listen(goog.dom.getElement('startGame'),
+  goog.events.listen(goog.dom.getElement('start-game'),
       goog.events.EventType.CLICK, function(e) {
         tetrinet.startGame();
       });
