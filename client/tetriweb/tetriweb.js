@@ -30,10 +30,19 @@ tetriweb.init = function() {
   goog.events.listen(goog.dom.getElement('partyline-form'),
       goog.events.EventType.SUBMIT, function(e) {
         e.preventDefault();
-        var msg = goog.dom.getElement('msg');
+        var msg = goog.dom.getElement('party-msg');
         tetrinet.sayPline(msg.value);
         msg.value = '';
       });
+
+  goog.events.listen(goog.dom.getElement('eventlog-form'),
+      goog.events.EventType.SUBMIT, function(e) {
+        e.preventDefault();
+        var msg = goog.dom.getElement('event-msg');
+        tetrinet.sayGmsg(msg.value);
+        msg.value = '';
+      });
+
 
   goog.events.listen(goog.dom.getElement('start-game'),
       goog.events.EventType.CLICK, function(e) {

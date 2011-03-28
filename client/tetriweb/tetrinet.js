@@ -227,7 +227,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         message = msg;
     }
     if (message.length > 0) {
-      tetriweb.Graphics.domWritePline(message);
+      tetriweb.Graphics.domWriteMessage(message);
     }
   }
 };
@@ -275,7 +275,15 @@ tetriweb.Tetrinet.prototype.startGame = function() {
  */
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
-  tetriweb.Graphics.domWritePline('<' + this.players_[this.pnum_] + '> ' + msg);
+  tetriweb.Graphics.domWriteMessage('<' + this.players_[this.pnum_] + '> ' + msg);
+};
+
+/**
+ * Sends a message on the partyline.
+ * @param {string} msg The message to send.
+ */
+tetriweb.Tetrinet.prototype.sayGmsg = function(msg) {
+  this.sendMessage_('gmsg ' + this.pnum_ + ' ' + msg);
 };
 
 

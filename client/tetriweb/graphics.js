@@ -32,16 +32,18 @@ tetriweb.Graphics.displayFields = function() {
   goog.dom.classes.remove(goog.dom.getElement('fields'), 'hid');
   goog.dom.classes.add(goog.dom.getElement('chat-area'), 'hid');
 
-  // TODO: Reroute the incoming messages to the log area.
+  tetriweb.Graphics.domWriteMessage = tetriweb.Graphics.domLogEvent;
 };
 
 
 /**
- * Shows the chat area and hided the fields.
+ * Shows the chat area and hides the fields.
  */
 tetriweb.Graphics.displayChat = function() {
   goog.dom.classes.add(goog.dom.getElement('fields'), 'hid');
   goog.dom.classes.remove(goog.dom.getElement('chat-area'), 'hid');
+
+  tetriweb.Graphics.domWriteMessage = tetriweb.Graphics.domWritePline;
 };
 
 
@@ -69,6 +71,9 @@ tetriweb.Graphics.domWritePline = function(msg) {
   goog.dom.appendChild(pline, cont);
   pline.scrollTop = pline.scrollHeight; // scroll to bottom
 };
+
+
+tetriweb.Graphics.domWriteMessage = tetriweb.Graphics.domWritePline;
 
 
 /**

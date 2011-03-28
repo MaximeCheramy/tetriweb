@@ -22,7 +22,14 @@
 
 <!-- To display only when a game is launched. -->
 <div id="fields" class="hid">
-  <div id="event-log"></div>
+  <div id="event-area">
+    <div id="event-log"></div>
+    <form action="" method="get" id="eventlog-form">
+      <input type="text" name="msg" id="event-msg" value="" />
+      <input type="submit" name="submit" value="Send" />
+    </form>
+  </div>
+
   <div id="my-container">
     <div id="my-name"></div>
     <div id="next-piece"></div>
@@ -35,7 +42,7 @@
 <div id="chat-area">
   <div id="partyline"></div>
   <form action="" method="get" id="partyline-form">
-    <input type="text" name="msg" id="msg" value="" />
+    <input type="text" name="msg" id="party-msg" value="" />
     <input type="submit" name="submit" value="Send" />
   </form>
 </div>

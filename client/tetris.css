@@ -23,12 +23,8 @@ body {
 
 #event-log {
   border: 2px solid #000;
-  bottom: 2px;
-  height: 175px;
-  left: 410px;
   overflow: auto;
-  position: absolute;
-  width: 500px;
+  height: 175px;
 }
 
 .field {
@@ -123,4 +119,11 @@ body {
   height: 20px;
   margin-top: 10px;
   position: relative;
+}
+
+#event-area {
+  left: 410px;
+  position: absolute;
+  width: 500px;
+  bottom: 2px;
 }
