@@ -105,14 +105,18 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           this.players_[player_id] = nick;
           this.initField_(player_id);
         }
+        tetriweb.Graphics.updatePlayerList(this.players_);
         message = '*** ' + nick + ' a rejoint le jeu.';
         break;
       // A player has left
       case 'playerleave':
         // Destroy its field
         var player_id = data[1];
-        this.destroyField_(player_id);
         message = '*** ' + this.players_[player_id] + ' a quitté le jeu.';
+        this.destroyField_(player_id);
+        delete this.players_[player_id];
+        delete this.teams_[player_id];
+        tetriweb.Graphics.updatePlayerList(this.players_);
         break;
       // A player has changed teams
       case 'team':

@@ -22,6 +22,7 @@ tetriweb.Graphics.domInit = function(pnum, nickname, moderator) {
   // Init the player's field
   tetriweb.Graphics.myField_ = goog.dom.getElement('my-field');
   tetriweb.Graphics.specialBar_ = goog.dom.getElement('special-bar');
+  tetriweb.Graphics.playerList_ = goog.dom.getElement('player-list');
 };
 
 
@@ -173,6 +174,24 @@ tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
 
 
 /**
+ * Updates the player list.
+ * @param {Array.<string>} players The player list.
+ */
+tetriweb.Graphics.updatePlayerList = function(players) {
+  // Clear the list...
+  goog.dom.removeChildren(tetriweb.Graphics.playerList_);
+  // And fill it again !
+  for (var i = 0; i < players.length; i++) {
+    if (players[i] != undefined) {
+      var player = goog.dom.createDom('div');
+      goog.dom.setTextContent(player, players[i]);
+      goog.dom.appendChild(tetriweb.Graphics.playerList_, player);
+    }
+  }
+};
+
+
+/**
  * Updates graphically the field using the internal matrix representing the
  * game.
  * @param {Array.<Array.<number>>} gameArea The game area matrix.
@@ -318,6 +337,13 @@ tetriweb.Graphics.currentObj_ = null;
  * @private
  */
 tetriweb.Graphics.specialBar_ = null;
+
+
+/**
+ * @type {!Element}
+ * @private
+ */
+tetriweb.Graphics.playerList_ = null;
 
 
 /**
