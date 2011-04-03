@@ -251,8 +251,8 @@ tetriweb.Tetris.prototype.step_ = function() {
   //TODO: Commenter le workflow du moteur de jeu.
 
   var stop = false;
-  for (var l = 0; l < 4 && !stop; l++) {
-    for (var c = 0; c < 4 && !stop; c++) {
+  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && !stop; l++) {
+    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
       if (this.current_[l][c]) {
         if (l + this.curY_ + 1 >= tetriweb.Tetris.HEIGHT_ ||
             this.gameArea_[l + this.curY_ + 1][c + this.curX_] > 0) {
@@ -269,8 +269,8 @@ tetriweb.Tetris.prototype.step_ = function() {
       this.gameLost_ = true;
     }
 
-    for (var l = 0; l < 4; l++) {
-      for (var c = 0; c < 4; c++) {
+    for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
+      for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
         if (this.current_[l][c]) {
           this.gameArea_[l + this.curY_][c + this.curX_] = this.currentColor_;
         }
@@ -311,8 +311,8 @@ tetriweb.Tetris.prototype.tryToRotate = function() {
   var dx = 0;
   for (dx = 0; dx < delta_x.length && !ok; dx++) {
     ok = true;
-    for (var l = 0; l < 4 && ok; l++) {
-      for (var c = 0; c < 4 && ok; c++) {
+    for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && ok; l++) {
+      for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && ok; c++) {
         if (piece[l][c]) {
           var newL = this.curY_ + l;
           var newC = this.curX_ + delta_x[dx] + c;
@@ -343,8 +343,8 @@ tetriweb.Tetris.prototype.tryToRotate = function() {
  */
 tetriweb.Tetris.prototype.moveLeftOrRight = function(shift) {
   var ok = true;
-  for (var l = 0; l < 4 && ok; l++) {
-    for (var c = 0; c < 4 && ok; c++) {
+  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && ok; l++) {
+    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && ok; c++) {
       ok = !this.current_[l][c] ||
           (c + this.curX_ + shift >= 0 &&
           c + this.curX_ + shift < tetriweb.Tetris.WIDTH_ &&
@@ -449,7 +449,7 @@ tetriweb.Tetris.prototype.deleteSpecial = function() {
  * @return {Array.<Array.<boolean>>} La matrice qui represente la piece.
  */
 tetriweb.Tetris.generatePiece = function(id, orientation) {
-  var piece = new Array(4);
+  var piece = new Array(tetriweb.Tetris.DIM_PIECE_);
 
   switch (id) {
     case 0:
@@ -513,10 +513,10 @@ tetriweb.Tetris.generatePiece = function(id, orientation) {
  */
 tetriweb.Tetris.rotate_ = function(piece) {
   // Rotation de la piece.
-  var npiece = new Array(4);
-  for (var l = 0; l < 4; l++) {
-    npiece[l] = new Array(4);
-    for (var c = 0; c < 4; c++) {
+  var npiece = new Array(tetriweb.Tetris.DIM_PIECE_);
+  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
+    npiece[l] = new Array(tetriweb.Tetris.DIM_PIECE_);
+    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
       npiece[l][c] = piece[3 - c][l];
     }
   }
@@ -526,24 +526,24 @@ tetriweb.Tetris.rotate_ = function(piece) {
   do {
     done_t = npiece[0][0] || npiece[0][1] || npiece[0][2] || npiece[0][3];
     if (!done_t) {
-      for (var l = 0; l < 3; l++) {
-        for (var c = 0; c < 4; c++) {
+      for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ - 1; l++) {
+        for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
           npiece[l][c] = npiece[l + 1][c];
         }
       }
-      for (var c = 0; c < 4; c++) {
-        npiece[3][c] = false;
+      for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
+        npiece[tetriweb.Tetris.DIM_PIECE_ - 1][c] = false;
       }
     }
     done_l = npiece[0][0] || npiece[1][0] || npiece[2][0] || npiece[3][0];
     if (!done_l) {
-      for (var l = 0; l < 4; l++) {
-        for (var c = 0; c < 3; c++) {
+      for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
+        for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ - 1; c++) {
           npiece[l][c] = npiece[l][c + 1];
         }
       }
-      for (var l = 0; l < 4; l++) {
-        npiece[l][3] = false;
+      for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
+        npiece[l][tetriweb.Tetris.DIM_PIECE_ - 1] = false;
       }
     }
   } while (!(done_l && done_t));
@@ -827,9 +827,9 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
   this.generateRandom_();
 
   // Remonte un peu l'objet si commence par du vide.
-  for (var l = 0; l < 4; l++) {
+  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
     var empty = true;
-    for (var c = 0; c < 4; c++) {
+    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
       empty = empty && !this.current_[l][c];
     }
     if (empty && this.curY_ > 0) {
@@ -905,6 +905,13 @@ tetriweb.Tetris.WIDTH_ = 12;
  * @private
  */
 tetriweb.Tetris.HEIGHT_ = 22;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.DIM_PIECE_ = 4;
 
 
 /**
