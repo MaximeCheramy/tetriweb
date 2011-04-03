@@ -44,7 +44,7 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
             // Init DOM
             tetriweb.Graphics.domInit(this.pnum_, nickname, this.pnum_ == 1);
 
-						tetriweb.Graphics.hideLoginForm();
+            tetriweb.Graphics.hideLoginForm();
           } else {
             alert('Connexion impossible : ' + response['error']);
           }
@@ -281,7 +281,8 @@ tetriweb.Tetrinet.prototype.startGame = function() {
  */
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
-  tetriweb.Graphics.domWriteMessage('<' + this.players_[this.pnum_] + '> ' + msg);
+  tetriweb.Graphics.domWriteMessage(
+      '<' + this.players_[this.pnum_] + '> ' + msg);
 };
 
 /**

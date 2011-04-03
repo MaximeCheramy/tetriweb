@@ -174,7 +174,7 @@ tetriweb.Tetris.prototype.handleSpecials_ = function(nbLines, specials) {
       var pos = tetriweb.Tetris.randomInt(0, posMax);
       // Move specials above new position
       for (var p = posMax; p > pos; p--) {
-        this.specialsQueue_[p] = this.specialsQueue_[p-1];
+        this.specialsQueue_[p] = this.specialsQueue_[p - 1];
       }
       // Place new special
       this.specialsQueue_[pos] = specials[i];

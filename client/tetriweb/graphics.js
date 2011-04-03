@@ -74,6 +74,9 @@ tetriweb.Graphics.domWritePline = function(msg) {
 };
 
 
+/**
+ * Function to display a message to the user (pline or log)
+ */
 tetriweb.Graphics.domWriteMessage = tetriweb.Graphics.domWritePline;
 
 
@@ -316,8 +319,8 @@ tetriweb.Graphics.moveCurPieceV = function(posY) {
  * Hides the login form.
  */
 tetriweb.Graphics.hideLoginForm = function() {
-	var form = goog.dom.getElement('connect-form');
-	goog.dom.classes.add(form, 'hid');
+  var form = goog.dom.getElement('connect-form');
+  goog.dom.classes.add(form, 'hid');
 };
 
 
@@ -325,8 +328,8 @@ tetriweb.Graphics.hideLoginForm = function() {
  * Shows the login form.
  */
 tetriweb.Graphics.showLoginForm = function() {
-	var form = goog.dom.getElement('connect-form');
-	goog.dom.classes.remove(form, 'hid');
+  var form = goog.dom.getElement('connect-form');
+  goog.dom.classes.remove(form, 'hid');
 };
 
 
