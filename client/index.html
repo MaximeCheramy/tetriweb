@@ -39,12 +39,17 @@
 </div>
 
 <!-- To be displayed only when no game is being played.  -->
-<div id="chat-area">
+<div id="chat-area" class="hid">
   <div id="player-list"></div>
   <div id="partyline"></div>
   <form action="" method="get" id="partyline-form">
-    <input type="text" name="msg" id="party-msg" value="" />
-    <input type="submit" name="submit" value="Send" />
+    <table>
+      <tr><td style="width:100%">
+        <input type="text" name="msg" id="party-msg" value="" />
+      </td><td>
+        <input type="submit" name="submit" value="Send" />
+      </td></tr>
+    </table>
   </form>
 </div>
 

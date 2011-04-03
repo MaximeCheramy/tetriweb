@@ -15,6 +15,10 @@ body {
   overflow: auto;
 }
 
+#party-msg {
+  width: 100%;
+}
+
 #player-list {
   background: #fff;
   border: 2px solid #666;

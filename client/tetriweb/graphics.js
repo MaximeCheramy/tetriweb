@@ -23,6 +23,8 @@ tetriweb.Graphics.domInit = function(pnum, nickname, moderator) {
   tetriweb.Graphics.myField_ = goog.dom.getElement('my-field');
   tetriweb.Graphics.specialBar_ = goog.dom.getElement('special-bar');
   tetriweb.Graphics.playerList_ = goog.dom.getElement('player-list');
+
+  tetriweb.Graphics.displayChat();
 };
 
 
