@@ -43,6 +43,8 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
 
             // Init DOM
             tetriweb.Graphics.domInit(this.pnum_, nickname, this.pnum_ == 1);
+
+						tetriweb.Graphics.hideLoginForm();
           } else {
             alert('Connexion impossible : ' + response['error']);
           }

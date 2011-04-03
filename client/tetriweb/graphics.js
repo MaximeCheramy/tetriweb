@@ -313,6 +313,24 @@ tetriweb.Graphics.moveCurPieceV = function(posY) {
 
 
 /**
+ * Hides the login form.
+ */
+tetriweb.Graphics.hideLoginForm = function() {
+	var form = goog.dom.getElement('connect-form');
+	goog.dom.classes.add(form, 'hid');
+};
+
+
+/**
+ * Shows the login form.
+ */
+tetriweb.Graphics.showLoginForm = function() {
+	var form = goog.dom.getElement('connect-form');
+	goog.dom.classes.remove(form, 'hid');
+};
+
+
+/**
  * @type {!Element}
  */
 tetriweb.Graphics.eventLog = null;
