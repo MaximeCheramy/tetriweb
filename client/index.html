@@ -12,11 +12,14 @@
 
 <body onload="tetriweb.init()">
 
-<form action="" method="get" id="connect-form">
-  <input type="text" name="nickname" id="nickname" value="" />
-  <input type="text" name="team" id="team" value="" />
-  <input type="submit" name="submit" value="Connect !" />
-</form>
+<fieldset id="connect-form">
+  <legend>Connexion</legend>
+  <form action="" method="get">
+    <p><label for="nickname">Pseudo : </label><input type="text" name="nickname" id="nickname" value="" /></p>
+    <p><label for="team">Team : </label><input type="text" name="team" id="team" value="" /></p>
+    <p class="submit"><input type="submit" name="submit" value="Connect !" /></p>
+  </form>
+</fieldset>
 
 <p><input type="button" id="start-game" value="Commencer la partie" disabled="disabled" /></p>
 

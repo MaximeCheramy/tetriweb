@@ -7,6 +7,38 @@ body {
   display: none;
 }
 
+#connect-form {
+  background: #fff;
+  border: 2px solid #666;
+  left: 50%;
+  margin-left: -110px;
+  padding: 10px;
+  position: absolute;
+  top: 30%;
+  width: 250px;
+}
+
+#connect-form input {
+  width: 150px;
+}
+
+#connect-form label {
+  float: left;
+  display: block;
+  width: 80px;
+}
+
+#connect-form legend {
+  border: 1px solid #666;
+  background: #fff;
+  padding: 2px 6px;
+}
+
+#connect-form .submit {
+  text-align: center;
+}
+
+
 #partyline {
   background: #fff;
   border: 2px solid #666;
