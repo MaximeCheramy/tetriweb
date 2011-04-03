@@ -35,6 +35,7 @@ body {
 }
 
 #event-log {
+  background: #fff;
   border: 2px solid #000;
   overflow: auto;
   height: 175px;
@@ -128,6 +129,7 @@ body {
 }
 
 #special-bar {
+  background: #fff;
   border: 2px solid #222;
   height: 20px;
   margin-top: 10px;
