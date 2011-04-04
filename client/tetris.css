@@ -226,12 +226,12 @@ body {
 }
 
 #next-piece {
-  background: #FFF;
+  background: #000;
   border: 2px solid #222;
-  height: 80px;
+  height: 86px;
   left: 280px;
   position: absolute;
-  width: 80px;
+  width: 86px;
 }
 
 #special-bar {

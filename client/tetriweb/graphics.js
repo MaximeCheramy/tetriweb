@@ -279,8 +279,8 @@ tetriweb.Graphics.updateNextPiece = function(nextPiece, nextId) {
     for (var c = 0; c < 4; c++) {
       if (nextPiece[l][c]) {
         var block = goog.dom.createDom('div');
-        block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_;
-        block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_;
+        block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 3;
+        block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 3;
         goog.dom.classes.set(block, 'block ' + convert(getColor(nextId)));
         goog.dom.appendChild(nextPieceObj, block);
       }
