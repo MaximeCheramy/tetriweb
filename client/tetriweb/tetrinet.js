@@ -249,8 +249,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
  */
 tetriweb.Tetrinet.prototype.logEvent = function(special, to, from) {
   var message = tetriweb.Tetrinet.SPECIALS[special];
-  message += (to == 0) ? ' to all' : ' to ' + this.players_[to];
-  message += ' from ' + this.players_[from];
+  message += (to == 0) ? ' pour tous' : ' pour ' + this.players_[to];
+  message += ' de la part de ' + this.players_[from];
   tetriweb.Graphics.domLogEvent(message);
 };
 
