@@ -48,10 +48,6 @@ tetriweb.init = function() {
       goog.events.EventType.CLICK, function(e) {
         tetrinet.startGame();
       });
-
-  goog.events.listen(window, 'beforeunload', function(e) {
-    tetrinet.disconnect();
-  });
 };
 
 goog.exportSymbol('tetriweb.init', tetriweb.init);

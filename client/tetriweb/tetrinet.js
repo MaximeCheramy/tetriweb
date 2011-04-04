@@ -99,6 +99,10 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
     var data = msg.split(' ');
     var message = ''; // Message that will be shown in the partyline
     switch (data[0]) {
+      // Ping from the proxy
+      case 'ping':
+        this.pong();
+        break;
       // New player joins
       case 'playerjoin':
         var player_id = data[1];
@@ -264,6 +268,14 @@ tetriweb.Tetrinet.prototype.sendMessage_ = function(msg) {
   this.xhr_out_ = new goog.net.XhrIo();
   this.xhr_out_.send(this.url_ + '?' +
       goog.uri.utils.buildQueryDataFromMap({'pnum': this.pnum_, 'send': msg}));
+};
+
+
+/**
+ * Pongs the proxy.
+ */
+tetriweb.Tetrinet.prototype.pong = function() {
+  this.sendMessage_('pong');
 };
 
 

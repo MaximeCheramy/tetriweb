@@ -1,5 +1,7 @@
 <?php
 define('BUFFER_LEN', 1024);
+define('PING_INTERVAL', 10);
+define('TIMEOUT', 5);
 
 $port = 1234;
 $server_addr = 'localhost';
@@ -132,6 +134,10 @@ while(true) {
 						$tmp_clients--;
 					}
 				}
+        elseif($msg == 'pong') {
+          // PONG !
+          $clients[$client]['pong'] = true;
+        }
         elseif($msg == 'disconnect') {
           // Demande de déconnexion
           echo "Le client $client a quitté le jeu.\n";
@@ -183,6 +189,8 @@ while(true) {
 							socket_write($s, "playernum $c_id\n");
 							$clients[$c_id] = $clients[$client];
 							$clients[$c_id]['s_server'] = $s_server;
+              $clients[$c_id]['last_ping'] = time();
+              $clients[$c_id]['pong'] = true;
 							unset($clients[$c_id]['s_client_read']); // On va fermer la connexion plus bas
 						}
 						else {
@@ -232,5 +240,31 @@ while(true) {
 			}
 		}
 	}
+
+  // Check for timeouts
+  foreach($clients as $pnum => $client) {
+    if(isset($client['last_ping'])) {
+      echo "PNUM $pnum : last ping {$client['last_ping']}, pong ".(int)$client['pong'].", time ".time()."\n";
+      if(!$client['pong'] && time() > $client['last_ping'] + TIMEOUT) {
+        echo "DISCONNECT ".time()."\n";
+        // Disconnect client
+        socket_close($client['s_server']);
+        if(isset($client['s_client_read'])) {
+          socket_close($client['s_client_read']);
+        }
+        if(isset($client['s_client_write'])) {
+          socket_close($client['s_client_write']);
+        }
+        unset($clients[$pnum]);
+      }
+      elseif($client['last_ping'] < (time() - PING_INTERVAL)) {
+        echo "REPING ".time()."\n";
+        // Ping client
+        socket_write($clients[$pnum]['s_client_read'], "ping\n");
+        $clients[$pnum]['last_ping'] = time();
+        $clients[$pnum]['pong'] = false;
+      }
+    }
+  }
 }
 ?>
