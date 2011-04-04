@@ -1,5 +1,6 @@
 body {
   font-size: 12px;
+  font-family: verdana,helvetica,arial,sans-serif;
   background: #eee;
 }
 
@@ -55,11 +56,18 @@ body {
   background: #fff;
   border: 2px solid #666;
   float: right;
-  height: 180px;
+  height: 200px;
   margin-left: 5px;
   overflow: auto;
-  padding: 10px;
   width: 120px;
+  padding: 0;
+}
+
+#player-list div {
+  background: #EEE;
+  border-bottom: 2px dotted #666;
+  padding: 5px 10px 5px 10px;
+  margin: 0px
 }
 
 #fields {
