@@ -168,6 +168,9 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             piecesFreq, specialsFreq);
         tetriweb.Graphics.displayFields();
         break;
+      case 'ingame':
+        tetriweb.Graphics.displayFields();
+        break;
       // All players lose except one
       case 'endgame':
         message = '*** La partie est terminée';
