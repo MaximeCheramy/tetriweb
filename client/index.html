@@ -21,10 +21,12 @@
   </form>
 </fieldset>
 
-<p><input type="button" id="start-game" value="Commencer la partie" disabled="disabled" /></p>
 
 <!-- To display only when a game is launched. -->
 <div id="fields" class="hid">
+  <div class="game-control">
+    <input type="button" id="pause-game" value="Pause" disabled="disabled" />
+  </div>
   <div id="event-area">
     <div id="event-log"></div>
     <form action="" method="get" id="eventlog-form">
@@ -44,6 +46,9 @@
 
 <!-- To be displayed only when no game is being played.  -->
 <div id="chat-area" class="hid">
+  <div class="game-control">
+    <input type="button" id="start-game" value="Commencer la partie" disabled="disabled" />
+  </div>
   <div id="player-list"></div>
   <div id="partyline"></div>
   <form action="" method="get" id="partyline-form">
