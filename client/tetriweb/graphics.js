@@ -290,6 +290,15 @@ tetriweb.Graphics.updateNextPiece = function(nextPiece, nextId) {
 
 
 /**
+ * Sets the current level.
+ * @param {number} level The current level.
+ */
+tetriweb.Graphics.setLevel = function(level) {
+  var lvlElement = goog.dom.getElement('my-level');
+  goog.dom.setTextContent(lvlElement, 'Level : ' + level.toString());
+}
+
+/**
  * Empties the game field.
  */
 tetriweb.Graphics.emptyField = function() {

@@ -77,7 +77,8 @@ tetriweb.Tetris.prototype.startGame = function(_specialLines, _specialCount,
   this.updateGridAndSendField_();
   this.generateRandom_();
   this.newPiece_();
-  this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
+  this.stepTimer = window.setTimeout(
+      goog.bind(this.step_, this), 1005 - (this.level_ * 10));
 
   // Enable key events in game field
   this.keyEvents.setKeyEvent();
@@ -618,7 +619,7 @@ tetriweb.Tetris.getColor = function(id) {
 
 
 /**
- * Add a line at the bottom of the grid.
+ * Adds a line at the bottom of the grid.
  */
 tetriweb.Tetris.prototype.addLine = function() {
   for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
@@ -894,6 +895,17 @@ tetriweb.Tetris.prototype.isGameLost = function() {
 
 
 /**
+ * Sets the current level.
+ * @param {number} level The current level.
+ */
+tetriweb.Tetris.prototype.setLevel = function(level) {
+  if (level <= 100) {
+    this.level_ = level;
+  }
+  tetriweb.Graphics.setLevel(level);
+};
+
+/**
  * @type {number}
  * @private
  */
@@ -912,6 +924,13 @@ tetriweb.Tetris.HEIGHT_ = 22;
  * @private
  */
 tetriweb.Tetris.DIM_PIECE_ = 4;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.prototype.level_ = 1;
 
 
 /**

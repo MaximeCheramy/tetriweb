@@ -146,6 +146,11 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           message = '<' + this.players_[player_id] + '> ' + m;
         }
         break;
+      case 'lvl':
+        var player_id = data[1];
+        var level_num = data[2];
+        // TODO. Attention c'est le client qui envoie son changement de level.
+        break;
       // Starting a new game
       case 'newgame':
         message = '*** La partie a débuté';
