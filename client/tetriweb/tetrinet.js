@@ -48,6 +48,8 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
           } else {
             alert('Connexion impossible : ' + response['error']);
           }
+        } else {
+          alert('Connexion impossible.');
         }
       }, this));
 
