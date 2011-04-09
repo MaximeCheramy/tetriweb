@@ -173,6 +173,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         this.tetris.startGame(specialLines, specialCount, specialCapacity,
             piecesFreq, specialsFreq);
         tetriweb.Graphics.displayFields();
+        tetriweb.Graphics.gameAreaFocus();
         break;
       case 'ingame':
         tetriweb.Graphics.displayFields();

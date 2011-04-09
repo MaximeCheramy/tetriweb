@@ -41,6 +41,7 @@ tetriweb.init = function() {
         var msg = goog.dom.getElement('event-msg');
         tetrinet.sayGmsg(msg.value);
         msg.value = '';
+        tetriweb.Graphics.gameAreaFocus();
       });
 
   goog.events.listen(goog.dom.getElement('start-game'),

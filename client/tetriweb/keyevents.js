@@ -63,6 +63,8 @@ tetriweb.KeyEvents.prototype.keyHandler_ = function(e) {
     this.tetris_.useSpecial(e.keyCode - keys.ZERO);
   } else if (e.keyCode == keys.D) {
     this.tetris_.deleteSpecial();
+  } else if (e.keyCode == keys.T) {
+    tetriweb.Graphics.eventMsgFocus();
   }
 };
 

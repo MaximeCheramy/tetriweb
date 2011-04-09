@@ -54,6 +54,22 @@ tetriweb.Graphics.displayChat = function() {
 
 
 /**
+ * Gives the focus to the event message input box.
+ */
+tetriweb.Graphics.eventMsgFocus = function () {
+  goog.dom.getElement('event-msg').focus();
+}
+
+
+/**
+ * Gives the focus to the game area.
+ */
+tetriweb.Graphics.gameAreaFocus = function () {
+  goog.dom.getElement('my-field').focus();
+}
+
+
+/**
  * Displays an event in the event window.
  * @param {string} message The message to display.
  */
