@@ -187,17 +187,27 @@ tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
  * @param {Array.<string>} teams The team list.
  */
 tetriweb.Graphics.updatePlayerList = function(players, teams) {
+  var first = true;
   // Clear the list...
   goog.dom.removeChildren(tetriweb.Graphics.playerList_);
   // And fill it again !
   for (var i = 0; i < players.length; i++) {
     if (players[i] != undefined) {
       var player = goog.dom.createDom('div');
-      var text = players[i];
-      if (teams[i] != undefined && teams[i] != '') {
-        text += ' (' + teams[i] + ')';
+      var nickNode;
+      if (first) {
+        nickNode = goog.dom.createDom('strong');
+        goog.dom.setTextContent(nickNode, players[i]);
+        first = false;
+      } else {
+        nickNode = goog.dom.createTextNode(players[i]);
+        text = players[i];
       }
-      goog.dom.setTextContent(player, text);
+      goog.dom.appendChild(player, nickNode);
+      if (teams[i] != undefined && teams[i] != '') {
+        var teamNode = goog.dom.createTextNode(' (' + teams[i] + ')');
+        goog.dom.appendChild(player, teamNode);
+      }
       goog.dom.appendChild(tetriweb.Graphics.playerList_, player);
     }
   }
