@@ -57,6 +57,8 @@ tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
   this.specialCapacity_ = _specialCapacity;
   this.currentSpecialLines_ = 0;
   this.specialsQueue_ = [];
+
+  tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
 };
 
 
