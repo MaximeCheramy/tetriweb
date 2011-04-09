@@ -114,6 +114,9 @@ while(true) {
 					if(isset($clients[$client]['s_client_read'])) {
 						echo "Envoi de '$msg' au client $client...\n";
 						socket_write($clients[$client]['s_client_read'], $msg."\n");
+            // Le client va de toutes façons fermer la connexion, donc on la ferme aussi pour ne pas avoir à attendre le prochain tour de boucle pour être au courant
+            socket_close($clients[$client]['s_client_read']);
+            unset($clients[$client]['s_client_read']);
 					}
 					else {
 						echo "Stockage de '$msg' pour le client $client...\n";
@@ -136,6 +139,7 @@ while(true) {
 				}
         elseif($msg == 'pong') {
           // PONG !
+          echo "Client $pnum PONG !\n";
           $clients[$client]['pong'] = true;
         }
         elseif($msg == 'disconnect') {
@@ -218,7 +222,15 @@ while(true) {
 								if(!empty($clients[$c_id]['msg'])) {
 									echo "Envoi de messages en attente : ".implode("\n", $clients[$c_id]['msg'])."\n";
 									socket_write($s, implode("\n", $clients[$c_id]['msg'])."\n");
+                  if (in_array('ping', $clients[$c_id]['msg'])) {
+                    echo "REPING $c_id ".time()."\n";
+                    $clients[$c_id]['last_ping'] = time();
+                    $clients[$c_id]['pong'] = false;
+                  }
 									$clients[$c_id]['msg'] = array();
+                  // Le client va de toutes façons fermer la connexion, donc on la ferme aussi pour ne pas avoir à attendre le prochain tour de boucle pour être au courant
+                  socket_close($clients[$c_id]['s_client_read']);
+                  unset($clients[$c_id]['s_client_read']);
 								}
 							}
 						}
@@ -244,9 +256,9 @@ while(true) {
   // Check for timeouts
   foreach($clients as $pnum => $client) {
     if(isset($client['last_ping'])) {
-      echo "PNUM $pnum : last ping {$client['last_ping']}, pong ".(int)$client['pong'].", time ".time()."\n";
+      //echo "PNUM $pnum : last ping {$client['last_ping']}, pong ".(int)$client['pong'].", time ".time()."\n";
       if(!$client['pong'] && time() > $client['last_ping'] + TIMEOUT) {
-        echo "DISCONNECT ".time()."\n";
+        echo "DISCONNECT $pnum ".time()."\n";
         // Disconnect client
         socket_close($client['s_server']);
         if(isset($client['s_client_read'])) {
@@ -257,12 +269,19 @@ while(true) {
         }
         unset($clients[$pnum]);
       }
-      elseif($client['last_ping'] < (time() - PING_INTERVAL) && isset($clients[$pnum]['s_client_read'])) {
-        echo "REPING ".time()."\n";
-        // Ping client
-        socket_write($clients[$pnum]['s_client_read'], "ping\n");
-        $clients[$pnum]['last_ping'] = time();
-        $clients[$pnum]['pong'] = false;
+      elseif($client['last_ping'] < (time() - PING_INTERVAL) && !in_array('ping', $client['msg'])) {
+        if (isset($clients[$pnum]['s_client_read'])) {
+          // Ping client
+          if(socket_write($clients[$pnum]['s_client_read'], "ping\n") !== false) {
+            echo "REPING $pnum ".time()."\n";
+            $clients[$pnum]['last_ping'] = time();
+            $clients[$pnum]['pong'] = false;
+          }
+        }
+        else {
+          // Add ping to message queue
+          array_push($clients[$pnum]['msg'], "ping");
+        }
       }
     }
   }

@@ -114,7 +114,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           this.initField_(player_id);
         }
         tetriweb.Graphics.enableModeratorControls(this.checkModerator_());
-        tetriweb.Graphics.updatePlayerList(this.players_);
+        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
         message = '*** ' + nick + ' a rejoint le jeu.';
         break;
       // A player has left
@@ -126,7 +126,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         delete this.players_[player_id];
         delete this.teams_[player_id];
         tetriweb.Graphics.enableModeratorControls(this.checkModerator_());
-        tetriweb.Graphics.updatePlayerList(this.players_);
+        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
         break;
       // A player has changed teams
       case 'team':
@@ -137,8 +137,10 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           message = '*** ' + this.players_[player_id] +
               " est dans l'équipe " + team + '.';
         } else {
+          delete this.teams_[player_id];
           message = '*** ' + this.players_[player_id] + ' est seul.';
         }
+        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
         break;
       // New message on the partyline (from a player or the server)
       case 'pline':
@@ -214,16 +216,23 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
       // Receiving a special
       case 'sb':
         if (data[1] == 0 || data[1] == this.pnum_) {
-          if (data[2] == 'cs1' || data[2] == 'a') {
+          if (data[2] == 'a') {
             this.tetris.addLine();
-          } else if (data[2] == 'cs2') {
-            this.tetris.addLine();
-            this.tetris.addLine();
-          } else if (data[2] == 'cs4') {
-            this.tetris.addLine();
-            this.tetris.addLine();
-            this.tetris.addLine();
-            this.tetris.addLine();
+          } else if (data[2] == 'cs1' || data[2] == 'cs2' || data[2] == 'cs4') {
+            if (this.teams_[data[3]] == undefined ||
+                this.teams_[data[3]] != this.teams_[this.pnum_]) {
+              if (data[2] == 'cs1') {
+                this.tetris.addLine();
+              } else if (data[2] == 'cs2') {
+                this.tetris.addLine();
+                this.tetris.addLine();
+              } else if (data[2] == 'cs4') {
+                this.tetris.addLine();
+                this.tetris.addLine();
+                this.tetris.addLine();
+                this.tetris.addLine();
+              }
+            }
           } else if (data[2] == 'b') {
             this.tetris.clearSpecialBlocks();
           } else if (data[2] == 'c') {

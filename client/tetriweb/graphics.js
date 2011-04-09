@@ -184,15 +184,20 @@ tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
 /**
  * Updates the player list.
  * @param {Array.<string>} players The player list.
+ * @param {Array.<string>} teams The team list.
  */
-tetriweb.Graphics.updatePlayerList = function(players) {
+tetriweb.Graphics.updatePlayerList = function(players, teams) {
   // Clear the list...
   goog.dom.removeChildren(tetriweb.Graphics.playerList_);
   // And fill it again !
   for (var i = 0; i < players.length; i++) {
     if (players[i] != undefined) {
       var player = goog.dom.createDom('div');
-      goog.dom.setTextContent(player, players[i]);
+      var text = players[i];
+      if (teams[i] != undefined && teams[i] != '') {
+        text += ' (' + teams[i] + ')';
+      }
+      goog.dom.setTextContent(player, text);
       goog.dom.appendChild(tetriweb.Graphics.playerList_, player);
     }
   }
