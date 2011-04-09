@@ -43,10 +43,14 @@ tetriweb.init = function() {
         msg.value = '';
       });
 
-
   goog.events.listen(goog.dom.getElement('start-game'),
       goog.events.EventType.CLICK, function(e) {
         tetrinet.startGame();
+      });
+  
+  goog.events.listen(goog.dom.getElement('stop-game'),
+      goog.events.EventType.CLICK, function(e) {
+        tetrinet.stopGame();
       });
 };
 

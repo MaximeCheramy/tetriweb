@@ -257,7 +257,7 @@ while(true) {
         }
         unset($clients[$pnum]);
       }
-      elseif($client['last_ping'] < (time() - PING_INTERVAL)) {
+      elseif($client['last_ping'] < (time() - PING_INTERVAL) && isset($clients[$pnum]['s_client_read'])) {
         echo "REPING ".time()."\n";
         // Ping client
         socket_write($clients[$pnum]['s_client_read'], "ping\n");

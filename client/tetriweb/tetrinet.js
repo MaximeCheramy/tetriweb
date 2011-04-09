@@ -42,7 +42,7 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
             this.readFromServer_();
 
             // Init DOM
-            tetriweb.Graphics.domInit(this.pnum_, nickname, this.pnum_ == 1);
+            tetriweb.Graphics.domInit(this.pnum_, nickname);
 
             tetriweb.Graphics.hideLoginForm();
           } else {
@@ -113,6 +113,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           this.players_[player_id] = nick;
           this.initField_(player_id);
         }
+        tetriweb.Graphics.enableModeratorControls(this.checkModerator_());
         tetriweb.Graphics.updatePlayerList(this.players_);
         message = '*** ' + nick + ' a rejoint le jeu.';
         break;
@@ -124,6 +125,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         this.destroyField_(player_id);
         delete this.players_[player_id];
         delete this.teams_[player_id];
+        tetriweb.Graphics.enableModeratorControls(this.checkModerator_());
         tetriweb.Graphics.updatePlayerList(this.players_);
         break;
       // A player has changed teams
@@ -282,6 +284,19 @@ tetriweb.Tetrinet.prototype.sendMessage_ = function(msg) {
 
 
 /**
+ * Checks if the current user is the moderator.
+ * @return {boolean} True if the user is the moderator.
+ * @private
+ */
+tetriweb.Tetrinet.prototype.checkModerator_ = function() {
+  var moderator = true;
+  for (player_num in this.players_) {
+    moderator = moderator && this.pnum_ <= player_num;
+  }
+  return moderator;
+}
+
+/**
  * Pongs the proxy.
  */
 tetriweb.Tetrinet.prototype.pong = function() {
@@ -294,6 +309,14 @@ tetriweb.Tetrinet.prototype.pong = function() {
  */
 tetriweb.Tetrinet.prototype.startGame = function() {
   this.sendMessage_('startgame 1 ' + this.pnum_);
+};
+
+
+/**
+ * Notifies the server that we want to stop the game.
+ */
+tetriweb.Tetrinet.prototype.stopGame = function() {
+  this.sendMessage_('startgame 0 ' + this.pnum_);
 };
 
 

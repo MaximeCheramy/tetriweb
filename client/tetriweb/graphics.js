@@ -7,17 +7,10 @@ goog.require('goog.dom');
  * Initializes the DOM elements needed by the game.
  * @param {number} pnum The player's playernum.
  * @param {string} nickname The player's nickname.
- * @param {boolean} moderator True if the player can start or stop games.
  */
-tetriweb.Graphics.domInit = function(pnum, nickname, moderator) {
+tetriweb.Graphics.domInit = function(pnum, nickname) {
   // Gets event log
   tetriweb.Graphics.eventLog = goog.dom.getElement('event-log');
-
-  // Enable start button for moderators
-  if (moderator) {
-    // FIXME: If we lose this right the button should be disabled.
-    goog.dom.getElement('start-game').disabled = false;
-  }
 
   // Init the player's field
   tetriweb.Graphics.myField_ = goog.dom.getElement('my-field');
@@ -26,6 +19,16 @@ tetriweb.Graphics.domInit = function(pnum, nickname, moderator) {
 
   tetriweb.Graphics.displayChat();
 };
+
+
+/**
+ * Enable/disable moderator controls
+ * @param {boolean} enable Whether enable or disable the controls.
+ */
+tetriweb.Graphics.enableModeratorControls = function(enable) {
+  goog.dom.getElement('start-game').disabled = !enable;
+  goog.dom.getElement('stop-game').disabled = !enable;
+}
 
 
 /**
