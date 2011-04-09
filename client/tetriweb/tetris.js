@@ -79,8 +79,7 @@ tetriweb.Tetris.prototype.startGame = function(_specialLines, _specialCount,
   this.updateGridAndSendField_();
   this.generateRandom_();
   this.newPiece_();
-  this.stepTimer = window.setTimeout(
-      goog.bind(this.step_, this), 1005 - (this.level_ * 10));
+  this.setTimer();
 
   // Enable key events in game field
   this.keyEvents.setKeyEvent();
@@ -282,7 +281,6 @@ tetriweb.Tetris.prototype.step_ = function() {
     tetriweb.Graphics.layDownPiece(
         this.curX_, this.curY_, this.current_, this.currentColor_);
 
-
     this.pieceDropped_ = true;
     this.checkLine_();
     this.sendField_();
@@ -293,8 +291,34 @@ tetriweb.Tetris.prototype.step_ = function() {
     this.fillRandomly_();
   } else {
     clearTimeout(this.stepTimer);
-    this.stepTimer = window.setTimeout(goog.bind(this.step_, this), 1000);
+    this.setTimer();
   }
+};
+
+
+/**
+ * Sets the timer.
+ */
+tetriweb.Tetris.prototype.setTimer = function() {
+  this.stepTimer = window.setTimeout(
+      goog.bind(this.step_, this), 1005 - (this.level_ * 10));
+};
+
+
+/**
+ * Pauses the game.
+ */
+tetriweb.Tetris.prototype.pauseGame = function() {
+  clearTimeout(this.stepTimer);
+};
+
+
+/**
+ * Resume the game.
+ */
+tetriweb.Tetris.prototype.resumeGame = function() {
+  clearTimeout(this.stepTimer);
+  this.setTimer();
 };
 
 
@@ -906,6 +930,7 @@ tetriweb.Tetris.prototype.setLevel = function(level) {
   }
   tetriweb.Graphics.setLevel(level);
 };
+
 
 /**
  * @type {number}

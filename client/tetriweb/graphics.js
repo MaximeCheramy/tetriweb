@@ -380,6 +380,41 @@ tetriweb.Graphics.showLoginForm = function() {
 
 
 /**
+ * Hides the pause and resume buttons.
+ */
+tetriweb.Graphics.hidePauseResumeButtons = function() {
+  var pauseButton = goog.dom.getElement('pause-game');
+  var resumeButton = goog.dom.getElement('resume-game');
+
+  goog.dom.classes.add(pauseButton, 'hid');
+  goog.dom.classes.add(resumeButton, 'hid');
+};
+
+/**
+ * Shows the pause button and hides the resume button.
+ */
+tetriweb.Graphics.showPauseButton = function() {
+  var pauseButton = goog.dom.getElement('pause-game');
+  var resumeButton = goog.dom.getElement('resume-game');
+
+  goog.dom.classes.remove(pauseButton, 'hid');
+  goog.dom.classes.add(resumeButton, 'hid');
+};
+
+
+/**
+ * Shows the resume button and hides the pause button.
+ */
+tetriweb.Graphics.showResumeButton = function() {
+  var pauseButton = goog.dom.getElement('pause-game');
+  var resumeButton = goog.dom.getElement('resume-game');
+
+  goog.dom.classes.remove(resumeButton, 'hid');
+  goog.dom.classes.add(pauseButton, 'hid');
+};
+
+
+/**
  * @type {!Element}
  */
 tetriweb.Graphics.eventLog = null;

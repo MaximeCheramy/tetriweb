@@ -128,6 +128,15 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         tetriweb.Graphics.enableModeratorControls(this.checkModerator_());
         tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
         break;
+      // Pause the game.
+      case 'pause':
+        var state = data[1];
+        if (state == '1') {
+          this.tetris.pauseGame();
+        } else {
+          this.tetris.resumeGame();
+        }
+        break;
       // A player has changed teams
       case 'team':
         var player_id = data[1];
@@ -174,6 +183,11 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             piecesFreq, specialsFreq);
         tetriweb.Graphics.displayFields();
         tetriweb.Graphics.gameAreaFocus();
+        if (this.checkModerator_()) {
+          tetriweb.Graphics.showPauseButton();
+        } else {
+          tetriweb.Graphics.hidePauseResumeButtons();
+        }
         break;
       case 'ingame':
         tetriweb.Graphics.displayFields();
@@ -305,6 +319,23 @@ tetriweb.Tetrinet.prototype.checkModerator_ = function() {
   }
   return moderator;
 }
+
+
+/**
+ * Pauses the game.
+ */
+tetriweb.Tetrinet.prototype.pauseGame = function() {
+  this.sendMessage_('pause 1 ' + this.pnum_);
+};
+
+
+/**
+ * Resumes the game.
+ */
+tetriweb.Tetrinet.prototype.resumeGame = function() {
+  this.sendMessage_('pause 0 ' + this.pnum_);
+};
+
 
 /**
  * Pongs the proxy.
