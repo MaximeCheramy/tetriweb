@@ -4,6 +4,8 @@ goog.require('goog.events');
 goog.require('goog.net.XhrIo');
 goog.require('tetriweb.Graphics');
 
+
+
 /**
  * Tetrinet.
  * @constructor
@@ -376,6 +378,7 @@ tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   tetriweb.Graphics.domWriteMessage(
       '<' + this.players_[this.pnum_] + '> ' + msg);
 };
+
 
 /**
  * Sends a message on the partyline.

@@ -390,6 +390,7 @@ tetriweb.Graphics.hidePauseResumeButtons = function() {
   goog.dom.classes.add(resumeButton, 'hid');
 };
 
+
 /**
  * Shows the pause button and hides the resume button.
  */

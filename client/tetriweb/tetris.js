@@ -4,6 +4,7 @@ goog.require('goog.array');
 goog.require('tetriweb.Graphics');
 
 
+
 /**
  * Tetris Class.
  * @param {object} tetrinet The tetrinet objet used to communicate with the
@@ -501,7 +502,6 @@ tetriweb.Tetris.prototype.deleteSpecial = function() {
   this.specialsQueue_.shift();
   tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
 };
-
 
 
 /**

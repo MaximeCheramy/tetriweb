@@ -68,8 +68,9 @@ tetriweb.KeyEvents.prototype.keyHandler_ = function(e) {
   }
 };
 
+
 /**
- * @type tetriweb.Tetris
+ * @type {tetriweb.Tetris}
  * @private
  */
 tetriweb.KeyEvents.prototype.tetris_ = null;
