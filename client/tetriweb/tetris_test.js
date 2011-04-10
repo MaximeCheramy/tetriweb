@@ -23,6 +23,6 @@ function testInit() {
   var specialsFreq = '1111111111111122222222223333333333334444444445555555555555666666666677777777777777888888888889999999';
 
   tetris.init(1, 1, 10, piecesFreq, specialsFreq);
-  
+
   assertFalse(tetris.gameLost_);
 }

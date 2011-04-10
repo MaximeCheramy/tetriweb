@@ -28,7 +28,7 @@ tetriweb.Graphics.domInit = function(pnum, nickname) {
 tetriweb.Graphics.enableModeratorControls = function(enable) {
   goog.dom.getElement('start-game').disabled = !enable;
   goog.dom.getElement('stop-game').disabled = !enable;
-}
+};
 
 
 /**
@@ -56,17 +56,17 @@ tetriweb.Graphics.displayChat = function() {
 /**
  * Gives the focus to the event message input box.
  */
-tetriweb.Graphics.eventMsgFocus = function () {
+tetriweb.Graphics.eventMsgFocus = function() {
   goog.dom.getElement('event-msg').focus();
-}
+};
 
 
 /**
  * Gives the focus to the game area.
  */
-tetriweb.Graphics.gameAreaFocus = function () {
+tetriweb.Graphics.gameAreaFocus = function() {
   goog.dom.getElement('my-field').focus();
-}
+};
 
 
 /**

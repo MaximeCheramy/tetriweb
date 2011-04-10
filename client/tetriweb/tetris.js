@@ -19,16 +19,24 @@ tetriweb.Tetris = function(tetrinet) {
 
 /**
  * Initializes the game.
+ * @param {number} _startingHeight The number of garbage lines at the bottom.
+ * @param {number} _startingLevel The initial level.
+ * @param {number} _linesLevel The number of lines required to advance to the
+ *    next level.
+ * @param {number} _levelIncrement The number of levels to increment when
+ *    completing the linesLevel number or lines.
  * @param {number} _specialLines The number of lines required to get a special.
  * @param {number} _specialCount The number of specials added each time
- * _specialLines are completed.
+ *    _specialLines are completed.
  * @param {number} _specialCapacity The capacity of the specials queue.
  * @param {string} _piecesFreq Occurence frequencies of each block.
  * @param {string} _specialsFreq Occurence frequencies of each special.
  * @private
  */
-tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
-    _specialCapacity, _piecesFreq, _specialsFreq) {
+tetriweb.Tetris.prototype.init_ = function(
+    _startingHeight, _startingLevel, _linesLevel, _levelIncrement,
+    _specialLines, _specialCount, _specialCapacity, _piecesFreq, 
+    _specialsFreq) {
   // init the game area : all empty.
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     this.gameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
@@ -36,8 +44,9 @@ tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
       this.gameArea_[l][c] = 0;
     }
   }
-  // TODO: maybe move ?
   tetriweb.Graphics.emptyField();
+
+  // TODO: Starting height.
 
   this.gameLost_ = false;
   // Pieces' frequency.
@@ -52,10 +61,14 @@ tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
     this.specialsFreq_[parseInt(_specialsFreq[i]) - 1]++;
   }
 
+  this.level_ = _startingLevel;
+  this.linesLevel_ = _linesLevel;
+  this.levelIncrement_ = _levelIncrement;
   this.specialLines_ = _specialLines;
   this.specialCount_ = _specialCount;
   this.specialCapacity_ = _specialCapacity;
   this.currentSpecialLines_ = 0;
+  this.currentLinesLevel_ = 0;
   this.specialsQueue_ = [];
 
   tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
@@ -64,6 +77,12 @@ tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
 
 /**
  * Starts a new game.
+ * @param {number} _startingHeight The number of garbage lines at the bottom.
+ * @param {number} _startingLevel The initial level.
+ * @param {number} _linesLevel The number of lines required to advance to the
+ *    next level.
+ * @param {number} _levelIncrement The number of levels to increment when
+ *    completing the linesLevel number or lines.
  * @param {number} _specialLines The number of lines required to get a special.
  * @param {number} _specialCount The number of specials added each time
  * _specialLines are completed.
@@ -71,9 +90,11 @@ tetriweb.Tetris.prototype.init_ = function(_specialLines, _specialCount,
  * @param {string} _piecesFreq Occurence frequencies of each block.
  * @param {string} _specialsFreq Occurence frequencies of each special.
  */
-tetriweb.Tetris.prototype.startGame = function(_specialLines, _specialCount,
+tetriweb.Tetris.prototype.startGame = function(_startingHeight, _startingLevel,
+    _linesLevel, _levelIncrement, _specialLines, _specialCount, 
     _specialCapacity, _piecesFreq, _specialsFreq) {
-  this.init_(_specialLines, _specialCount, _specialCapacity, _piecesFreq,
+  this.init_(_startingHeight, _startingLevel, _linesLevel, _levelIncrement,
+      _specialLines, _specialCount, _specialCapacity, _piecesFreq,
       _specialsFreq);
 
   this.updateGridAndSendField_();
@@ -154,6 +175,7 @@ tetriweb.Tetris.prototype.checkLine_ = function(cleanupOnly) {
       }
 
       this.handleSpecials_(nbLines, tmpSpecials);
+      this.handleLevel_(nbLines);
     }
   }
 };
@@ -189,6 +211,19 @@ tetriweb.Tetris.prototype.handleSpecials_ = function(nbLines, specials) {
   var nbSpecials = this.currentSpecialLines_ / this.specialLines_;
   this.placeSpecials_(nbSpecials * this.specialCount_);
   this.currentSpecialLines_ %= this.specialLines_;
+};
+
+
+/**
+ * Handles specials after complete lines cleanup.
+ * @param {number} nbLines The number of complete lines.
+ * @private
+ */
+tetriweb.Tetris.prototype.handleLevel_ = function(nbLines) {
+  this.currentLinesLevel_ += nbLines;
+  this.level_ += Math.floor(this.currentLinesLevel_ / this.linesLevel_);
+  this.currentLinesLevel_ %= this.linesLevel_;
+  tetriweb.Graphics.setLevel(this.level_);
 };
 
 

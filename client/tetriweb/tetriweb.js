@@ -48,19 +48,19 @@ tetriweb.init = function() {
       goog.events.EventType.CLICK, function(e) {
         tetrinet.startGame();
       });
- 
+
   goog.events.listen(goog.dom.getElement('pause-game'),
       goog.events.EventType.CLICK, function(e) {
         tetrinet.pauseGame();
         tetriweb.Graphics.showResumeButton();
       });
- 
+
   goog.events.listen(goog.dom.getElement('resume-game'),
       goog.events.EventType.CLICK, function(e) {
         tetrinet.resumeGame();
         tetriweb.Graphics.showPauseButton();
       });
- 
+
   goog.events.listen(goog.dom.getElement('stop-game'),
       goog.events.EventType.CLICK, function(e) {
         tetrinet.stopGame();

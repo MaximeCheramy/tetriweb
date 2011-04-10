@@ -176,10 +176,16 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           }
         }
         // Start tetris
-        var specialLines = data[5], specialCount = data[6],
-            specialCapacity = data[7];
+        var startingHeight = parseInt(data[1], 10);
+        var startingLevel = parseInt(data[2], 10);
+        var linesLevel = parseInt(data[3], 10);
+        var levelIncrement = parseInt(data[4], 10);
+        var specialLines = parseInt(data[5], 10);
+        var specialCount = parseInt(data[6], 10);
+        var specialCapacity = parseInt(data[7], 10);
         var piecesFreq = data[8], specialsFreq = data[9];
-        this.tetris.startGame(specialLines, specialCount, specialCapacity,
+        this.tetris.startGame(startingHeight, startingLevel, linesLevel,
+            levelIncrement, specialLines, specialCount, specialCapacity,
             piecesFreq, specialsFreq);
         tetriweb.Graphics.displayFields();
         tetriweb.Graphics.gameAreaFocus();
@@ -318,7 +324,7 @@ tetriweb.Tetrinet.prototype.checkModerator_ = function() {
     moderator = moderator && this.pnum_ <= player_num;
   }
   return moderator;
-}
+};
 
 
 /**
