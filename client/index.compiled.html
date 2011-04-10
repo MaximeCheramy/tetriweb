@@ -8,24 +8,57 @@
 
 <body onload="tetriweb.init()">
 
-<form action="" method="get" id="connectForm">
-  <input type="text" name="nickname" id="nickname" value="" />
-  <input type="text" name="team" id="team" value="" />
-  <input type="submit" name="submit" value="Connect !" />
-</form>
-
-<div id="content"></div>
-
-<p>
-  <form action="" method="get" id="partylineForm">
-    <input type="text" name="msg" id="msg" value="" />
-    <input type="submit" name="submit" value="Send" />
+<fieldset id="connect-form">
+  <legend>Connexion</legend>
+  <form action="" method="get">
+    <p><label for="nickname">Pseudo : </label><input type="text" name="nickname" id="nickname" value="" /></p>
+    <p><label for="team">Team : </label><input type="text" name="team" id="team" value="" /></p>
+    <p class="submit"><input type="submit" name="submit" value="Connect !" /></p>
   </form>
+</fieldset>
 
-  <p><input type="button" id="startGame" value="Commencer la partie" disabled="disabled" /></p>
 
-  <div id="fields"></div>
-</p>
+<!-- To display only when a game is launched. -->
+<div id="fields" class="hid">
+  <div class="game-control">
+    <input type="button" id="stop-game" value="Stop" disabled="disabled" />
+    <input type="button" id="pause-game" value="Pause" class="hid" />
+    <input type="button" id="resume-game" value="Resume" class="hid" />
+  </div>
+  <div id="event-area">
+    <div id="event-log"></div>
+    <form action="" method="get" id="eventlog-form">
+      <input type="text" name="msg" id="event-msg" value="" />
+      <input type="submit" name="submit" value="Send" />
+    </form>
+  </div>
+
+  <div id="my-container">
+    <div id="my-name"></div>
+    <div id="next-piece"></div>
+    <div id="my-level"></div>
+    <div id="my-field" tabindex="1"></div>
+    <div id="special-bar"></div>
+  </div>
+</div>
+
+<!-- To be displayed only when no game is being played.  -->
+<div id="chat-area" class="hid">
+  <div class="game-control">
+    <input type="button" id="start-game" value="Commencer la partie" disabled="disabled" />
+  </div>
+  <div id="player-list"></div>
+  <div id="partyline"></div>
+  <form action="" method="get" id="partyline-form">
+    <table>
+      <tr><td style="width:100%">
+        <input type="text" name="msg" id="party-msg" value="" />
+      </td><td>
+        <input type="submit" name="submit" value="Send" />
+      </td></tr>
+    </table>
+  </form>
+</div>
 
 </body>
 </html>
