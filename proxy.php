@@ -161,50 +161,51 @@ while(true) {
 						$pseudo = $results[1];
 						// Connexion au serveur et récupération du numéro de client
 						$s_server = socket_create(AF_INET, SOCK_STREAM, 0);
-						socket_connect($s_server, $server_addr, $server_port);
-						socket_write($s_server, hello_msg($pseudo).chr(0xFF));
-						$c_id = 0;
-						do {
-							$msg = socket_read($s_server, BUFFER_LEN);
-							// Connexion refusée (pseudo déjà pris par exemple)
-							if(empty($msg)) {
-								echo "Connexion refusée par le serveur.\n";
-								break;
-							}
-							else {
-								echo "Message du serveur : $msg\n";
-								$tb_msg = explode(chr(0xFF), trim($msg, "\xFF"));
-								print_r($tb_msg);
-								foreach($tb_msg as $msg) {
-									if(preg_match('#^playernum ([0-9]+)$#', $msg, $results)) {
-										echo "Recup playernum : $msg\n";
-										$c_id = $results[1];
-									}
-									else {
-										echo "Stockage : $msg...\n";
-										array_push($clients[$client]['msg'], $msg);
+						if (socket_connect($s_server, $server_addr, $server_port)) {
+							socket_write($s_server, hello_msg($pseudo).chr(0xFF));
+							$c_id = 0;
+							do {
+								$msg = socket_read($s_server, BUFFER_LEN);
+								// Connexion refusée (pseudo déjà pris par exemple)
+								if(empty($msg)) {
+									echo "Connexion refusée par le serveur.\n";
+									break;
+								}
+								else {
+									echo "Message du serveur : $msg\n";
+									$tb_msg = explode(chr(0xFF), trim($msg, "\xFF"));
+									print_r($tb_msg);
+									foreach($tb_msg as $msg) {
+										if(preg_match('#^playernum ([0-9]+)$#', $msg, $results)) {
+											echo "Recup playernum : $msg\n";
+											$c_id = $results[1];
+										}
+										else {
+											echo "Stockage : $msg...\n";
+											array_push($clients[$client]['msg'], $msg);
+										}
 									}
 								}
+							} while(!$c_id);
+
+							// Connexion acceptée
+							if($c_id) {	
+								socket_write($s, "playernum $c_id\n");
+								$clients[$c_id] = $clients[$client];
+								$clients[$c_id]['s_server'] = $s_server;
+								$clients[$c_id]['last_ping'] = time();
+								$clients[$c_id]['pong'] = true;
+								unset($clients[$c_id]['s_client_read']); // On va fermer la connexion plus bas
 							}
-						} while(!$c_id);
+							else {
+								socket_write($s, implode("\n", $clients[$client]['msg'])."\n");
+							}
 
-						// Connexion acceptée
-						if($c_id) {	
-							socket_write($s, "playernum $c_id\n");
-							$clients[$c_id] = $clients[$client];
-							$clients[$c_id]['s_server'] = $s_server;
-              $clients[$c_id]['last_ping'] = time();
-              $clients[$c_id]['pong'] = true;
-							unset($clients[$c_id]['s_client_read']); // On va fermer la connexion plus bas
+							// Dans tous les cas, suppression du client temporaire et fermeture socket (on n'enverra rien d'autre sur cette connexion) 
+							unset($clients[$client]);
+							$tmp_clients--;
+							socket_close($s);
 						}
-						else {
-							socket_write($s, implode("\n", $clients[$client]['msg'])."\n");
-						}
-
-						// Dans tous les cas, suppression du client temporaire et fermeture socket (on n'enverra rien d'autre sur cette connexion) 
-						unset($clients[$client]);
-						$tmp_clients--;
-						socket_close($s);
 					}
 					elseif(preg_match('#^(read|write) ([0-9]+)$#', $msg, $results)) {
 						// Retour d'un client
