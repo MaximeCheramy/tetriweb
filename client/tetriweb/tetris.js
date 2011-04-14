@@ -62,7 +62,7 @@ tetriweb.Tetris.prototype.init_ = function(
     this.specialsFreq_[parseInt(_specialsFreq[i]) - 1]++;
   }
 
-  this.level_ = _startingLevel;
+  this.setLevel(_startingLevel);
   this.linesLevel_ = _linesLevel;
   this.levelIncrement_ = _levelIncrement;
   this.specialLines_ = _specialLines;

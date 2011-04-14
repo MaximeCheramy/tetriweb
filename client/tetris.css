@@ -104,6 +104,12 @@ body {
   top: -20px;
 }
 
+#my-level {
+  position: absolute;
+  left: 280px;
+  top: 100px;
+}
+
 .block {
   height: 20px;
   position: absolute;
