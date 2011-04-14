@@ -382,12 +382,12 @@ tetriweb.Graphics.showLoginForm = function() {
 /**
  * Hides the pause and resume buttons.
  */
-tetriweb.Graphics.hidePauseResumeButtons = function() {
+tetriweb.Graphics.enablePauseResumeButtons = function(enable) {
   var pauseButton = goog.dom.getElement('pause-game');
   var resumeButton = goog.dom.getElement('resume-game');
 
-  goog.dom.classes.add(pauseButton, 'hid');
-  goog.dom.classes.add(resumeButton, 'hid');
+  pauseButton.disabled = !enable;
+  resumeButton.disabled = !enable;
 };
 
 

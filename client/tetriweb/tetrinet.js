@@ -191,11 +191,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             piecesFreq, specialsFreq);
         tetriweb.Graphics.displayFields();
         tetriweb.Graphics.gameAreaFocus();
-        if (this.checkModerator_()) {
-          tetriweb.Graphics.showPauseButton();
-        } else {
-          tetriweb.Graphics.hidePauseResumeButtons();
-        }
+        tetriweb.Graphics.showPauseButton();
+        tetriweb.Graphics.enablePauseResumeButtons(this.checkModerator_());
         break;
       case 'ingame':
         tetriweb.Graphics.displayFields();
