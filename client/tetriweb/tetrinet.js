@@ -46,6 +46,7 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
             // Init DOM
             tetriweb.Graphics.domInit(this.pnum_, nickname);
 
+            tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
             tetriweb.Graphics.hideLoginForm();
           } else {
             alert('Connexion impossible : ' + response['error']);
