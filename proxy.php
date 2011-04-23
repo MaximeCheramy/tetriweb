@@ -273,11 +273,12 @@ while(true) {
       elseif($client['last_ping'] < (time() - PING_INTERVAL) && !in_array('ping', $client['msg'])) {
         if (isset($clients[$pnum]['s_client_read'])) {
           // Ping client
-          if(socket_write($clients[$pnum]['s_client_read'], "ping\n") !== false) {
-            echo "REPING $pnum ".time()."\n";
-            $clients[$pnum]['last_ping'] = time();
-            $clients[$pnum]['pong'] = false;
-          }
+          echo "REPING $pnum ".time()."\n";
+          socket_write($clients[$pnum]['s_client_read'], "ping\n");
+          $clients[$pnum]['last_ping'] = time();
+          $clients[$pnum]['pong'] = false;
+          socket_close($clients[$pnum]['s_client_read']);
+          unset($clients[$pnum]['s_client_read']);
         }
         else {
           // Add ping to message queue
