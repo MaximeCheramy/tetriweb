@@ -106,6 +106,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
     switch (data[0]) {
       // Ping from the proxy
       case 'ping':
+        // DEBUG
+        console.log("ping -> pong");
         this.pong();
         break;
       // New player joins
@@ -490,6 +492,10 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
   // Find differences
   for (var l = 0; l < 22; l++) {
     for (var c = 0; c < 12; c++) {
+      // DEBUG
+      if (field[l][c] == undefined) {
+        alert('ATTENTION UNDEFINED !!');
+      }
       if (field[l][c] != oldfield[l][c]) {
         diff[field[l][c]].push({'l': l, 'c': c});
         nbdiff++;
@@ -501,7 +507,11 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
     var f = 'f ' + this.pnum_ + ' ';
 
     // Incremental send
-    if (nbdiff < (tetriweb.Tetris.WIDTH_ * tetriweb.Tetris.HEIGHT_) / 2) {
+    var nb_blocks_diff = 0;
+    for (var b = 0; b < diff.length; b++) {
+      nb_blocks_diff += (diff[b].length > 0);
+    }
+    if (nb_blocks_diff + nbdiff*2 < tetriweb.Tetris.WIDTH_ * tetriweb.Tetris.HEIGHT_) {
       for (var b = 0; b < diff.length; b++) {
         if (diff[b].length > 0) {
           // Output block type
