@@ -492,10 +492,6 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
   // Find differences
   for (var l = 0; l < 22; l++) {
     for (var c = 0; c < 12; c++) {
-      // DEBUG
-      if (field[l][c] == undefined) {
-        alert('ATTENTION UNDEFINED !!');
-      }
       if (field[l][c] != oldfield[l][c]) {
         diff[field[l][c]].push({'l': l, 'c': c});
         nbdiff++;
@@ -595,8 +591,9 @@ tetriweb.Tetrinet.intToChar = function(type) {
     type = specials[type];
   }
   else {
-    return '' + type;
+    type = '' + type;
   }
+  return type;
 };
 
 
