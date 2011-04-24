@@ -169,6 +169,11 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           message = '<' + this.players_[player_id] + '> ' + m;
         }
         break;
+      case 'plineact':
+        var player_id = data[1];
+        var m = msg.substr(data[0].length + data[1].length + 2);
+        message = '* ' + this.players_[player_id] + ' ' + m;
+        break;
       case 'lvl':
         var player_id = data[1];
         var level_num = data[2];
@@ -380,10 +385,17 @@ tetriweb.Tetrinet.prototype.stopGame = function() {
  * @param {string} msg The message to send.
  */
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
-  this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
-  tetriweb.Graphics.domWriteMessage(
-      tetriweb.Graphics.htmlspecialchars(
-          '<' + this.players_[this.pnum_] + '> ' + msg));
+  if (msg.substr(0, 4) == '/me ') {
+    this.sendMessage_('plineact ' + this.pnum_ + ' ' + msg.substr(4));
+    tetriweb.Graphics.domWriteMessage(
+        tetriweb.Graphics.htmlspecialchars(
+            '* ' + this.players_[this.pnum_] + ' ' + msg.substr(4)));
+  } else {
+    this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
+    tetriweb.Graphics.domWriteMessage(
+        tetriweb.Graphics.htmlspecialchars(
+            '<' + this.players_[this.pnum_] + '> ' + msg));
+  }
 };
 
 
