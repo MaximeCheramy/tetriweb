@@ -224,9 +224,7 @@ while(true) {
 									echo "Envoi de messages en attente : ".implode("\n", $clients[$c_id]['msg'])."\n";
 									socket_write($s, implode("\n", $clients[$c_id]['msg'])."\n");
                   if (in_array('ping', $clients[$c_id]['msg'])) {
-                    echo "REPING $c_id ".time()."\n";
-                    $clients[$c_id]['last_ping'] = time();
-                    $clients[$c_id]['pong'] = false;
+                    echo "DELAYED REPING SENT TO $c_id ".time()."\n";
                   }
 									$clients[$c_id]['msg'] = array();
                   // Le client va de toutes façons fermer la connexion, donc on la ferme aussi pour ne pas avoir à attendre le prochain tour de boucle pour être au courant
@@ -270,7 +268,7 @@ while(true) {
         }
         unset($clients[$pnum]);
       }
-      elseif($client['last_ping'] < (time() - PING_INTERVAL) && !in_array('ping', $client['msg'])) {
+      elseif($client['last_ping'] < (time() - PING_INTERVAL)) {
         if (isset($clients[$pnum]['s_client_read'])) {
           // Ping client
           echo "REPING $pnum ".time()."\n";
@@ -282,7 +280,10 @@ while(true) {
         }
         else {
           // Add ping to message queue
+          echo "REPING (delayed) $pnum ".time()."\n";
           array_push($clients[$pnum]['msg'], "ping");
+          $clients[$c_id]['last_ping'] = time();
+          $clients[$c_id]['pong'] = false;
         }
       }
     }
