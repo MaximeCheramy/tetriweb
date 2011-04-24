@@ -105,6 +105,16 @@ tetriweb.Tetris.prototype.startGame = function(_startingHeight, _startingLevel,
 
   // Enable key events in game field
   this.keyEvents.setKeyEvent();
+  this.pause_ = false;
+};
+
+
+/**
+ * Return the pause state of the game. Used to disable the key events.
+ * @return {boolean} True is the game is paused.
+ */
+tetriweb.Tetris.prototype.isPause = function() {
+  return this.pause_;
 };
 
 
@@ -345,6 +355,7 @@ tetriweb.Tetris.prototype.setTimer = function() {
  * Pauses the game.
  */
 tetriweb.Tetris.prototype.pauseGame = function() {
+  this.pause_ = true;
   clearTimeout(this.stepTimer);
 };
 
@@ -353,6 +364,7 @@ tetriweb.Tetris.prototype.pauseGame = function() {
  * Resume the game.
  */
 tetriweb.Tetris.prototype.resumeGame = function() {
+  this.pause_ = false;
   clearTimeout(this.stepTimer);
   this.setTimer();
 };
@@ -1062,6 +1074,13 @@ tetriweb.Tetris.prototype.nextId_ = null;
  * @private
  */
 tetriweb.Tetris.prototype.nextDirection_ = null;
+
+
+/**
+ * @type {boolean}
+ * @private
+ */
+tetriweb.Tetris.prototype.pause_ = false;
 
 
 /**
