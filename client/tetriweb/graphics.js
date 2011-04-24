@@ -32,6 +32,15 @@ tetriweb.Graphics.enableModeratorControls = function(enable) {
 
 
 /**
+ * Disables the player's field.
+ */
+tetriweb.Graphics.disableField = function() {
+  var mask = goog.dom.createDom('div', {id: 'field-mask'});
+  goog.dom.appendChild(goog.dom.getElement('my-field'), mask);
+};
+
+
+/**
  * Shows the fields and hides the chat area.
  */
 tetriweb.Graphics.displayFields = function() {

@@ -202,6 +202,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         break;
       case 'ingame':
         tetriweb.Graphics.displayFields();
+        tetriweb.Graphics.disableField();
         break;
       // All players lose except one
       case 'endgame':
