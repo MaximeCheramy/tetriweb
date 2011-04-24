@@ -285,6 +285,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         message = msg;
     }
     if (message.length > 0) {
+      // HL
+      message = tetriweb.Graphics.hlNick(message, this.players_[this.pnum_]);
       tetriweb.Graphics.domWriteMessage(message);
     }
   }
@@ -380,7 +382,8 @@ tetriweb.Tetrinet.prototype.stopGame = function() {
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
   this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
   tetriweb.Graphics.domWriteMessage(
-      '<' + this.players_[this.pnum_] + '> ' + msg);
+      tetriweb.Graphics.htmlspecialchars(
+          '<' + this.players_[this.pnum_] + '> ' + msg));
 };
 
 

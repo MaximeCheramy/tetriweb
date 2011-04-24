@@ -112,13 +112,39 @@ tetriweb.Graphics.domLogEvent = function(message) {
 
 
 /**
+ * Escapes HTML special characters in a string.
+ * @param {string} str The string to escape.
+ */
+tetriweb.Graphics.htmlspecialchars = function(str) {
+   str = str.replace(/&/g, "&amp;");
+   str = str.replace(/\"/g, "&quot;");
+   str = str.replace(/\'/g, "&#039;");
+   str = str.replace(/</g, "&lt;");
+   str = str.replace(/>/g, "&gt;");
+   return str;
+};
+
+
+/**
+ * Highlights a nickname in a message.
+ * @param {string} message The message.
+ * @param {string} nick The nickname to highlight.
+ */
+tetriweb.Graphics.hlNick = function(message, nick) {
+  var reg = new RegExp("\\b" + nick + "\\b", "g");
+  message = tetriweb.Graphics.htmlspecialchars(message);
+  return message.replace(reg, '<span class="hl">' + nick + '</span>');
+};
+
+
+/**
  * Writes a message on the partyline DOM element.
  * @param {string} msg The message to write.
  */
 tetriweb.Graphics.domWritePline = function(msg) {
   var pline = goog.dom.getElement('partyline');
   var cont = goog.dom.createDom('div');
-  goog.dom.setTextContent(cont, msg);
+  cont.innerHTML = msg;
   goog.dom.appendChild(pline, cont);
   pline.scrollTop = pline.scrollHeight; // scroll to bottom
 };
