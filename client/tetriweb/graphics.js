@@ -105,7 +105,7 @@ tetriweb.Graphics.gameAreaFocus = function() {
 tetriweb.Graphics.domLogEvent = function(message) {
   var eventLog = tetriweb.Graphics.eventLog;
   var cont = goog.dom.createDom('div');
-  goog.dom.setTextContent(cont, message);
+  cont.innerHTML = message;
   goog.dom.appendChild(eventLog, cont);
   eventLog.scrollTop = eventLog.scrollHeight; // scroll to bottom
 };
