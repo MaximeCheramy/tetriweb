@@ -256,31 +256,28 @@ tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
  * Updates the player list.
  * @param {Array.<string>} players The player list.
  * @param {Array.<string>} teams The team list.
+ * @param {number} moderator The moderator's playernum.
  */
-tetriweb.Graphics.updatePlayerList = function(players, teams) {
-  var first = true;
+tetriweb.Graphics.updatePlayerList = function(players, teams, moderator) {
   // Clear the list...
   goog.dom.removeChildren(tetriweb.Graphics.playerList_);
   // And fill it again !
-  for (var i = 0; i < players.length; i++) {
-    if (players[i] != undefined) {
-      var player = goog.dom.createDom('div');
-      var nickNode;
-      if (first) {
-        nickNode = goog.dom.createDom('strong');
-        goog.dom.setTextContent(nickNode, players[i]);
-        first = false;
-      } else {
-        nickNode = goog.dom.createTextNode(players[i]);
-        text = players[i];
-      }
-      goog.dom.appendChild(player, nickNode);
-      if (teams[i] != undefined && teams[i] != '') {
-        var teamNode = goog.dom.createTextNode(' (' + teams[i] + ')');
-        goog.dom.appendChild(player, teamNode);
-      }
-      goog.dom.appendChild(tetriweb.Graphics.playerList_, player);
+  for (player_num in players) {
+    var player = goog.dom.createDom('div');
+    var nickNode;
+    if (player_num == moderator) {
+      nickNode = goog.dom.createDom('strong');
+      goog.dom.setTextContent(nickNode, players[player_num]);
+    } else {
+      nickNode = goog.dom.createTextNode(players[player_num]);
+      text = players[player_num];
     }
+    goog.dom.appendChild(player, nickNode);
+    if (teams[player_num] != undefined && teams[player_num] != '') {
+      var teamNode = goog.dom.createTextNode(' (' + teams[player_num] + ')');
+      goog.dom.appendChild(player, teamNode);
+    }
+    goog.dom.appendChild(tetriweb.Graphics.playerList_, player);
   }
 };
 

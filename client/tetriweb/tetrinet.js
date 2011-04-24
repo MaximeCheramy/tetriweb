@@ -46,7 +46,8 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
             // Init DOM
             tetriweb.Graphics.domInit(this.pnum_, nickname);
 
-            tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
+            tetriweb.Graphics.updatePlayerList(this.players_, this.teams_,
+                this.getModerator_());
             tetriweb.Graphics.hideLoginForm();
           } else {
             alert('Connexion impossible : ' + response['error']);
@@ -122,7 +123,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           this.initField_(player_id);
         }
         tetriweb.Graphics.enableModeratorControls(this.checkModerator_());
-        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
+        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_,
+            this.getModerator_());
         message = '*** ' + nick + ' a rejoint le jeu.';
         break;
       // A player has left
@@ -134,7 +136,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         delete this.players_[player_id];
         delete this.teams_[player_id];
         tetriweb.Graphics.enableModeratorControls(this.checkModerator_());
-        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
+        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_,
+            this.getModerator_());
         break;
       // Pause the game.
       case 'pause':
@@ -157,7 +160,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           delete this.teams_[player_id];
           message = '*** ' + this.players_[player_id] + ' est seul.';
         }
-        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_);
+        tetriweb.Graphics.updatePlayerList(this.players_, this.teams_,
+            this.getModerator_());
         break;
       // New message on the partyline (from a player or the server)
       case 'pline':
@@ -335,9 +339,21 @@ tetriweb.Tetrinet.prototype.sendMessage_ = function(msg) {
  * @private
  */
 tetriweb.Tetrinet.prototype.checkModerator_ = function() {
-  var moderator = true;
-  for (player_num in this.players_) {
-    moderator = moderator && this.pnum_ <= player_num;
+  return this.getModerator_() == this.pnum_;
+};
+
+
+/**
+ * Gets the moderator's playernum.
+ * @return {number} The moderator's playernum.
+ * @private
+ */
+tetriweb.Tetrinet.prototype.getModerator_ = function() {
+  var moderator = 0;
+  for (var i = 0; i < this.players_.length && !moderator; i++) {
+    if (this.players_[i] != undefined) {
+      moderator = i;
+    }
   }
   return moderator;
 };
