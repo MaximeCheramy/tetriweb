@@ -716,14 +716,16 @@ tetriweb.Tetris.prototype.addLine = function() {
     this.gameArea_[tetriweb.Tetris.HEIGHT_ - 1][r] = 0;
     
     // On décale la pièce courante si besoin
-    var stop = false;
-    for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && !stop; l++) {
-      for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
-        if (this.current_[l][c]
-            && this.gameArea_[l + this.curY_][c + this.curX_] > 0) {
-          stop = true;
-          this.curY_--;
-          tetriweb.Graphics.moveCurPieceV(this.curY_);
+    if (this.curY_ > 0) {
+      var stop = false;
+      for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && !stop; l++) {
+        for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
+          if (this.current_[l][c]
+              && this.gameArea_[l + this.curY_][c + this.curX_] > 0) {
+            stop = true;
+            this.curY_--;
+            tetriweb.Graphics.moveCurPieceV(this.curY_);
+          }
         }
       }
     }
