@@ -139,7 +139,7 @@ while(true) {
 				}
         elseif($msg == 'pong') {
           // PONG !
-          echo "Client $pnum PONG !\n";
+          echo "Client $client PONG !\n";
           $clients[$client]['pong'] = true;
         }
         elseif($msg == 'disconnect') {
@@ -282,8 +282,8 @@ while(true) {
           // Add ping to message queue
           echo "REPING (delayed) $pnum ".time()."\n";
           array_push($clients[$pnum]['msg'], "ping");
-          $clients[$c_id]['last_ping'] = time();
-          $clients[$c_id]['pong'] = false;
+          $clients[$pnum]['last_ping'] = time();
+          $clients[$pnum]['pong'] = false;
         }
       }
     }
