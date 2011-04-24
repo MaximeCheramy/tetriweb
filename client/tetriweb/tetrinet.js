@@ -82,6 +82,9 @@ tetriweb.Tetrinet.prototype.readFromServer_ = function() {
         if (e.target.isSuccess()) {
           this.handleResponse_(e.target.getResponseJson());
           this.readFromServer_();
+        } else if (e.target.getStatus() == 410) {
+          tetriweb.Graphics.setErrorMessage("You have been disconnected.");
+          tetriweb.Graphics.displayLoginForm();
         } else {
           // Wait before reconnecting if there was an error
           this.timer_ = setTimeout(goog.bind(this.readFromServer_, this), 5000);

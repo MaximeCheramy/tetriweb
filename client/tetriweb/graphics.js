@@ -54,6 +54,26 @@ tetriweb.Graphics.displayChat = function() {
 
 
 /**
+ * Show the login form and hides the fields and the chat area.
+ */
+tetriweb.Graphics.displayLoginForm = function() {
+  goog.dom.classes.add(goog.dom.getElement('fields'), 'hid');
+  goog.dom.classes.add(goog.dom.getElement('chat-area'), 'hid');
+  tetriweb.Graphics.showLoginForm();  
+}
+
+
+/**
+ * Sets the error message on the login form.
+ */
+tetriweb.Graphics.setErrorMessage = function(message) {
+  var errorMessage = goog.dom.getElement('error-message');
+  goog.dom.setTextContent(errorMessage, message);
+  goog.dom.classes.remove(errorMessage, 'hid');
+}
+
+
+/**
  * Gives the focus to the event message input box.
  */
 tetriweb.Graphics.eventMsgFocus = function() {
@@ -366,7 +386,9 @@ tetriweb.Graphics.moveCurPieceV = function(posY) {
  */
 tetriweb.Graphics.hideLoginForm = function() {
   var form = goog.dom.getElement('connect-form');
+  var errorMessage = goog.dom.getElement('error-message');
   goog.dom.classes.add(form, 'hid');
+  goog.dom.classes.add(errorMessage, 'hid');
 };
 
 

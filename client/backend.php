@@ -72,7 +72,7 @@ if(!empty($_GET['pnum'])) {
 
     if(empty($msg)) {
       // Le proxy nous a fermé la connexion au nez : quelque chose ne va pas.
-      header('HTTP/1.1 400 Bad Request');
+      header('HTTP/1.1 410 Gone');
       die();
     }
 

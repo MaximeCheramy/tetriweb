@@ -8,6 +8,11 @@ body {
   display: none;
 }
 
+#error-message {
+  color: #990000;
+  text-align: center;
+}
+
 #connect-form {
   background: #fff;
   border: 2px solid #666;
