@@ -109,11 +109,15 @@ while(true) {
 					unset($clients[$client]);
 				}
 				else {
-					$msg = str_replace(chr(0xFF), "\n", $msg);
-					echo "Message du serveur pour le client $client : '$msg'.\n";
+          echo "Server input : '$msg'\n";
+          $clients[$client]['server_buffer'] .= $msg;
+          $messages = explode(chr(0xFF), $clients[$client]['server_buffer']);
+          $clients[$client]['server_buffer'] = array_pop($messages);
+          $msg = implode("\n", $messages);
+					echo "Message(s) du serveur pour le client $client : '$msg'.\n";
 					if(isset($clients[$client]['s_client_read'])) {
 						echo "Envoi de '$msg' au client $client...\n";
-						socket_write($clients[$client]['s_client_read'], $msg."\n");
+						socket_write($clients[$client]['s_client_read'], $msg);
             // Le client va de toutes façons fermer la connexion, donc on la ferme aussi pour ne pas avoir à attendre le prochain tour de boucle pour être au courant
             socket_close($clients[$client]['s_client_read']);
             unset($clients[$client]['s_client_read']);
@@ -164,6 +168,7 @@ while(true) {
 						if (socket_connect($s_server, $server_addr, $server_port)) {
 							socket_write($s_server, hello_msg($pseudo).chr(0xFF));
 							$c_id = 0;
+              $server_buffer = '';
 							do {
 								$msg = socket_read($s_server, BUFFER_LEN);
 								// Connexion refusée (pseudo déjà pris par exemple)
@@ -173,7 +178,9 @@ while(true) {
 								}
 								else {
 									echo "Message du serveur : $msg\n";
-									$tb_msg = explode(chr(0xFF), trim($msg, "\xFF"));
+                  $server_buffer .= $msg;
+									$tb_msg = explode(chr(0xFF), $server_buffer);
+                  $server_buffer = array_pop($tb_msg);
 									print_r($tb_msg);
 									foreach($tb_msg as $msg) {
 										if(preg_match('#^playernum ([0-9]+)$#', $msg, $results)) {
@@ -190,15 +197,16 @@ while(true) {
 
 							// Connexion acceptée
 							if($c_id) {	
-								socket_write($s, "playernum $c_id\n");
+								socket_write($s, "playernum $c_id");
 								$clients[$c_id] = $clients[$client];
 								$clients[$c_id]['s_server'] = $s_server;
 								$clients[$c_id]['last_ping'] = time();
 								$clients[$c_id]['pong'] = true;
+                $clients[$c_id]['server_buffer'] = $server_buffer;
 								unset($clients[$c_id]['s_client_read']); // On va fermer la connexion plus bas
 							}
 							else {
-								socket_write($s, implode("\n", $clients[$client]['msg'])."\n");
+								socket_write($s, implode("\n", $clients[$client]['msg']));
 							}
 
 							// Dans tous les cas, suppression du client temporaire et fermeture socket (on n'enverra rien d'autre sur cette connexion) 
@@ -218,11 +226,11 @@ while(true) {
 							if($rw == 'read') {
 								/*while(!empty($clients[$c_id]['msg'])) {
 									echo "Envoi...\n";
-									socket_write($s, array_shift($clients[$c_id]['msg'])."\n");
+									socket_write($s, array_shift($clients[$c_id]['msg']));
 								}*/
 								if(!empty($clients[$c_id]['msg'])) {
 									echo "Envoi de messages en attente : ".implode("\n", $clients[$c_id]['msg'])."\n";
-									socket_write($s, implode("\n", $clients[$c_id]['msg'])."\n");
+									socket_write($s, implode("\n", $clients[$c_id]['msg']));
                   if (in_array('ping', $clients[$c_id]['msg'])) {
                     echo "DELAYED REPING SENT TO $c_id ".time()."\n";
                   }
@@ -268,11 +276,11 @@ while(true) {
         }
         unset($clients[$pnum]);
       }
-      elseif($client['last_ping'] < (time() - PING_INTERVAL)) {
+      elseif($client['last_ping'] < (time() - PING_INTERVAL) && !in_array('ping', $clients[$pnum]['msg'])) {
         if (isset($clients[$pnum]['s_client_read'])) {
           // Ping client
           echo "REPING $pnum ".time()."\n";
-          socket_write($clients[$pnum]['s_client_read'], "ping\n");
+          socket_write($clients[$pnum]['s_client_read'], "ping");
           $clients[$pnum]['last_ping'] = time();
           $clients[$pnum]['pong'] = false;
           socket_close($clients[$pnum]['s_client_read']);
