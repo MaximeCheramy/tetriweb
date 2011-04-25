@@ -111,6 +111,7 @@ body {
 #my-name {
   position: absolute;
   top: -20px;
+  right: 160px;
 }
 
 #my-level {

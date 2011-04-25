@@ -18,6 +18,10 @@ tetriweb.Graphics.domInit = function(pnum, nickname) {
   tetriweb.Graphics.specialBar_ = goog.dom.getElement('special-bar');
   tetriweb.Graphics.playerList_ = goog.dom.getElement('player-list');
 
+  // Display the player's num and nickname
+  var myName = goog.dom.getElement('my-name');
+  goog.dom.setTextContent(myName, pnum + ' - ' + nickname);
+
   tetriweb.Graphics.displayChat();
 };
 
