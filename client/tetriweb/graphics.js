@@ -173,7 +173,20 @@ tetriweb.Graphics.domInitField = function(player_id, nickname) {
   // Create a new field div and add it to the fields container
   var field = goog.dom.createDom('div', {className: 'field', id: 'field-' +
         player_id});
-  goog.dom.appendChild(goog.dom.getElement('fields'), field);
+
+  // Insert the new field at the right place
+  var inserted = false;
+  var container = goog.dom.getElement('opponents-container');
+  for (var i = 0; i < container.childNodes.length && !inserted; i++) {
+    if (container.childNodes[i].id > field.id) {
+      goog.dom.insertSiblingBefore(field, container.childNodes[i]);
+      inserted = true;
+    }
+  }
+  if (!inserted) {
+    goog.dom.appendChild(container, field);
+  }
+
   var name = goog.dom.createDom('div', {className: 'field-name'});
   goog.dom.setTextContent(name, player_id + ' - ' + nickname);
   goog.dom.appendChild(field, name);
