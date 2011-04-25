@@ -20,8 +20,9 @@ function fix_magic_quotes() {
 function read_messages($sock) {
   $buf = '';
   do {
-    $buf .= socket_read($sock, 1024*1024); // blocking
-  } while (substr($buf, -1) != "\n");
+    $msg = socket_read($sock, 1024*1024); // blocking
+    $buf .= $msg;
+  } while (!empty($msg) && substr($buf, -1) != "\n");
   return $buf;
 }
 
