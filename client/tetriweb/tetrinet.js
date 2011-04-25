@@ -357,6 +357,26 @@ tetriweb.Tetrinet.prototype.getModerator_ = function() {
 
 
 /**
+ * Changes teams.
+ * @param {string} team The new team.
+ */
+tetriweb.Tetrinet.prototype.changeTeams = function(team) {
+  if (team != "") {
+    this.teams_[this.pnum_] = team;
+    message = '*** ' + this.players_[this.pnum_] +
+        " est dans l'équipe " + team + '.';
+  } else {
+    delete this.teams_[this.pnum_];
+    message = '*** ' + this.players_[this.pnum_] + ' est seul.';
+  }
+  tetriweb.Graphics.domWriteMessage(message);
+  tetriweb.Graphics.updatePlayerList(this.players_, this.teams_,
+      this.getModerator_());
+  this.sendMessage_('team ' + this.pnum_ + ' ' + team);
+};
+
+
+/**
  * Pauses the game.
  */
 tetriweb.Tetrinet.prototype.pauseGame = function() {

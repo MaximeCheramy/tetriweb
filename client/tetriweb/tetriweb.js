@@ -45,6 +45,15 @@ tetriweb.init = function() {
         tetriweb.Graphics.gameAreaFocus();
       });
 
+  goog.events.listen(goog.dom.getElement('change-teams'),
+      goog.events.EventType.CLICK, function(e) {
+        var team = prompt("Team:", goog.dom.getElement('team').value);
+        if (team != null) {
+          goog.dom.getElement('team').value = team;
+          tetrinet.changeTeams(team);
+        }
+      });
+
   goog.events.listen(goog.dom.getElement('start-game'),
       goog.events.EventType.CLICK, function(e) {
         tetrinet.startGame();
