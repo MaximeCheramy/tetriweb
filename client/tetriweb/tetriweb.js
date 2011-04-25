@@ -1,8 +1,8 @@
 goog.require('goog.dom');
 goog.require('goog.events');
+goog.require('tetriweb.KeyEvents');
 goog.require('tetriweb.Tetrinet');
 goog.require('tetriweb.Tetris');
-goog.require('tetriweb.KeyEvents');
 
 goog.provide('tetriweb');
 

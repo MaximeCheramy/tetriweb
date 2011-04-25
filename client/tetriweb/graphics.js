@@ -1,7 +1,7 @@
 goog.provide('tetriweb.Graphics');
 
-goog.require('goog.dom');
 goog.require('goog.array');
+goog.require('goog.dom');
 
 
 /**
@@ -69,18 +69,19 @@ tetriweb.Graphics.displayChat = function() {
 tetriweb.Graphics.displayLoginForm = function() {
   goog.dom.classes.add(goog.dom.getElement('fields'), 'hid');
   goog.dom.classes.add(goog.dom.getElement('chat-area'), 'hid');
-  tetriweb.Graphics.showLoginForm();  
-}
+  tetriweb.Graphics.showLoginForm();
+};
 
 
 /**
  * Sets the error message on the login form.
+ * @param {string} message The message to set.
  */
 tetriweb.Graphics.setErrorMessage = function(message) {
   var errorMessage = goog.dom.getElement('error-message');
   goog.dom.setTextContent(errorMessage, message);
   goog.dom.classes.remove(errorMessage, 'hid');
-}
+};
 
 
 /**
@@ -115,13 +116,14 @@ tetriweb.Graphics.domLogEvent = function(message) {
 /**
  * Escapes HTML special characters in a string.
  * @param {string} str The string to escape.
+ * @return {string} The escaped string.
  */
 tetriweb.Graphics.htmlspecialchars = function(str) {
-   str = str.replace(/&/g, "&amp;");
-   str = str.replace(/\"/g, "&quot;");
-   str = str.replace(/\'/g, "&#039;");
-   str = str.replace(/</g, "&lt;");
-   str = str.replace(/>/g, "&gt;");
+   str = str.replace(/&/g, '&amp;');
+   str = str.replace(/\"/g, '&quot;');
+   str = str.replace(/\'/g, '&#039;');
+   str = str.replace(/</g, '&lt;');
+   str = str.replace(/>/g, '&gt;');
    return str;
 };
 
@@ -130,9 +132,10 @@ tetriweb.Graphics.htmlspecialchars = function(str) {
  * Highlights a nickname in a message.
  * @param {string} message The message.
  * @param {string} nick The nickname to highlight.
+ * @return {string} The message, in which the nickname has been highlighted.
  */
 tetriweb.Graphics.hlNick = function(message, nick) {
-  var reg = new RegExp("\\b" + nick + "\\b", "g");
+  var reg = new RegExp('\\b' + nick + '\\b', 'g');
   message = tetriweb.Graphics.htmlspecialchars(message);
   return message.replace(reg, '<span class="hl">' + nick + '</span>');
 };
@@ -172,9 +175,10 @@ tetriweb.Graphics.domInitField = function(player_id, nickname) {
   goog.dom.appendChild(field, name);
 
   // Fill the field with empty blocks
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       var block = goog.dom.createDom('div');
+      // TODO constante 0
       goog.dom.classes.set(block, 'small block ' + tetriweb.Tetris.convert(0));
       block.id = 'block-' + player_id + '-' + l + '-' + c;
       block.style.top = l * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_);
@@ -218,8 +222,8 @@ tetriweb.Graphics.layDownPiece = function(curX, curY, current, currentColor) {
   var myField_ = tetriweb.Graphics.myField_;
   var currentObj_ = tetriweb.Graphics.currentObj_;
   var convert = tetriweb.Tetris.convert;
-  for (var l = 0; l < 4; l++) {
-    for (var c = 0; c < 4; c++) {
+  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
       if (current[l][c]) {
         var block = goog.dom.createDom('div');
         block.style.top = (curY + l) * tetriweb.Graphics.BLOCK_SIZE_;
@@ -335,8 +339,8 @@ tetriweb.Graphics.updatePiece = function(current, curX, curY, currentColor) {
   tetriweb.Graphics.moveCurPieceH(curX);
   tetriweb.Graphics.moveCurPieceV(curY);
   goog.dom.appendChild(myField_, currentObj_);
-  for (var l = 0; l < 4; l++) {
-    for (var c = 0; c < 4; c++) {
+  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
       if (current[l][c]) {
         var block = goog.dom.createDom('div');
         block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_;
@@ -361,10 +365,11 @@ tetriweb.Graphics.updateNextPiece = function(nextPiece, nextId) {
 
   var nextPieceObj = goog.dom.getElement('next-piece');
   goog.dom.removeChildren(nextPieceObj);
-  for (var l = 0; l < 4; l++) {
-    for (var c = 0; c < 4; c++) {
+  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
       if (nextPiece[l][c]) {
         var block = goog.dom.createDom('div');
+        // TODO: +3 ??
         block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 3;
         block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 3;
         goog.dom.classes.set(block, 'block ' + convert(getColor(nextId)));
@@ -435,6 +440,7 @@ tetriweb.Graphics.showLoginForm = function() {
 
 /**
  * Hides the pause and resume buttons.
+ * @param {boolean} enable Whether enable or disable the buttons.
  */
 tetriweb.Graphics.enablePauseResumeButtons = function(enable) {
   var pauseButton = goog.dom.getElement('pause-game');
@@ -508,5 +514,3 @@ tetriweb.Graphics.playerList_ = null;
  * @private
  */
 tetriweb.Graphics.BLOCK_SIZE_ = 20;
-
-

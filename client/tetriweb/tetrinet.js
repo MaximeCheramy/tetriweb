@@ -5,7 +5,6 @@ goog.require('goog.net.XhrIo');
 goog.require('tetriweb.Graphics');
 
 
-
 /**
  * Tetrinet.
  * @constructor
@@ -84,7 +83,7 @@ tetriweb.Tetrinet.prototype.readFromServer_ = function() {
           this.handleResponse_(e.target.getResponseJson());
           this.readFromServer_();
         } else if (e.target.getStatus() == 410) {
-          tetriweb.Graphics.setErrorMessage("You have been disconnected.");
+          tetriweb.Graphics.setErrorMessage('You have been disconnected.');
           tetriweb.Graphics.displayLoginForm();
         } else {
           // Wait before reconnecting if there was an error
@@ -231,8 +230,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         // Complete field
         if (field[0] >= '0') {
           for (var j = 0; j < field.length; j++) {
-            y = Math.floor(j / 12);
-            x = j % 12;
+            y = Math.floor(j / tetriweb.Tetris.WIDTH_);
+            x = j % tetriweb.Tetris.WIDTH_;
             this.setBlock_(player_id, x, y,
                 tetriweb.Tetrinet.charToInt(field[j]));
           }
@@ -312,7 +311,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
  * @param {number} from The sender of the special.
  */
 tetriweb.Tetrinet.prototype.logEvent = function(special, to, from) {
-  var message = tetriweb.Tetrinet.SPECIALS[special];
+  var message = tetriweb.Tetris.SPECIALS[special];
   message += (to == 0) ? ' pour tous' : ' pour ' + this.players_[to];
   message += ' de la part de ' + this.players_[from];
   tetriweb.Graphics.domLogEvent(message);
@@ -466,10 +465,11 @@ tetriweb.Tetrinet.prototype.sendSpecial = function(special, playerDest) {
  */
 tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
   // Empty the whole field
-  this.fields_[player_id] = new Array(22);
-  for (var l = 0; l < 22; l++) {
-    this.fields_[player_id][l] = new Array(12);
-    for (var c = 0; c < 12; c++) {
+  this.fields_[player_id] = new Array(tetriweb.Tetris.HEIGHT_);
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    this.fields_[player_id][l] = new Array(tetriweb.Tetris.WIDTH_);
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+      // TODO: constante 0
       this.fields_[player_id][l][c] = '0';
     }
   }
@@ -495,8 +495,9 @@ tetriweb.Tetrinet.prototype.destroyField_ = function(player_id) {
  * @private
  */
 tetriweb.Tetrinet.prototype.clearField_ = function(player_id) {
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+      // TODO: constante 0
       this.setBlock_(player_id, c, l, 0);
     }
   }
@@ -526,13 +527,13 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
   // Initialize an array of differences indexed by block type
   var diff = [];
   var nbdiff = 0;
-  for (var b = 0; b < 15; b++) {
+  for (var b = 0; b < tetriweb.Tetris.NB_BLOCKS; b++) {
     diff[b] = [];
   }
 
   // Find differences
-  for (var l = 0; l < 22; l++) {
-    for (var c = 0; c < 12; c++) {
+  for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+    for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (field[l][c] != oldfield[l][c]) {
         diff[field[l][c]].push({'l': l, 'c': c});
         nbdiff++;
@@ -548,7 +549,8 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
     for (var b = 0; b < diff.length; b++) {
       nb_blocks_diff += (diff[b].length > 0);
     }
-    if (nb_blocks_diff + nbdiff*2 < tetriweb.Tetris.WIDTH_ * tetriweb.Tetris.HEIGHT_) {
+    if (nb_blocks_diff + nbdiff * 2 <
+        tetriweb.Tetris.WIDTH_ * tetriweb.Tetris.HEIGHT_) {
       for (var b = 0; b < diff.length; b++) {
         if (diff[b].length > 0) {
           // Output block type
@@ -563,8 +565,8 @@ tetriweb.Tetrinet.prototype.sendField = function(field, oldfield) {
     }
     // Send complete field
     else {
-      for (var l = 0; l < 22; l++) {
-        for (var c = 0; c < 12; c++) {
+      for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
+        for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
           f += tetriweb.Tetrinet.intToChar(field[l][c]);
         }
       }
@@ -611,7 +613,9 @@ tetriweb.Tetrinet.prototype.getPlayerField = function(playerNum) {
 tetriweb.Tetrinet.charToInt = function(type) {
   var specials = {'a': 6, 'c': 7, 'n': 8, 'r': 9, 's': 10, 'b': 11, 'g': 12,
     'q': 13, 'o': 14};
-  if (type >= '0' && type <= '5') {
+  var lastNormalBlockCode =
+      '0'.charCodeAt(0) + tetriweb.Tetris.NB_NORMAL_BLOCKS - 1;
+  if (type >= '0' && type <= String.fromCharCode(lastNormalBlockCode)) {
     type = parseInt(type);
   } else if (specials[type] != undefined) {
     type = specials[type];
@@ -705,13 +709,3 @@ tetriweb.Tetrinet.prototype.fields_ = null;
  * @private
  */
 tetriweb.Tetrinet.BLOCK_SIZE_OPP_ = 10;
-
-
-/**
- * @type {Object.<string, string>}
- */
-tetriweb.Tetrinet.SPECIALS = {'cs1': '1 line', 'cs2': '2 lines',
-  'cs4' : '4 lines', 'a': 'Add line', 'c': 'Clear line', 'n': 'Nuke field',
-  'r': 'Random clear blocks', 's': 'Switch fields',
-  'b': 'Clear special blocks', 'g': 'Block gravity',
-  'q': 'Block quake', 'o': 'Block bomb'};

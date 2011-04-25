@@ -4,7 +4,6 @@ goog.require('goog.array');
 goog.require('tetriweb.Graphics');
 
 
-
 /**
  * Tetris Class.
  * @param {object} tetrinet The tetrinet objet used to communicate with the
@@ -42,6 +41,7 @@ tetriweb.Tetris.prototype.init_ = function(
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     this.gameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+      // TODO: constante 0
       this.gameArea_[l][c] = 0;
     }
   }
@@ -51,13 +51,13 @@ tetriweb.Tetris.prototype.init_ = function(
 
   this.gameLost_ = false;
   // Pieces' frequency.
-  this.piecesFreq_ = goog.array.repeat(0, 7);
+  this.piecesFreq_ = goog.array.repeat(0, tetriweb.Tetris.NB_PIECES);
   for (var i = 0; i < _piecesFreq.length; i++) {
     this.piecesFreq_[parseInt(_piecesFreq[i]) - 1]++;
   }
 
   // Specials' frequency.
-  this.specialsFreq_ = goog.array.repeat(0, 9);
+  this.specialsFreq_ = goog.array.repeat(0, tetriweb.Tetris.NB_SPECIAL_BLOCKS);
   for (var i = 0; i < _specialsFreq.length; i++) {
     this.specialsFreq_[parseInt(_specialsFreq[i]) - 1]++;
   }
@@ -160,7 +160,7 @@ tetriweb.Tetris.prototype.checkLine_ = function(cleanupOnly) {
       nbLines++;
       // Take specials
       for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-        if (this.gameArea_[l][c] > 5) {
+        if (this.gameArea_[l][c] >= tetriweb.Tetris.NB_NORMAL_BLOCKS) {
           tmpSpecials.push(this.gameArea_[l][c]);
         }
       }
@@ -250,7 +250,8 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
   var availBlocks = 0;
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
+      if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <
+          tetriweb.Tetris.NB_NORMAL_BLOCKS) {
         availBlocks++;
       }
     }
@@ -268,13 +269,14 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
       n -= this.specialsFreq_[special];
       special++;
     }
-    special += 6;
+    special += tetriweb.Tetris.NB_NORMAL_BLOCKS;
 
     // Choose place on the field (nth available block)
     var place = randomInt(0, availBlocks - i - 1);
     for (var l = 0; place >= 0 && l < tetriweb.Tetris.HEIGHT_; l++) {
       for (var c = 0; place >= 0 && c < tetriweb.Tetris.WIDTH_; c++) {
-        if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <= 5) {
+        if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <
+            tetriweb.Tetris.NB_NORMAL_BLOCKS) {
           if (place == 0) {
             this.gameArea_[l][c] = special;
           }
@@ -710,18 +712,21 @@ tetriweb.Tetris.prototype.addLine = function() {
     }
 
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      this.gameArea_[tetriweb.Tetris.HEIGHT_ - 1][c] = randomInt(1, 5);
+      this.gameArea_[tetriweb.Tetris.HEIGHT_ - 1][c] =
+          randomInt(1, tetriweb.Tetris.NB_NORMAL_BLOCKS - 1);
     }
     var r = randomInt(0, tetriweb.Tetris.WIDTH_ - 1);
+    // TODO: constante 0
     this.gameArea_[tetriweb.Tetris.HEIGHT_ - 1][r] = 0;
-    
+
     // On décale la pièce courante si besoin
     if (this.curY_ > 0) {
       var stop = false;
       for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && !stop; l++) {
         for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
-          if (this.current_[l][c]
-              && this.gameArea_[l + this.curY_][c + this.curX_] > 0) {
+          // TODO: constante 0
+          if (this.current_[l][c] &&
+              this.gameArea_[l + this.curY_][c + this.curX_] > 0) {
             stop = true;
             this.curY_--;
             tetriweb.Graphics.moveCurPieceV(this.curY_);
@@ -758,6 +763,7 @@ tetriweb.Tetris.prototype.blockGravity = function() {
       if (this.gameArea_[l][c] > 0) {
         if (l != curLine) {
           this.gameArea_[curLine][c] = this.gameArea_[l][c];
+          // TODO: constante 0
           this.gameArea_[l][c] = 0;
         }
         curLine--;
@@ -775,6 +781,7 @@ tetriweb.Tetris.prototype.blockGravity = function() {
 tetriweb.Tetris.prototype.randomClearBlocks = function() {
   var randomInt = tetriweb.Tetris.randomInt;
   for (var i = 0; i < 10; i++) {
+    // TODO: constante 0
     this.gameArea_[randomInt(0, 21)][randomInt(0, 11)] = 0;
   }
   this.updateGridAndSendField_();
@@ -811,6 +818,7 @@ tetriweb.Tetris.prototype.switchFields = function(playerNum) {
       this.gameArea_ : this.tetrinet_.getPlayerField(playerNum);
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+      // TODO: constante 0
       this.gameArea_[l][c] = (l < 6) ? 0 : playerField[l][c];
     }
   }
@@ -825,8 +833,9 @@ tetriweb.Tetris.prototype.clearSpecialBlocks = function() {
   var randomInt = tetriweb.Tetris.randomInt;
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      if (this.gameArea_[l][c] > 5) {
-        this.gameArea_[l][c] = randomInt(1, 5);
+      if (this.gameArea_[l][c] >= tetriweb.Tetris.NB_NORMAL_BLOCKS) {
+        this.gameArea_[l][c] =
+            randomInt(1, tetriweb.Tetris.NB_NORMAL_BLOCKS - 1);
       }
     }
   }
@@ -846,6 +855,7 @@ tetriweb.Tetris.prototype.blockBomb = function() {
       // Look for block bombs
       if (this.gameArea_[l][c] == 14) { // TODO: constant
         // Remove bomb
+        // TODO: constante 0
         this.gameArea_[l][c] = 0;
         // Explode the blocks around
         for (var d = 0; d < dep.length; d++) {
@@ -853,7 +863,7 @@ tetriweb.Tetris.prototype.blockBomb = function() {
           var cc = c + dep[d][1];
           if (ll >= 0 && ll < tetriweb.Tetris.HEIGHT_ &&
               cc >= 0 && cc < tetriweb.Tetris.WIDTH_) {
-            if (this.gameArea_[ll][cc] != 14) {
+            if (this.gameArea_[ll][cc] != 14) { // TODO: constante
               // New random coordinates
               var randomInt = tetriweb.Tetris.randomInt;
               var newL = randomInt(6, tetriweb.Tetris.HEIGHT_ - 1);
@@ -875,6 +885,7 @@ tetriweb.Tetris.prototype.blockBomb = function() {
 tetriweb.Tetris.prototype.nukeField = function() {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+      // TODO: constante 0
       this.gameArea_[l][c] = 0;
     }
   }
@@ -890,7 +901,7 @@ tetriweb.Tetris.prototype.fillRandomly_ = function() {
   var randomInt = tetriweb.Tetris.randomInt;
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      this.gameArea_[l][c] = randomInt(1, 5);
+      this.gameArea_[l][c] = randomInt(1, tetriweb.Tetris.NB_NORMAL_BLOCKS - 1);
     }
   }
   this.updateGridAndSendField_();
@@ -944,6 +955,7 @@ tetriweb.Tetris.prototype.sendField_ = function() {
     for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
       this.oldGameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
       for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
+        // TODO: constante 0
         this.oldGameArea_[l][c] = 0;
       }
     }
@@ -1013,6 +1025,40 @@ tetriweb.Tetris.HEIGHT_ = 22;
  * @private
  */
 tetriweb.Tetris.DIM_PIECE_ = 4;
+
+
+/**
+ * @type {number}
+ */
+tetriweb.Tetris.NB_PIECES = 7;
+
+
+/**
+ * @type {number}
+ */
+tetriweb.Tetris.NB_BLOCKS = 15;
+
+
+/**
+ * @type {number}
+ */
+tetriweb.Tetris.NB_NORMAL_BLOCKS = 6;
+
+
+/**
+ * @type {number}
+ */
+tetriweb.Tetris.NB_SPECIAL_BLOCKS = 9;
+
+
+/**
+ * @type {Object.<string, string>}
+ */
+tetriweb.Tetris.SPECIALS = {'cs1': '1 line', 'cs2': '2 lines',
+  'cs4' : '4 lines', 'a': 'Add line', 'c': 'Clear line', 'n': 'Nuke field',
+  'r': 'Random clear blocks', 's': 'Switch fields',
+  'b': 'Clear special blocks', 'g': 'Block gravity',
+  'q': 'Block quake', 'o': 'Block bomb'};
 
 
 /**

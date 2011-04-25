@@ -1,7 +1,7 @@
-goog.require('tetriweb.Graphics');
-goog.require('tetriweb.Tetris');
-goog.require('tetriweb.Tetrinet');
 goog.require('goog.testing.jsunit');
+goog.require('tetriweb.Graphics');
+goog.require('tetriweb.Tetrinet');
+goog.require('tetriweb.Tetris');
 
 function setUp() {
   var next = goog.dom.createDom('div', {id: 'nextpiece'});

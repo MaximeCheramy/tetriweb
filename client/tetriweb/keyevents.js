@@ -6,7 +6,6 @@ goog.require('tetriweb.Graphics');
 goog.require('tetriweb.Tetris');
 
 
-
 /**
  * @constructor
  * @param {tetriweb.Tetris} tetris The tetris object.
