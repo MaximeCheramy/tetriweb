@@ -807,7 +807,7 @@ tetriweb.Tetris.prototype.blockQuake = function() {
  * @param {number} playerNum The player to switch fields with.
  */
 tetriweb.Tetris.prototype.switchFields = function(playerNum) {
-  playerField = (playerNum == this.tetrinet_.getMyPlayerNum()) ?
+  var playerField = (playerNum == this.tetrinet_.getMyPlayerNum()) ?
       this.gameArea_ : this.tetrinet_.getPlayerField(playerNum);
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {

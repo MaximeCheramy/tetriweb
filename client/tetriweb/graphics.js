@@ -1,6 +1,7 @@
 goog.provide('tetriweb.Graphics');
 
 goog.require('goog.dom');
+goog.require('goog.array');
 
 
 /**
@@ -262,7 +263,7 @@ tetriweb.Graphics.updatePlayerList = function(players, teams, moderator) {
   // Clear the list...
   goog.dom.removeChildren(tetriweb.Graphics.playerList_);
   // And fill it again !
-  for (player_num in players) {
+  for (var player_num in players) {
     var player = goog.dom.createDom('div');
     var nickNode;
     if (player_num == moderator) {
@@ -270,7 +271,6 @@ tetriweb.Graphics.updatePlayerList = function(players, teams, moderator) {
       goog.dom.setTextContent(nickNode, players[player_num]);
     } else {
       nickNode = goog.dom.createTextNode(players[player_num]);
-      text = players[player_num];
     }
     goog.dom.appendChild(player, nickNode);
     if (teams[player_num] != undefined && teams[player_num] != '') {

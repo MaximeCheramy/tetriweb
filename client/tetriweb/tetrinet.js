@@ -110,8 +110,6 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
     switch (data[0]) {
       // Ping from the proxy
       case 'ping':
-        // DEBUG
-        console.log("ping -> pong");
         this.pong();
         break;
       // New player joins
