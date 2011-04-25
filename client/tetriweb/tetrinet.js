@@ -293,12 +293,12 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
       case 'winlist':
         var scores = msg.substr(data[0].length + 1).split(' ');
         this.scores_ = [];
-        for (var i = 0; i < scores.length; i++) {
-          var data = scores[i].split(';');
+        for (var j = 0; j < scores.length; j++) {
+          var data = scores[j].split(';');
           var type = (data[0].substr(0, 1) == 'p') ? 'player' : 'team';
           var name = data[0].substr(1);
           var score = parseInt(data[1], 10);
-          this.scores_[i] = {name: name, type: type, score: score};
+          this.scores_[j] = {name: name, type: type, score: score};
         }
         break;
       // Fallback
