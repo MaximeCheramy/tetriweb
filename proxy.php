@@ -58,9 +58,9 @@ while(true) {
       }
       elseif($type == 'client_read' || $type == 'client_write') {
         // Message d'un client
-        $msg = @socket_read($s, BUFFER_LEN, PHP_NORMAL_READ);
-        $msg = trim($msg, "\r\n");
-        if(empty($msg)) {
+        $msgsocket = @socket_read($s, BUFFER_LEN, PHP_NORMAL_READ);
+        $msg = trim($msgsocket, "\r\n");
+        if(empty($msgsocket)) {
           // Déconnexion du client
           echo "Le client $client ($type) s'est déconnecté.\n";
           socket_close($clients[$client]['s_'.$type]);

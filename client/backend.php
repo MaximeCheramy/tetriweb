@@ -41,7 +41,7 @@ if(!empty($_GET['connect'])) {
 if(!empty($_GET['pnum'])) {
   $pnum = (int)$_GET['pnum'];
 
-  if(!empty($_GET['send'])) {
+  if(isset($_GET['send'])) {
     $send = $_GET['send'];
     socket_write($sock, "write $pnum\n");
     socket_write($sock, $send."\n");

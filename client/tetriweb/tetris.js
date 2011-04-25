@@ -359,6 +359,8 @@ tetriweb.Tetris.prototype.setTimer = function() {
 tetriweb.Tetris.prototype.pauseGame = function() {
   this.pause_ = true;
   clearTimeout(this.stepTimer);
+  this.heartbeatTimer = window.setInterval(
+      goog.bind(this.tetrinet_.heartbeat, this.tetrinet_), 10000);
 };
 
 
@@ -368,6 +370,7 @@ tetriweb.Tetris.prototype.pauseGame = function() {
 tetriweb.Tetris.prototype.resumeGame = function() {
   this.pause_ = false;
   clearTimeout(this.stepTimer);
+  clearTimeout(this.heartbeatTimer);
   this.setTimer();
 };
 

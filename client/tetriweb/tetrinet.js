@@ -357,6 +357,14 @@ tetriweb.Tetrinet.prototype.getModerator_ = function() {
 
 
 /**
+ * Heartbeat.
+ */
+tetriweb.Tetrinet.prototype.heartbeat = function() {
+  this.sendMessage_('f ' + this.pnum_);
+};
+
+
+/**
  * Changes teams.
  * @param {string} team The new team.
  */
