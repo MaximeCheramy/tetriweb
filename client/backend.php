@@ -17,6 +17,13 @@ if (get_magic_quotes_gpc()) {
     unset($process);
 }
 
+function read_messages($sock) {
+	$buf = '';
+	do {
+		$buf .= socket_read($sock, 1024*1024); // blocking
+	} while (substr($buf, -1) != "\n");
+	return $buf;
+}
 
 $host = 'localhost';
 $port = 1234;
@@ -38,7 +45,7 @@ if(!socket_connect($sock, $host, $port)) {
 if(!empty($_GET['connect'])) {
 	$pseudo = $_GET['connect'];
 	socket_write($sock, "connect $pseudo\n");
-	$msg = socket_read($sock, 1024);
+	$msg = read_messages($sock);
 	//file_put_contents('log_recu', $msg, FILE_APPEND);
 	
 	$response = array();
@@ -67,7 +74,7 @@ if(!empty($_GET['pnum'])) {
 	}
 	else {
 		socket_write($sock, "read $pnum\n");
-		$msg = socket_read($sock, 1024*1024); // blocking
+		$msg = read_messages($sock);
 		socket_close($sock);
 
     if(empty($msg)) {

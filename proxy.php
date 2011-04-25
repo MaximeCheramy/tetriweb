@@ -117,7 +117,7 @@ while(true) {
 					echo "Message(s) du serveur pour le client $client : '$msg'.\n";
 					if(isset($clients[$client]['s_client_read'])) {
 						echo "Envoi de '$msg' au client $client...\n";
-						socket_write($clients[$client]['s_client_read'], $msg);
+						socket_write($clients[$client]['s_client_read'], $msg."\n");
             // Le client va de toutes façons fermer la connexion, donc on la ferme aussi pour ne pas avoir à attendre le prochain tour de boucle pour être au courant
             socket_close($clients[$client]['s_client_read']);
             unset($clients[$client]['s_client_read']);
@@ -197,7 +197,7 @@ while(true) {
 
 							// Connexion acceptée
 							if($c_id) {	
-								socket_write($s, "playernum $c_id");
+								socket_write($s, "playernum $c_id\n");
 								$clients[$c_id] = $clients[$client];
 								$clients[$c_id]['s_server'] = $s_server;
 								$clients[$c_id]['last_ping'] = time();
@@ -206,7 +206,7 @@ while(true) {
 								unset($clients[$c_id]['s_client_read']); // On va fermer la connexion plus bas
 							}
 							else {
-								socket_write($s, implode("\n", $clients[$client]['msg']));
+								socket_write($s, implode("\n", $clients[$client]['msg'])."\n");
 							}
 
 							// Dans tous les cas, suppression du client temporaire et fermeture socket (on n'enverra rien d'autre sur cette connexion) 
@@ -226,11 +226,11 @@ while(true) {
 							if($rw == 'read') {
 								/*while(!empty($clients[$c_id]['msg'])) {
 									echo "Envoi...\n";
-									socket_write($s, array_shift($clients[$c_id]['msg']));
+									socket_write($s, array_shift($clients[$c_id]['msg'])."\n");
 								}*/
 								if(!empty($clients[$c_id]['msg'])) {
 									echo "Envoi de messages en attente : ".implode("\n", $clients[$c_id]['msg'])."\n";
-									socket_write($s, implode("\n", $clients[$c_id]['msg']));
+									socket_write($s, implode("\n", $clients[$c_id]['msg'])."\n");
                   if (in_array('ping', $clients[$c_id]['msg'])) {
                     echo "DELAYED REPING SENT TO $c_id ".time()."\n";
                   }
@@ -280,7 +280,7 @@ while(true) {
         if (isset($clients[$pnum]['s_client_read'])) {
           // Ping client
           echo "REPING $pnum ".time()."\n";
-          socket_write($clients[$pnum]['s_client_read'], "ping");
+          socket_write($clients[$pnum]['s_client_read'], "ping\n");
           $clients[$pnum]['last_ping'] = time();
           $clients[$pnum]['pong'] = false;
           socket_close($clients[$pnum]['s_client_read']);
