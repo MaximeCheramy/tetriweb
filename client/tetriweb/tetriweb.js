@@ -1,5 +1,6 @@
 goog.require('goog.dom');
 goog.require('goog.events');
+goog.require('goog.ui.Dialog');
 goog.require('tetriweb.KeyEvents');
 goog.require('tetriweb.Tetrinet');
 goog.require('tetriweb.Tetris');
@@ -45,9 +46,14 @@ tetriweb.init = function() {
         tetriweb.Graphics.gameAreaFocus();
       });
 
+  goog.events.listen(goog.dom.getElement('winlist'),
+      goog.events.EventType.CLICK, function(e) {
+        tetriweb.Graphics.showScoresWindow(tetrinet.getScores());
+      });
+
   goog.events.listen(goog.dom.getElement('change-teams'),
       goog.events.EventType.CLICK, function(e) {
-        var team = prompt("Team:", goog.dom.getElement('team').value);
+        var team = prompt('Team:', goog.dom.getElement('team').value);
         if (team != null) {
           goog.dom.getElement('team').value = team;
           tetrinet.changeTeams(team);

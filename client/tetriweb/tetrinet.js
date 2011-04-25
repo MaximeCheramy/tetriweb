@@ -289,6 +289,18 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         }
         this.logEvent(data[2], data[1], data[3]);
         break;
+      // Scores
+      case 'winlist':
+        var scores = msg.substr(data[0].length + 1).split(' ');
+        this.scores_ = [];
+        for (var i = 0; i < scores.length; i++) {
+          var data = scores[i].split(';');
+          var type = (data[0].substr(0, 1) == 'p') ? 'player' : 'team';
+          var name = data[0].substr(1);
+          var score = parseInt(data[1], 10);
+          this.scores_[i] = {name: name, type: type, score: score};
+        }
+        break;
       // Fallback
       default:
         message = msg;
@@ -369,7 +381,8 @@ tetriweb.Tetrinet.prototype.heartbeat = function() {
  * @param {string} team The new team.
  */
 tetriweb.Tetrinet.prototype.changeTeams = function(team) {
-  if (team != "") {
+  var message;
+  if (team != '') {
     this.teams_[this.pnum_] = team;
     message = '*** ' + this.players_[this.pnum_] +
         " est dans l'équipe " + team + '.';
@@ -634,6 +647,15 @@ tetriweb.Tetrinet.prototype.getPlayerField = function(playerNum) {
 
 
 /**
+ * Gets the scores array.
+ * @return {Array.<Object.<string, string>>} The scores array.
+ */
+tetriweb.Tetrinet.prototype.getScores = function() {
+  return this.scores_;
+};
+
+
+/**
  * Converts a block type to the matching integer type.
  * @param {string} type Character block type.
  * @return {number} Matching integer block type.
@@ -723,6 +745,13 @@ tetriweb.Tetrinet.prototype.players_ = null;
  * @private
  */
 tetriweb.Tetrinet.prototype.teams_ = null;
+
+
+/**
+ * @type {Array.<Object.<string, string>>}
+ * @private
+ */
+tetriweb.Tetrinet.prototype.scores_ = null;
 
 
 /**

@@ -493,6 +493,24 @@ tetriweb.Graphics.showResumeButton = function() {
 
 
 /**
+ * Shows the scores window.
+ * @param {Array.<Object.<string, string>>} scores The scores.
+ */
+tetriweb.Graphics.showScoresWindow = function(scores) {
+  var dialog = new goog.ui.Dialog();
+  var content = '';
+  for (var i = 0; i < scores.length; i++) {
+    content += scores[i].type + ' ' + scores[i].name + ' : ' +
+        scores[i].score + '<br />';
+  }
+  dialog.setContent(content);
+  dialog.setTitle('Winlist');
+  dialog.setButtonSet(goog.ui.Dialog.ButtonSet.OK);
+  dialog.setVisible(true);
+};
+
+
+/**
  * @type {!Element}
  */
 tetriweb.Graphics.eventLog = null;
