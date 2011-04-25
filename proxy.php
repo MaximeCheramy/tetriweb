@@ -2,8 +2,8 @@
 require_once('proxy.inc.php');
 
 define('BUFFER_LEN', 1024);
-define('PING_INTERVAL', 10);
-define('TIMEOUT', 5);
+define('PING_INTERVAL', 20);
+define('TIMEOUT', 10);
 
 $port = 1234;
 $server_addr = 'localhost';
