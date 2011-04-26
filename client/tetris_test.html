@@ -2,8 +2,11 @@
 <html>
 <head>
   <title>Test - tetriweb.Tetris</title>
+  <script src="closure-library/closure/goog/base.js"></script>
+  <script type="text/javascript" src="tetriweb-deps.js"></script>
 </head>
 <body>
+<div style="display: none;">
 <fieldset id="connect-form">
   <legend>Connexion</legend>
   <div id="error-message" class="hid"></div>
@@ -59,12 +62,8 @@
     </table>
   </form>
 </div>
+</div>
 
-
-  <script src="closure-library/closure/goog/base.js"></script>
-  <script src="tetriweb/graphics.js"></script>
-  <script src="tetriweb/tetris.js"></script>
-  <script src="tetriweb/tetrinet.js"></script>
   <script src="tetriweb/tetris_test.js"></script>
 </body>
 </html>
