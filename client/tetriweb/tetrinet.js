@@ -444,16 +444,18 @@ tetriweb.Tetrinet.prototype.stopGame = function() {
  * @param {string} msg The message to send.
  */
 tetriweb.Tetrinet.prototype.sayPline = function(msg) {
-  if (msg.substr(0, 4) == '/me ') {
-    this.sendMessage_('plineact ' + this.pnum_ + ' ' + msg.substr(4));
-    tetriweb.Graphics.domWriteMessage(
-        tetriweb.Graphics.htmlspecialchars(
-            '* ' + this.players_[this.pnum_] + ' ' + msg.substr(4)));
-  } else {
-    this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
-    tetriweb.Graphics.domWriteMessage(
-        tetriweb.Graphics.htmlspecialchars(
-            '<' + this.players_[this.pnum_] + '> ' + msg));
+  if (goog.string.trim(msg)) {
+    if (msg.substr(0, 4) == '/me ') {
+      this.sendMessage_('plineact ' + this.pnum_ + ' ' + msg.substr(4));
+      tetriweb.Graphics.domWriteMessage(
+          tetriweb.Graphics.htmlspecialchars(
+              '* ' + this.players_[this.pnum_] + ' ' + msg.substr(4)));
+    } else {
+      this.sendMessage_('pline ' + this.pnum_ + ' ' + msg);
+      tetriweb.Graphics.domWriteMessage(
+          tetriweb.Graphics.htmlspecialchars(
+              '<' + this.players_[this.pnum_] + '> ' + msg));
+    }
   }
 };
 
