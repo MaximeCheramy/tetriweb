@@ -198,8 +198,8 @@ tetriweb.Graphics.domInitField = function(player_id, nickname) {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       var block = goog.dom.createDom('div');
-      // TODO constante 0
-      goog.dom.classes.set(block, 'small block ' + tetriweb.Tetris.convert(0));
+      goog.dom.classes.set(block, 'small block ' +
+          tetriweb.Tetris.convert(tetriweb.Tetris.BLOCK_EMPTY));
       block.id = 'block-' + player_id + '-' + l + '-' + c;
       block.style.top = l * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_);
       block.style.left = c * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_);

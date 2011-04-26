@@ -41,8 +41,7 @@ tetriweb.Tetris.prototype.init_ = function(
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     this.gameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      // TODO: constante 0
-      this.gameArea_[l][c] = 0;
+      this.gameArea_[l][c] = tetriweb.Tetris.BLOCK_EMPTY;
     }
   }
   tetriweb.Graphics.emptyField();
@@ -165,7 +164,7 @@ tetriweb.Tetris.prototype.checkLine_ = function(cleanupOnly) {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     var tetris = true;
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      tetris = tetris && (this.gameArea_[l][c] > 0);
+      tetris = tetris && (this.gameArea_[l][c] > tetriweb.Tetris.BLOCK_EMPTY);
     }
     if (tetris) {
       nbLines++;
@@ -181,7 +180,7 @@ tetriweb.Tetris.prototype.checkLine_ = function(cleanupOnly) {
         }
       }
       for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-        this.gameArea_[0][c] = 0;
+        this.gameArea_[0][c] = tetriweb.Tetris.BLOCK_EMPTY;
       }
     }
   }
@@ -261,8 +260,8 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
   var availBlocks = 0;
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      if (this.gameArea_[l][c] > 0 && this.gameArea_[l][c] <
-          tetriweb.Tetris.NB_NORMAL_BLOCKS) {
+      if (this.gameArea_[l][c] > tetriweb.Tetris.BLOCK_EMPTY &&
+          this.gameArea_[l][c] < tetriweb.Tetris.NB_NORMAL_BLOCKS) {
         availBlocks++;
       }
     }
@@ -316,7 +315,8 @@ tetriweb.Tetris.prototype.step_ = function() {
     for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
       if (this.current_[l][c]) {
         if (l + this.curY_ + 1 >= tetriweb.Tetris.HEIGHT_ ||
-            this.gameArea_[l + this.curY_ + 1][c + this.curX_] > 0) {
+            this.gameArea_[l + this.curY_ + 1][c + this.curX_] >
+            tetriweb.Tetris.BLOCK_EMPTY) {
           stop = true;
         }
       }
@@ -411,7 +411,7 @@ tetriweb.Tetris.prototype.tryToRotate = function() {
                newC < tetriweb.Tetris.WIDTH_ &&
                newL >= 0 &&
                newL < tetriweb.Tetris.HEIGHT_ &&
-               this.gameArea_[newL][newC] == 0;
+               this.gameArea_[newL][newC] == tetriweb.Tetris.BLOCK_EMPTY;
         }
       }
     }
@@ -661,21 +661,21 @@ tetriweb.Tetris.randomInt = function(min, max) {
  */
 tetriweb.Tetris.convert = function(color) {
   switch (color) {
-    case 0: return 'empty';
-    case 1: return 'blue';//return '#0000FF'; // bleu
-    case 2: return 'yellow';//return '#FFFF00'; // jaune
-    case 3: return 'green';//return '#00FF00'; // vert
-    case 4: return 'purple';//return '#800080'; // violet
-    case 5: return 'red';//return '#FF0000'; // rouge
-    case 6: return 'sb-a';
-    case 7: return 'sb-c';
-    case 8: return 'sb-n';
-    case 9: return 'sb-r';
-    case 10: return 'sb-s';
-    case 11: return 'sb-b';
-    case 12: return 'sb-g';
-    case 13: return 'sb-q';
-    case 14: return 'sb-o';
+    case tetriweb.Tetris.BLOCK_EMPTY:   return 'empty';
+    case tetriweb.Tetris.BLOCK_BLUE:    return 'blue';
+    case tetriweb.Tetris.BLOCK_YELLOW:  return 'yellow';
+    case tetriweb.Tetris.BLOCK_GREEN:   return 'green';
+    case tetriweb.Tetris.BLOCK_PURPLE:  return 'purple';
+    case tetriweb.Tetris.BLOCK_RED:     return 'red';
+    case tetriweb.Tetris.BLOCK_SB_A:    return 'sb-a';
+    case tetriweb.Tetris.BLOCK_SB_C:    return 'sb-c';
+    case tetriweb.Tetris.BLOCK_SB_N:    return 'sb-n';
+    case tetriweb.Tetris.BLOCK_SB_R:    return 'sb-r';
+    case tetriweb.Tetris.BLOCK_SB_S:    return 'sb-s';
+    case tetriweb.Tetris.BLOCK_SB_B:    return 'sb-b';
+    case tetriweb.Tetris.BLOCK_SB_G:    return 'sb-g';
+    case tetriweb.Tetris.BLOCK_SB_Q:    return 'sb-q';
+    case tetriweb.Tetris.BLOCK_SB_O:    return 'sb-o';
     default: alert('unknown block ' + typeof(color) + ' ' + color);
   }
 };
@@ -688,13 +688,13 @@ tetriweb.Tetris.convert = function(color) {
  */
 tetriweb.Tetris.getColor = function(id) {
   switch (id) {
-    case 0: return 1; // barre : bleu
-    case 1: return 2; // carré : jaune
-    case 2: return 3; // L gauche : vert
-    case 3: return 4; // L droite : violet
-    case 4: return 5; // Z : rouge
-    case 5: return 1; // Z inversé : bleu
-    case 6: return 2; // T : jaune
+    case 0: return tetriweb.Tetris.BLOCK_BLUE;    // barre : bleu
+    case 1: return tetriweb.Tetris.BLOCK_YELLOW;  // carré : jaune
+    case 2: return tetriweb.Tetris.BLOCK_GREEN;   // L gauche : vert
+    case 3: return tetriweb.Tetris.BLOCK_PURPLE;  // L droite : violet
+    case 4: return tetriweb.Tetris.BLOCK_RED;     // Z : rouge
+    case 5: return tetriweb.Tetris.BLOCK_BLUE;    // Z inversé : bleu
+    case 6: return tetriweb.Tetris.BLOCK_YELLOW;  // T : jaune
     default: return id;
   }
 };
@@ -712,7 +712,7 @@ tetriweb.Tetris.getColor = function(id) {
  */
 tetriweb.Tetris.prototype.addLine = function() {
   for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-    if (this.gameArea_[0][c] > 0) {
+    if (this.gameArea_[0][c] > tetriweb.Tetris.BLOCK_EMPTY) {
       this.gameLost_ = true;
     }
   }
@@ -730,17 +730,17 @@ tetriweb.Tetris.prototype.addLine = function() {
           randomInt(1, tetriweb.Tetris.NB_NORMAL_BLOCKS - 1);
     }
     var r = randomInt(0, tetriweb.Tetris.WIDTH_ - 1);
-    // TODO: constante 0
-    this.gameArea_[tetriweb.Tetris.HEIGHT_ - 1][r] = 0;
+    this.gameArea_[tetriweb.Tetris.HEIGHT_ - 1][r] =
+        tetriweb.Tetris.BLOCK_EMPTY;
 
     // On décale la pièce courante si besoin
     if (this.curY_ > 0) {
       var stop = false;
       for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && !stop; l++) {
         for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
-          // TODO: constante 0
           if (this.current_[l][c] &&
-              this.gameArea_[l + this.curY_][c + this.curX_] > 0) {
+              this.gameArea_[l + this.curY_][c + this.curX_] >
+              tetriweb.Tetris.BLOCK_EMPTY) {
             stop = true;
             this.curY_--;
             tetriweb.Graphics.moveCurPieceV(this.curY_);
@@ -774,11 +774,10 @@ tetriweb.Tetris.prototype.blockGravity = function() {
   for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
     var curLine = tetriweb.Tetris.HEIGHT_ - 1;
     for (var l = tetriweb.Tetris.HEIGHT_ - 1; l >= 0; l--) {
-      if (this.gameArea_[l][c] > 0) {
+      if (this.gameArea_[l][c] > tetriweb.Tetris.BLOCK_EMPTY) {
         if (l != curLine) {
           this.gameArea_[curLine][c] = this.gameArea_[l][c];
-          // TODO: constante 0
-          this.gameArea_[l][c] = 0;
+          this.gameArea_[l][c] = tetriweb.Tetris.BLOCK_EMPTY;
         }
         curLine--;
       }
@@ -795,8 +794,8 @@ tetriweb.Tetris.prototype.blockGravity = function() {
 tetriweb.Tetris.prototype.randomClearBlocks = function() {
   var randomInt = tetriweb.Tetris.randomInt;
   for (var i = 0; i < 10; i++) {
-    // TODO: constante 0
-    this.gameArea_[randomInt(0, 21)][randomInt(0, 11)] = 0;
+    this.gameArea_[randomInt(0, 21)][randomInt(0, 11)] =
+        tetriweb.Tetris.BLOCK_EMPTY;
   }
   this.updateGridAndSendField_();
 };
@@ -832,8 +831,8 @@ tetriweb.Tetris.prototype.switchFields = function(playerNum) {
       this.gameArea_ : this.tetrinet_.getPlayerField(playerNum);
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      // TODO: constante 0
-      this.gameArea_[l][c] = (l < 6) ? 0 : playerField[l][c];
+      this.gameArea_[l][c] = (l < 6) ?
+          tetriweb.Tetris.BLOCK_EMPTY : playerField[l][c];
     }
   }
   this.updateGridAndSendField_();
@@ -867,17 +866,16 @@ tetriweb.Tetris.prototype.blockBomb = function() {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       // Look for block bombs
-      if (this.gameArea_[l][c] == 14) { // TODO: constant
+      if (this.gameArea_[l][c] == tetriweb.Tetris.BLOCK_SB_O) {
         // Remove bomb
-        // TODO: constante 0
-        this.gameArea_[l][c] = 0;
+        this.gameArea_[l][c] = tetriweb.Tetris.BLOCK_EMPTY;
         // Explode the blocks around
         for (var d = 0; d < dep.length; d++) {
           var ll = l + dep[d][0];
           var cc = c + dep[d][1];
           if (ll >= 0 && ll < tetriweb.Tetris.HEIGHT_ &&
               cc >= 0 && cc < tetriweb.Tetris.WIDTH_) {
-            if (this.gameArea_[ll][cc] != 14) { // TODO: constante
+            if (this.gameArea_[ll][cc] != tetriweb.Tetris.BLOCK_SB_O) {
               // New random coordinates
               var randomInt = tetriweb.Tetris.randomInt;
               var newL = randomInt(6, tetriweb.Tetris.HEIGHT_ - 1);
@@ -899,8 +897,7 @@ tetriweb.Tetris.prototype.blockBomb = function() {
 tetriweb.Tetris.prototype.nukeField = function() {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      // TODO: constante 0
-      this.gameArea_[l][c] = 0;
+      this.gameArea_[l][c] = tetriweb.Tetris.BLOCK_EMPTY;
     }
   }
   this.updateGridAndSendField_();
@@ -969,8 +966,7 @@ tetriweb.Tetris.prototype.sendField_ = function() {
     for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
       this.oldGameArea_[l] = new Array(tetriweb.Tetris.WIDTH_);
       for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-        // TODO: constante 0
-        this.oldGameArea_[l][c] = 0;
+        this.oldGameArea_[l][c] = tetriweb.Tetris.BLOCK_EMPTY;
       }
     }
   }
@@ -1063,6 +1059,26 @@ tetriweb.Tetris.NB_NORMAL_BLOCKS = 6;
  * @type {number}
  */
 tetriweb.Tetris.NB_SPECIAL_BLOCKS = 9;
+
+
+/**
+ * @type {number}
+ */
+tetriweb.Tetris.BLOCK_EMPTY   = 0;
+tetriweb.Tetris.BLOCK_BLUE    = 1;
+tetriweb.Tetris.BLOCK_YELLOW  = 2;
+tetriweb.Tetris.BLOCK_GREEN   = 3;
+tetriweb.Tetris.BLOCK_PURPLE  = 4;
+tetriweb.Tetris.BLOCK_RED     = 5;
+tetriweb.Tetris.BLOCK_SB_A    = 6;
+tetriweb.Tetris.BLOCK_SB_C    = 7;
+tetriweb.Tetris.BLOCK_SB_N    = 8;
+tetriweb.Tetris.BLOCK_SB_R    = 9;
+tetriweb.Tetris.BLOCK_SB_S    = 10;
+tetriweb.Tetris.BLOCK_SB_B    = 11;
+tetriweb.Tetris.BLOCK_SB_G    = 12;
+tetriweb.Tetris.BLOCK_SB_Q    = 13;
+tetriweb.Tetris.BLOCK_SB_O    = 14;
 
 
 /**

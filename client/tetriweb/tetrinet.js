@@ -514,8 +514,7 @@ tetriweb.Tetrinet.prototype.initField_ = function(player_id) {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     this.fields_[player_id][l] = new Array(tetriweb.Tetris.WIDTH_);
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      // TODO: constante 0
-      this.fields_[player_id][l][c] = '0';
+      this.fields_[player_id][l][c] = tetriweb.Tetris.BLOCK_EMPTY;
     }
   }
 
@@ -542,8 +541,7 @@ tetriweb.Tetrinet.prototype.destroyField_ = function(player_id) {
 tetriweb.Tetrinet.prototype.clearField_ = function(player_id) {
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
-      // TODO: constante 0
-      this.setBlock_(player_id, c, l, 0);
+      this.setBlock_(player_id, c, l, tetriweb.Tetris.BLOCK_EMPTY);
     }
   }
 };
