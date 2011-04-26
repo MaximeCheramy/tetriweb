@@ -110,6 +110,17 @@ tetriweb.Tetris.prototype.startGame = function(_startingHeight, _startingLevel,
 
 
 /**
+ * Stops the game.
+ */
+tetriweb.Tetris.prototype.stopGame = function() {
+  // Stop the timer
+  clearTimeout(this.stepTimer);
+  // Disable key events in the field
+  this.keyEvents.disposeKeyEvent();
+};
+
+
+/**
  * Return the pause state of the game. Used to disable the key events.
  * @return {boolean} True is the game is paused.
  */

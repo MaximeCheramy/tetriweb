@@ -60,6 +60,11 @@ tetriweb.init = function() {
         }
       });
 
+  goog.events.listen(goog.dom.getElement('disconnect'),
+      goog.events.EventType.CLICK, function(e) {
+        tetrinet.disconnect();
+      });
+
   goog.events.listen(goog.dom.getElement('start-game'),
       goog.events.EventType.CLICK, function(e) {
         tetrinet.startGame();

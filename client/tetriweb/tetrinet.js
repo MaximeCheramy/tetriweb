@@ -65,7 +65,10 @@ tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
  */
 tetriweb.Tetrinet.prototype.disconnect = function() {
   if (this.pnum_) {
+    if (this.xhr_in_) { this.xhr_in_.abort(); }
     this.sendMessage_('disconnect');
+    this.tetris.stopGame();
+    tetriweb.Graphics.displayLoginForm();
   }
 };
 
@@ -217,9 +220,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
       case 'endgame':
         message = '*** La partie est terminée';
         // Stop tetris
-        clearTimeout(this.tetris.stepTimer);
-        // Disable key events in the field
-        this.tetris.keyEvents.disposeKeyEvent();
+        this.tetris.stopGame();
         tetriweb.Graphics.displayChat();
         break;
       // Field description
