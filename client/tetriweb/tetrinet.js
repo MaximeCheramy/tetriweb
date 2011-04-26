@@ -86,6 +86,7 @@ tetriweb.Tetrinet.prototype.readFromServer_ = function() {
           this.handleResponse_(e.target.getResponseJson());
           this.readFromServer_();
         } else if (e.target.getStatus() == 410) {
+          this.tetris.stopGame();
           tetriweb.Graphics.setErrorMessage('You have been disconnected.');
           tetriweb.Graphics.displayLoginForm();
         } else {
