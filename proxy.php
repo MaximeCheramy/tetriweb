@@ -26,6 +26,7 @@ while(true) {
     echo "socket_select() failed : " . socket_strerror(socket_last_error()) . "\n";	
   }
   foreach($r as $s) {
+    echo "--------------------\n";
     if($s == $s_in) {
       // Arrivée client
       echo "Arrivée d'un client...\n";
@@ -39,7 +40,8 @@ while(true) {
       if($type == 'server') {
         // Message du serveur
         $msg = socket_read($s, BUFFER_LEN);
-        if(empty($msg)) {
+        echo "Server input pour le client $client : '$msg'\n";
+        if(strlen($msg) == 0) {
           // Déconnecté par serveur
           echo "Le client $client s'est fait jarrter par le serveur.\n";
           disconnect_client($client);

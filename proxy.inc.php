@@ -74,7 +74,6 @@ function disconnect_client($client) {
 function parse_server_message($msg, $client) {
   global $clients; 
 
-  echo "Server input : '$msg'\n";
   $clients[$client]['server_buffer'] .= $msg;
   $messages = explode(chr(0xFF), $clients[$client]['server_buffer']);
   $clients[$client]['server_buffer'] = array_pop($messages);
