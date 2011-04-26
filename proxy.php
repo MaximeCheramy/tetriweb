@@ -49,12 +49,14 @@ while(true) {
         else {
           $msg = parse_server_message($msg, $client);
           echo "Message(s) du serveur pour le client $client : '$msg'.\n";
-          if(isset($clients[$client]['s_client_read'])) {
-            send_message($msg, $client);
-          }
-          else {
-            echo "Stockage de '$msg' pour le client $client...\n";
-            array_push($clients[$client]['msg'], $msg);
+          if (strlen($msg) > 0) {
+            if(isset($clients[$client]['s_client_read'])) {
+              send_message($msg, $client);
+            }
+            else {
+              echo "Stockage de '$msg' pour le client $client...\n";
+              array_push($clients[$client]['msg'], $msg);
+            }
           }
         }
       }
