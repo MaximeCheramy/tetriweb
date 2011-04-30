@@ -42,13 +42,16 @@ if(!empty($_GET['pnum'])) {
   $pnum = (int)$_GET['pnum'];
 
   if(isset($_GET['send'])) {
+    file_put_contents("backend_client_$pnum.log", "WRITE from client $client\n", FILE_APPEND);
     $send = $_GET['send'];
     socket_write($sock, "write $pnum\n");
     socket_write($sock, $send."\n");
     socket_close($sock);
+    file_put_contents("backend_client_$pnum.log", "client >>> proxy :\n$send\n--------------------\n", FILE_APPEND);
     die();
   }
   else {
+    file_put_contents("backend_client_$pnum.log", "READ from client $client\n", FILE_APPEND);
     socket_write($sock, "read $pnum\n");
     $msg = read_messages($sock);
     socket_close($sock);
@@ -59,7 +62,7 @@ if(!empty($_GET['pnum'])) {
       die();
     }
 
-    //file_put_contents('log_recu', $msg, FILE_APPEND);
+    file_put_contents("backend_client_$pnum.log", "proxy >>> client :\n$msg\n--------------------\n", FILE_APPEND);
     $response = array();
     $response['msg'] = explode("\n", trim($msg));
     format_messages($response['msg']);
