@@ -355,7 +355,7 @@ tetriweb.Graphics.updatePiece = function(current, curX, curY, currentColor) {
 
   tetriweb.Graphics.currentObj_ =
       goog.dom.createDom('div', {className: 'piece'});
-  var currentObj_ = tetriweb.Graphics.currentObj_;
+  currentObj_ = tetriweb.Graphics.currentObj_;
   tetriweb.Graphics.moveCurPieceH(curX);
   tetriweb.Graphics.moveCurPieceV(curY);
   goog.dom.appendChild(myField_, currentObj_);
@@ -508,7 +508,7 @@ tetriweb.Graphics.showScoresWindow = function(scores) {
   }
   dialog.setContent(content);
   dialog.setTitle('Winlist');
-  dialog.setButtonSet(goog.ui.Dialog.ButtonSet.OK);
+  dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
   dialog.setVisible(true);
 };
 
@@ -516,35 +516,35 @@ tetriweb.Graphics.showScoresWindow = function(scores) {
 /**
  * @type {!Element}
  */
-tetriweb.Graphics.eventLog = null;
+tetriweb.Graphics.eventLog;
 
 
 /**
  * @type {!Element}
  * @private
  */
-tetriweb.Graphics.myField_ = null;
+tetriweb.Graphics.myField_;
 
 
 /**
  * @type {!Element}
  * @private
  */
-tetriweb.Graphics.currentObj_ = null;
+tetriweb.Graphics.currentObj_;
 
 
 /**
  * @type {!Element}
  * @private
  */
-tetriweb.Graphics.specialBar_ = null;
+tetriweb.Graphics.specialBar_;
 
 
 /**
  * @type {!Element}
  * @private
  */
-tetriweb.Graphics.playerList_ = null;
+tetriweb.Graphics.playerList_;
 
 
 /**

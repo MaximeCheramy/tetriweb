@@ -15,8 +15,8 @@ tetriweb.Tetrinet = function() {
 
 /**
  * Connects the player to the server and retrieves its playernum.
- * @param {String} nickname The player's nickname.
- * @param {String} team The player's team.
+ * @param {string} nickname The player's nickname.
+ * @param {string} team The player's team.
  */
 tetriweb.Tetrinet.prototype.connect = function(nickname, team) {
   // Clear existing timers and requests
@@ -191,9 +191,10 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
       case 'newgame':
         message = '*** La partie a débuté';
         // Clear all fields
-        for (player_id in this.players_) {
-          if (player_id != this.pnum_) {
-            this.clearField_(player_id);
+        for (var playerId in this.players_) {
+          var pId = parseInt(playerId, 10)
+          if (pId != this.pnum_) {
+            this.clearField_(pId);
           }
         }
         // Start tetris
@@ -244,6 +245,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             if (field[j] < '0') {
               block = field.charCodeAt(j) - '!'.charCodeAt(0);
             } else {
+              // FIXME: block undefined !
               x = field.charCodeAt(j) - '3'.charCodeAt(0);
               y = field.charCodeAt(++j) - '3'.charCodeAt(0);
               this.setBlock_(player_id, x, y, block);
@@ -296,10 +298,10 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         var scores = msg.substr(data[0].length + 1).split(' ');
         this.scores_ = [];
         for (var j = 0; j < scores.length; j++) {
-          var data = scores[j].split(';');
-          var type = (data[0].substr(0, 1) == 'p') ? 'player' : 'team';
-          var name = data[0].substr(1);
-          var score = parseInt(data[1], 10);
+          var data2 = scores[j].split(';');
+          var type = (data2[0].substr(0, 1) == 'p') ? 'player' : 'team';
+          var name = data2[0].substr(1);
+          var score = parseInt(data2[1], 10);
           this.scores_[j] = {name: name, type: type, score: score};
         }
         break;
@@ -668,7 +670,7 @@ tetriweb.Tetrinet.charToInt = function(type) {
   var lastNormalBlockCode =
       '0'.charCodeAt(0) + tetriweb.Tetris.NB_NORMAL_BLOCKS - 1;
   if (type >= '0' && type <= String.fromCharCode(lastNormalBlockCode)) {
-    type = parseInt(type);
+    type = parseInt(type, 10);
   } else if (specials[type] != undefined) {
     type = specials[type];
   }
@@ -732,7 +734,7 @@ tetriweb.Tetrinet.prototype.xhr_out_ = null;
  * @type {number}
  * @private
  */
-tetriweb.Tetrinet.prototype.timer_ = null;
+tetriweb.Tetrinet.prototype.timer_;
 
 
 /**
@@ -757,7 +759,7 @@ tetriweb.Tetrinet.prototype.scores_ = null;
 
 
 /**
- * @type {Array.<Array.<number>>}
+ * @type {Array.<Array.<Array.<number>>>}
  * @private
  */
 tetriweb.Tetrinet.prototype.fields_ = null;

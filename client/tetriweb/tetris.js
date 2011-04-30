@@ -6,7 +6,7 @@ goog.require('tetriweb.Graphics');
 
 /**
  * Tetris Class.
- * @param {object} tetrinet The tetrinet objet used to communicate with the
+ * @param {tetriweb.Tetrinet} tetrinet The tetrinet objet used to communicate with the
  * tetrinet server.
  * @constructor
  */
@@ -52,13 +52,13 @@ tetriweb.Tetris.prototype.init_ = function(
   // Pieces' frequency.
   this.piecesFreq_ = goog.array.repeat(0, tetriweb.Tetris.NB_PIECES);
   for (var i = 0; i < _piecesFreq.length; i++) {
-    this.piecesFreq_[parseInt(_piecesFreq[i]) - 1]++;
+    this.piecesFreq_[parseInt(_piecesFreq[i], 10) - 1]++;
   }
 
   // Specials' frequency.
   this.specialsFreq_ = goog.array.repeat(0, tetriweb.Tetris.NB_SPECIAL_BLOCKS);
   for (var i = 0; i < _specialsFreq.length; i++) {
-    this.specialsFreq_[parseInt(_specialsFreq[i]) - 1]++;
+    this.specialsFreq_[parseInt(_specialsFreq[i], 10) - 1]++;
   }
 
   this.setLevel(_startingLevel);
@@ -155,10 +155,11 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
 /**
  * Checks for complete lines. Complete lines will be removed and create new
  * bonus or add lines to opponents.
- * @param {boolean} cleanupOnly If true, do not take specials nor send lines.
+ * @param {boolean} opt_cleanupOnly If true, do not take specials nor send lines.
  * @private
  */
-tetriweb.Tetris.prototype.checkLine_ = function(cleanupOnly) {
+tetriweb.Tetris.prototype.checkLine_ = function(opt_cleanupOnly) {
+  var cleanupOnly = opt_cleanupOnly ? opt_cleanupOnly : false;
   var nbLines = 0;
   var tmpSpecials = [];
   for (var l = 0; l < tetriweb.Tetris.HEIGHT_; l++) {
@@ -678,6 +679,7 @@ tetriweb.Tetris.convert = function(color) {
     case tetriweb.Tetris.BLOCK_SB_O:    return 'sb-o';
     default: alert('unknown block ' + typeof(color) + ' ' + color);
   }
+  return '';
 };
 
 
@@ -1140,31 +1142,31 @@ tetriweb.Tetris.prototype.curY_ = 0;
 
 
 /**
- * TODO
+ * @type {Array.<Array.<number>>}
  * @private
  */
 tetriweb.Tetris.prototype.current_ = null;
 
 
 /**
- * TODO
+ * @type {number}
  * @private
  */
-tetriweb.Tetris.prototype.currentColor_ = null;
+tetriweb.Tetris.prototype.currentColor_;
 
 
 /**
  * @type {number}
  * @private
  */
-tetriweb.Tetris.prototype.nextId_ = null;
+tetriweb.Tetris.prototype.nextId_;
 
 
 /**
  * @type {number}
  * @private
  */
-tetriweb.Tetris.prototype.nextDirection_ = null;
+tetriweb.Tetris.prototype.nextDirection_;
 
 
 /**
@@ -1184,7 +1186,7 @@ tetriweb.Tetris.prototype.gameLost_ = false;
 /**
  * @type {number}
  */
-tetriweb.Tetris.prototype.stepTimer = null;
+tetriweb.Tetris.prototype.stepTimer;
 
 
 /**
@@ -1219,25 +1221,25 @@ tetriweb.Tetris.prototype.specialsQueue_ = null;
  * @type {number}
  * @private
  */
-tetriweb.Tetris.prototype.specialLines_ = null;
+tetriweb.Tetris.prototype.specialLines_;
 
 
 /**
  * @type {number}
  * @private
  */
-tetriweb.Tetris.prototype.specialCount_ = null;
+tetriweb.Tetris.prototype.specialCount_;
 
 
 /**
  * @type {number}
  * @private
  */
-tetriweb.Tetris.prototype.specialCapacity_ = null;
+tetriweb.Tetris.prototype.specialCapacity_;
 
 
 /**
  * @type {number}
  * @private
  */
-tetriweb.Tetris.prototype.currentSpecialLines_ = null;
+tetriweb.Tetris.prototype.currentSpecialLines_;
