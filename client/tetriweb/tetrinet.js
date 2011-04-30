@@ -244,8 +244,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
           for (var j = 0; j < field.length; j++) {
             if (field[j] < '0') {
               block = field.charCodeAt(j) - '!'.charCodeAt(0);
-            } else {
-              // FIXME: block undefined !
+            } else if (block != undefined) {
               x = field.charCodeAt(j) - '3'.charCodeAt(0);
               y = field.charCodeAt(++j) - '3'.charCodeAt(0);
               this.setBlock_(player_id, x, y, block);
