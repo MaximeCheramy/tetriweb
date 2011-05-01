@@ -262,8 +262,8 @@ tetriweb.Graphics.domInitField = function(player_id, nickname) {
       goog.dom.classes.set(block, 'small block ' +
           tetriweb.Tetris.convert(tetriweb.Tetris.BLOCK_EMPTY));
       block.id = 'block-' + player_id + '-' + l + '-' + c;
-      block.style.top = l * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_);
-      block.style.left = c * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_);
+      block.style.top = l * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_) + 'px';
+      block.style.left = c * (tetriweb.Tetrinet.BLOCK_SIZE_OPP_) + 'px';
       goog.dom.appendChild(field, block);
     }
   }
@@ -307,8 +307,8 @@ tetriweb.Graphics.layDownPiece = function(curX, curY, current, currentColor) {
     for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
       if (current[l][c]) {
         var block = goog.dom.createDom('div');
-        block.style.top = (curY + l) * tetriweb.Graphics.BLOCK_SIZE_;
-        block.style.left = (curX + c) * tetriweb.Graphics.BLOCK_SIZE_;
+        block.style.top = (curY + l) * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
+        block.style.left = (curX + c) * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
         goog.dom.classes.set(block, 'block ' + convert(currentColor));
         goog.dom.appendChild(myField_, block);
       }
@@ -331,8 +331,8 @@ tetriweb.Graphics.updateSpecialBar = function(specialsQueue) {
   for (var i = 0; i < specialsQueue.length; i++) {
     var special = goog.dom.createDom('div');
     goog.dom.classes.set(special, 'block ' + convert(specialsQueue[i]));
-    special.style.top = 0;
-    special.style.left = i * tetriweb.Graphics.BLOCK_SIZE_;
+    special.style.top = 0 + 'px';
+    special.style.left = i * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
     goog.dom.appendChild(tetriweb.Graphics.specialBar_, special);
   }
 };
@@ -390,8 +390,8 @@ tetriweb.Graphics.updateGrid = function(gameArea) {
     for (var c = 0; c < tetriweb.Tetris.WIDTH_; c++) {
       if (gameArea[l][c] > 0) {
         var block = goog.dom.createDom('div');
-        block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_;
-        block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_;
+        block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
+        block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
         goog.dom.classes.set(block, 'block ' + convert(gameArea[l][c]));
         myField_.appendChild(block);
       }
@@ -424,8 +424,8 @@ tetriweb.Graphics.updatePiece = function(current, curX, curY, currentColor) {
     for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
       if (current[l][c]) {
         var block = goog.dom.createDom('div');
-        block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_;
-        block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_;
+        block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
+        block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
         goog.dom.classes.set(block, 'block ' + convert(currentColor));
         goog.dom.appendChild(currentObj_, block);
       }
@@ -451,8 +451,8 @@ tetriweb.Graphics.updateNextPiece = function(nextPiece, nextId) {
       if (nextPiece[l][c]) {
         var block = goog.dom.createDom('div');
         // TODO: +3 ??
-        block.style.top = l * tetriweb.Graphics.BLOCK_SIZE_ + 3;
-        block.style.left = c * tetriweb.Graphics.BLOCK_SIZE_ + 3;
+        block.style.top = (l * tetriweb.Graphics.BLOCK_SIZE_ + 3) + 'px';
+        block.style.left = (c * tetriweb.Graphics.BLOCK_SIZE_ + 3) + 'px';
         goog.dom.classes.set(block, 'block ' + convert(getColor(nextId)));
         goog.dom.appendChild(nextPieceObj, block);
       }
@@ -485,7 +485,7 @@ tetriweb.Graphics.emptyField = function() {
  */
 tetriweb.Graphics.moveCurPieceH = function(posX) {
   tetriweb.Graphics.currentObj_.style.left =
-      posX * tetriweb.Graphics.BLOCK_SIZE_;
+      posX * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
 };
 
 
@@ -495,7 +495,7 @@ tetriweb.Graphics.moveCurPieceH = function(posX) {
  */
 tetriweb.Graphics.moveCurPieceV = function(posY) {
   tetriweb.Graphics.currentObj_.style.top =
-      posY * tetriweb.Graphics.BLOCK_SIZE_;
+      posY * tetriweb.Graphics.BLOCK_SIZE_ + 'px';
 };
 
 
