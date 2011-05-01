@@ -22,6 +22,8 @@ tetriweb.init = function() {
   window['tetris'] = tetris;
   //*/
 
+  tetriweb.Graphics.preloadImages();
+
   goog.events.listen(goog.dom.getElement('connect-form'),
       goog.events.EventType.SUBMIT, function(e) {
         e.preventDefault();

@@ -30,6 +30,15 @@ tetriweb.Graphics.domInit = function(pnum, nickname) {
 
 
 /**
+ * Preloads the images used by the UI.
+ */
+tetriweb.Graphics.preloadImages = function() {
+  var theme = new Image();
+  theme.src = 'img/theme.png';
+};
+
+
+/**
  * Enable/disable moderator controls
  * @param {boolean} enable Whether enable or disable the controls.
  */
