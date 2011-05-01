@@ -550,15 +550,15 @@ tetriweb.Tetris.generatePiece = function(id, orientation) {
 
   switch (id) {
     case 0:
-      piece[0] = new Array(false, false, false, false);
-      piece[1] = new Array(true, true, true, true);
+      piece[0] = new Array(true, true, true, true);
+      piece[1] = new Array(false, false, false, false);
       piece[2] = new Array(false, false, false, false);
       piece[3] = new Array(false, false, false, false);
       break;
     case 1:
-      piece[0] = new Array(false, false, false, false);
-      piece[1] = new Array(false, true, true, false);
-      piece[2] = new Array(false, true, true, false);
+      piece[0] = new Array(true, true, false, false);
+      piece[1] = new Array(true, true, false, false);
+      piece[2] = new Array(false, false, false, false);
       piece[3] = new Array(false, false, false, false);
       break;
     case 2:
@@ -574,15 +574,15 @@ tetriweb.Tetris.generatePiece = function(id, orientation) {
       piece[3] = new Array(false, false, false, false);
       break;
     case 4:
-      piece[0] = new Array(false, false, false, false);
-      piece[1] = new Array(true, true, false, false);
-      piece[2] = new Array(false, true, true, false);
+      piece[0] = new Array(true, true, false, false);
+      piece[1] = new Array(false, true, true, false);
+      piece[2] = new Array(false, false, false, false);
       piece[3] = new Array(false, false, false, false);
       break;
     case 5:
-      piece[0] = new Array(false, false, false, false);
-      piece[1] = new Array(false, true, true, false);
-      piece[2] = new Array(true, true, false, false);
+      piece[0] = new Array(false, true, true, false);
+      piece[1] = new Array(true, true, false, false);
+      piece[2] = new Array(false, false, false, false);
       piece[3] = new Array(false, false, false, false);
       break;
     case 6:
