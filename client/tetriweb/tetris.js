@@ -72,6 +72,7 @@ tetriweb.Tetris.prototype.init_ = function(
   this.specialsQueue_ = [];
 
   tetriweb.Graphics.updateSpecialBar(this.specialsQueue_);
+  tetriweb.Graphics.clearEventLog();
 };
 
 

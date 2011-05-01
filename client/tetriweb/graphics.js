@@ -152,6 +152,14 @@ tetriweb.Graphics.newGameFocus = function() {
 
 
 /**
+ * Clears the event log.
+ */
+tetriweb.Graphics.clearEventLog = function() {
+  goog.dom.removeChildren(tetriweb.Graphics.eventLog);
+};
+
+
+/**
  * Displays an event in the event window.
  * @param {string} message The message to display.
  */
