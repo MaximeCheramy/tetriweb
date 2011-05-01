@@ -49,6 +49,14 @@ tetriweb.Graphics.disableField = function() {
 
 
 /**
+ * Enables the player's field.
+ */
+tetriweb.Graphics.enableField = function() {
+  goog.dom.removeNode(goog.dom.getElement('field-mask'));
+};
+
+
+/**
  * Shows the fields and hides the chat area.
  */
 tetriweb.Graphics.displayFields = function() {
@@ -77,6 +85,26 @@ tetriweb.Graphics.displayLoginForm = function() {
   goog.dom.classes.add(goog.dom.getElement('fields'), 'hid');
   goog.dom.classes.add(goog.dom.getElement('chat-area'), 'hid');
   tetriweb.Graphics.showLoginForm();
+};
+
+
+/**
+ * Displays pause.
+ */
+tetriweb.Graphics.displayPause = function() {
+  tetriweb.Graphics.disableField();
+  var fieldMask = goog.dom.getElement('field-mask');
+  var pause = goog.dom.createDom('div', {id: 'pause'});
+  goog.dom.setTextContent(pause, 'Pause');
+  goog.dom.appendChild(fieldMask, pause);
+};
+
+
+/**
+ * Hides pause.
+ */
+tetriweb.Graphics.hidePause = function() {
+  tetriweb.Graphics.enableField();
 };
 
 

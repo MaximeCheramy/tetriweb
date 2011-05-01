@@ -369,6 +369,7 @@ tetriweb.Tetris.prototype.setTimer = function() {
  * Pauses the game.
  */
 tetriweb.Tetris.prototype.pauseGame = function() {
+  tetriweb.Graphics.displayPause();
   this.pause_ = true;
   clearTimeout(this.stepTimer);
   this.heartbeatTimer = window.setInterval(
@@ -380,6 +381,7 @@ tetriweb.Tetris.prototype.pauseGame = function() {
  * Resume the game.
  */
 tetriweb.Tetris.prototype.resumeGame = function() {
+  tetriweb.Graphics.hidePause();
   this.pause_ = false;
   clearTimeout(this.stepTimer);
   clearTimeout(this.heartbeatTimer);
