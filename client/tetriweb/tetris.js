@@ -1,6 +1,7 @@
 goog.provide('tetriweb.Tetris');
 
 goog.require('goog.array');
+goog.require('goog.async.Delay');
 goog.require('tetriweb.Graphics');
 
 
@@ -313,8 +314,9 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
  * @private
  */
 tetriweb.Tetris.prototype.step_ = function() {
-  //TODO: Commenter le workflow du moteur de jeu.
+  clearTimeout(this.stepTimer);
 
+  // Piece touch the ground?
   var stop = false;
   for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && !stop; l++) {
     for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
@@ -327,10 +329,9 @@ tetriweb.Tetris.prototype.step_ = function() {
       }
     }
   }
-  if (!stop) {
-    this.curY_++;
-    tetriweb.Graphics.moveCurPieceV(this.curY_);
-  } else {
+  
+  // If the piece touch the ground.
+  if (stop) {
     if (this.curY_ <= 0) {
       this.gameLost_ = true;
     }
@@ -348,15 +349,20 @@ tetriweb.Tetris.prototype.step_ = function() {
     this.pieceDropped_ = true;
     this.checkLine_();
     this.sendField_();
-    this.newPiece_();
-  }
-  if (this.gameLost_) {
-    this.tetrinet_.sendPlayerlost();
-    this.fillRandomly_();
+
+    if (this.gameLost_) {
+      this.tetrinet_.sendPlayerlost();
+      this.fillRandomly_();
+    } else {
+      var delay = new goog.async.Delay(this.newPiece_, tetriweb.Tetris.PIECE_DELAY_, this);
+      delay.start();
+    }
   } else {
-    clearTimeout(this.stepTimer);
+    this.curY_++;
+    tetriweb.Graphics.moveCurPieceV(this.curY_);
     this.setTimer();
   }
+
 };
 
 
@@ -976,6 +982,9 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
 
   tetriweb.Graphics.updatePiece(
       this.current_, this.curX_, this.curY_, this.currentColor_);
+
+  clearTimeout(this.stepTimer);
+  this.setTimer();
 };
 
 
@@ -1265,3 +1274,10 @@ tetriweb.Tetris.prototype.specialCapacity_;
  * @private
  */
 tetriweb.Tetris.prototype.currentSpecialLines_;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+tetriweb.Tetris.PIECE_DELAY_ = 1000;
