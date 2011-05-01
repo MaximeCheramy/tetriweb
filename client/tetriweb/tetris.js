@@ -155,7 +155,7 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
 /**
  * Checks for complete lines. Complete lines will be removed and create new
  * bonus or add lines to opponents.
- * @param {boolean} opt_cleanupOnly If true, do not take specials nor send
+ * @param {boolean=} opt_cleanupOnly If true, do not take specials nor send
  *    lines.
  * @private
  */
