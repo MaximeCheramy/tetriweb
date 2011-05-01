@@ -13,7 +13,7 @@ function testConnect() {
   var tetrinet = new tetriweb.Tetrinet();
 
   tetrinet.connect('test', 'teamtest');
-  
+
   // Connection succeed.
   var xhr = goog.net.XhrIo.getLastCall().getThis();
   xhr.simulateResponse(200, '{"pnum":1}');

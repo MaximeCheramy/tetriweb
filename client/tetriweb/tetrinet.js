@@ -192,7 +192,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         message = '*** La partie a débuté';
         // Clear all fields
         for (var playerId in this.players_) {
-          var pId = parseInt(playerId, 10)
+          var pId = parseInt(playerId, 10);
           if (pId != this.pnum_) {
             this.clearField_(pId);
           }

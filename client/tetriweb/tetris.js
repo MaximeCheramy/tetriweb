@@ -6,8 +6,8 @@ goog.require('tetriweb.Graphics');
 
 /**
  * Tetris Class.
- * @param {tetriweb.Tetrinet} tetrinet The tetrinet objet used to communicate with the
- * tetrinet server.
+ * @param {tetriweb.Tetrinet} tetrinet The tetrinet objet used to communicate
+ *    with the tetrinet server.
  * @constructor
  */
 tetriweb.Tetris = function(tetrinet) {
@@ -155,7 +155,8 @@ tetriweb.Tetris.prototype.generateRandom_ = function() {
 /**
  * Checks for complete lines. Complete lines will be removed and create new
  * bonus or add lines to opponents.
- * @param {boolean} opt_cleanupOnly If true, do not take specials nor send lines.
+ * @param {boolean} opt_cleanupOnly If true, do not take specials nor send
+ *    lines.
  * @private
  */
 tetriweb.Tetris.prototype.checkLine_ = function(opt_cleanupOnly) {
@@ -664,24 +665,40 @@ tetriweb.Tetris.randomInt = function(min, max) {
  */
 tetriweb.Tetris.convert = function(color) {
   switch (color) {
-    case tetriweb.Tetris.BLOCK_EMPTY:   return 'empty';
-    case tetriweb.Tetris.BLOCK_BLUE:    return 'blue';
-    case tetriweb.Tetris.BLOCK_YELLOW:  return 'yellow';
-    case tetriweb.Tetris.BLOCK_GREEN:   return 'green';
-    case tetriweb.Tetris.BLOCK_PURPLE:  return 'purple';
-    case tetriweb.Tetris.BLOCK_RED:     return 'red';
-    case tetriweb.Tetris.BLOCK_SB_A:    return 'sb-a';
-    case tetriweb.Tetris.BLOCK_SB_C:    return 'sb-c';
-    case tetriweb.Tetris.BLOCK_SB_N:    return 'sb-n';
-    case tetriweb.Tetris.BLOCK_SB_R:    return 'sb-r';
-    case tetriweb.Tetris.BLOCK_SB_S:    return 'sb-s';
-    case tetriweb.Tetris.BLOCK_SB_B:    return 'sb-b';
-    case tetriweb.Tetris.BLOCK_SB_G:    return 'sb-g';
-    case tetriweb.Tetris.BLOCK_SB_Q:    return 'sb-q';
-    case tetriweb.Tetris.BLOCK_SB_O:    return 'sb-o';
-    default: alert('unknown block ' + typeof(color) + ' ' + color);
+    case tetriweb.Tetris.BLOCK_EMPTY:
+            return 'empty';
+    case tetriweb.Tetris.BLOCK_BLUE:
+            return 'blue';
+    case tetriweb.Tetris.BLOCK_YELLOW:
+            return 'yellow';
+    case tetriweb.Tetris.BLOCK_GREEN:
+            return 'green';
+    case tetriweb.Tetris.BLOCK_PURPLE:
+            return 'purple';
+    case tetriweb.Tetris.BLOCK_RED:
+            return 'red';
+    case tetriweb.Tetris.BLOCK_SB_A:
+            return 'sb-a';
+    case tetriweb.Tetris.BLOCK_SB_C:
+            return 'sb-c';
+    case tetriweb.Tetris.BLOCK_SB_N:
+            return 'sb-n';
+    case tetriweb.Tetris.BLOCK_SB_R:
+            return 'sb-r';
+    case tetriweb.Tetris.BLOCK_SB_S:
+            return 'sb-s';
+    case tetriweb.Tetris.BLOCK_SB_B:
+            return 'sb-b';
+    case tetriweb.Tetris.BLOCK_SB_G:
+            return 'sb-g';
+    case tetriweb.Tetris.BLOCK_SB_Q:
+            return 'sb-q';
+    case tetriweb.Tetris.BLOCK_SB_O:
+            return 'sb-o';
+    default:
+            alert('unknown block ' + typeof(color) + ' ' + color);
+            return '';
   }
-  return '';
 };
 
 
@@ -1068,21 +1085,21 @@ tetriweb.Tetris.NB_SPECIAL_BLOCKS = 9;
 /**
  * @type {number}
  */
-tetriweb.Tetris.BLOCK_EMPTY   = 0;
-tetriweb.Tetris.BLOCK_BLUE    = 1;
-tetriweb.Tetris.BLOCK_YELLOW  = 2;
-tetriweb.Tetris.BLOCK_GREEN   = 3;
-tetriweb.Tetris.BLOCK_PURPLE  = 4;
-tetriweb.Tetris.BLOCK_RED     = 5;
-tetriweb.Tetris.BLOCK_SB_A    = 6;
-tetriweb.Tetris.BLOCK_SB_C    = 7;
-tetriweb.Tetris.BLOCK_SB_N    = 8;
-tetriweb.Tetris.BLOCK_SB_R    = 9;
-tetriweb.Tetris.BLOCK_SB_S    = 10;
-tetriweb.Tetris.BLOCK_SB_B    = 11;
-tetriweb.Tetris.BLOCK_SB_G    = 12;
-tetriweb.Tetris.BLOCK_SB_Q    = 13;
-tetriweb.Tetris.BLOCK_SB_O    = 14;
+tetriweb.Tetris.BLOCK_EMPTY = 0;
+tetriweb.Tetris.BLOCK_BLUE = 1;
+tetriweb.Tetris.BLOCK_YELLOW = 2;
+tetriweb.Tetris.BLOCK_GREEN = 3;
+tetriweb.Tetris.BLOCK_PURPLE = 4;
+tetriweb.Tetris.BLOCK_RED = 5;
+tetriweb.Tetris.BLOCK_SB_A = 6;
+tetriweb.Tetris.BLOCK_SB_C = 7;
+tetriweb.Tetris.BLOCK_SB_N = 8;
+tetriweb.Tetris.BLOCK_SB_R = 9;
+tetriweb.Tetris.BLOCK_SB_S = 10;
+tetriweb.Tetris.BLOCK_SB_B = 11;
+tetriweb.Tetris.BLOCK_SB_G = 12;
+tetriweb.Tetris.BLOCK_SB_Q = 13;
+tetriweb.Tetris.BLOCK_SB_O = 14;
 
 
 /**
