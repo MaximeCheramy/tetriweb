@@ -50,13 +50,15 @@ tetriweb.Tetris.prototype.init_ = function(
 
   this.gameLost_ = false;
   // Pieces' frequency.
-  this.piecesFreq_ = goog.array.repeat(0, tetriweb.Tetris.NB_PIECES);
+  this.piecesFreq_ = /** @type {Array.<number>} */
+      (goog.array.repeat(0, tetriweb.Tetris.NB_PIECES));
   for (var i = 0; i < _piecesFreq.length; i++) {
     this.piecesFreq_[parseInt(_piecesFreq[i], 10) - 1]++;
   }
 
   // Specials' frequency.
-  this.specialsFreq_ = goog.array.repeat(0, tetriweb.Tetris.NB_SPECIAL_BLOCKS);
+  this.specialsFreq_ = /** @type {Array.<number>} */
+      (goog.array.repeat(0, tetriweb.Tetris.NB_SPECIAL_BLOCKS));
   for (var i = 0; i < _specialsFreq.length; i++) {
     this.specialsFreq_[parseInt(_specialsFreq[i], 10) - 1]++;
   }

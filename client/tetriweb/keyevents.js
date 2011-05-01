@@ -37,7 +37,7 @@ tetriweb.KeyEvents.prototype.disposeKeyEvent = function() {
 
 /**
  * Key handler used to move the pieces or send actions.
- * @param {object} e The key event.
+ * @param {goog.events.KeyEvent} e The key event.
  * @private
  */
 tetriweb.KeyEvents.prototype.keyHandler_ = function(e) {
