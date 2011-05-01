@@ -117,7 +117,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         break;
       // New player joins
       case 'playerjoin':
-        var player_id = data[1];
+        var player_id = parseInt(data[1], 10);
         var nick = data[2];
         if (player_id != this.pnum_) {
           this.players_[player_id] = nick;
@@ -210,7 +210,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
             levelIncrement, specialLines, specialCount, specialCapacity,
             piecesFreq, specialsFreq);
         tetriweb.Graphics.displayFields();
-        tetriweb.Graphics.gameAreaFocus();
+        tetriweb.Graphics.newGameFocus();
         tetriweb.Graphics.showPauseButton();
         tetriweb.Graphics.enablePauseResumeButtons(this.checkModerator_());
         break;

@@ -136,6 +136,22 @@ tetriweb.Graphics.gameAreaFocus = function() {
 
 
 /**
+ * Handles the focus when a new game is started.
+ */
+tetriweb.Graphics.newGameFocus = function() {
+  var partyMsg = goog.dom.getElement('party-msg');
+  var eventMsg = goog.dom.getElement('event-msg');
+  if (document.activeElement == partyMsg) {
+    tetriweb.Graphics.eventMsgFocus();   
+    eventMsg.value = partyMsg.value;
+    partyMsg.value = '';
+  } else {
+    tetriweb.Graphics.gameAreaFocus();
+  }
+};
+
+
+/**
  * Displays an event in the event window.
  * @param {string} message The message to display.
  */
