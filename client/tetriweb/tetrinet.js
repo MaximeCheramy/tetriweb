@@ -218,6 +218,15 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         tetriweb.Graphics.displayFields();
         tetriweb.Graphics.disableField();
         break;
+      // A player lose
+      case 'playerlost':
+        // Do nothing special...
+        break;
+      // A player won
+      case 'playerwon':
+        var player_id = data[1];
+        message = '*** ' + this.players_[player_id] + ' a gagné la partie';
+        break;
       // All players lose except one
       case 'endgame':
         message = '*** La partie est terminée';
@@ -306,7 +315,8 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         break;
       // Fallback
       default:
-        message = msg;
+        // DEBUG
+        alert(msg);
     }
     if (message.length > 0) {
       // HL
