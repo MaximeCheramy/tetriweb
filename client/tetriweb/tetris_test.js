@@ -113,3 +113,81 @@ function testCheckLine() {
   random.uninstall();
   clock.uninstall();
 }
+
+function testEndOfGameCollision() {
+  var clock = new goog.testing.MockClock(true);
+
+  var tetrinet = new tetriweb.Tetrinet();
+  var tetris = new tetriweb.Tetris(tetrinet);
+  var keyEvents = new tetriweb.KeyEvents(tetris);
+  tetrinet.connect('test', 'teamtest');
+  // Connection succeed.
+  var xhr = goog.net.XhrIo.getLastCall().getThis();
+  xhr.simulateResponse(200, '{"pnum":1}');
+
+  // 1st game: only square blocks (11 blocks)
+  var random = new goog.testing.MockRandom([0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0], true);
+  tetrinet.startGame();
+  var xhr = tetrinet.xhr_in_;
+  xhr.simulateResponse(200, '{"msg": ["newgame 0 1 2 1 1 1 18 3333333333333355555555555555222222222222222444444444444446666666666666677777777777777111111111111111 1111111111111111111111111111111122222222222222222234444444444455566666666666666788888899999999999999 1 1"]}');
+  
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  assertFalse(tetris.gameLost_);
+  clock.tick(1001);
+  assertTrue(tetris.gameLost_);
+
+  var xhr = tetrinet.xhr_in_;
+  xhr.simulateResponse(200, '{"msg": ["endgame"]}');
+
+  // 2nd game: 10 square blocks and a L
+  var random = new goog.testing.MockRandom([0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.2, 0, 0.4, 0], true);
+  tetrinet.startGame();
+  var xhr = tetrinet.xhr_in_;
+  xhr.simulateResponse(200, '{"msg": ["newgame 0 1 2 1 1 1 18 3333333333333355555555555555222222222222222444444444444446666666666666677777777777777111111111111111 1111111111111111111111111111111122222222222222222234444444444455566666666666666788888899999999999999 1 1"]}');
+  
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  clock.tick(1001);
+  tetris.drop();
+  assertFalse(tetris.gameLost_);
+  clock.tick(1001);
+  assertTrue(tetris.gameLost_);
+  
+  random.uninstall();
+  clock.uninstall();
+}

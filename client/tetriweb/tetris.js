@@ -104,7 +104,6 @@ tetriweb.Tetris.prototype.startGame = function(_startingHeight, _startingLevel,
   this.updateGridAndSendField_();
   this.generateRandom_();
   this.newPiece_();
-  this.setTimer();
 
   // Enable key events in game field
   this.keyEvents.setKeyEvent();
@@ -310,6 +309,30 @@ tetriweb.Tetris.prototype.placeSpecials_ = function(nb) {
 
 
 /**
+ * Checks if the current piece collides with the ground
+ * or the borders of the field
+ * @param {number} pieceX The x-coordinate of the piece
+ * @param {number} pieceY The y-coordinate of the piece
+ * @return {boolean} True if the current piece collides.
+ */
+tetriweb.Tetris.prototype.checkCurrentPieceCollision_ = function(pieceX, pieceY) {
+  var stop = false;
+  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && !stop; l++) {
+    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
+      if (this.current_[l][c]) {
+        if (l + pieceY >= tetriweb.Tetris.HEIGHT_ ||
+            this.gameArea_[l + pieceY][c + pieceX] >
+            tetriweb.Tetris.BLOCK_EMPTY) {
+          stop = true;
+        }
+      }
+    }
+  }
+  return stop;
+};
+
+
+/**
  * Game Engine. This function is called periodicaly.
  * @private
  */
@@ -317,25 +340,9 @@ tetriweb.Tetris.prototype.step_ = function() {
   clearTimeout(this.stepTimer);
 
   // Piece touch the ground?
-  var stop = false;
-  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_ && !stop; l++) {
-    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_ && !stop; c++) {
-      if (this.current_[l][c]) {
-        if (l + this.curY_ + 1 >= tetriweb.Tetris.HEIGHT_ ||
-            this.gameArea_[l + this.curY_ + 1][c + this.curX_] >
-            tetriweb.Tetris.BLOCK_EMPTY) {
-          stop = true;
-        }
-      }
-    }
-  }
-  
+  var stop = this.checkCurrentPieceCollision_(this.curX_, this.curY_ + 1);
   // If the piece touch the ground.
   if (stop) {
-    if (this.curY_ <= 0) {
-      this.gameLost_ = true;
-    }
-
     for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
       for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
         if (this.current_[l][c]) {
@@ -350,19 +357,13 @@ tetriweb.Tetris.prototype.step_ = function() {
     this.checkLine_();
     this.sendField_();
 
-    if (this.gameLost_) {
-      this.tetrinet_.sendPlayerlost();
-      this.fillRandomly_();
-    } else {
-      var delay = new goog.async.Delay(this.newPiece_, tetriweb.Tetris.PIECE_DELAY_, this);
-      delay.start();
-    }
+    var delay = new goog.async.Delay(this.newPiece_, tetriweb.Tetris.PIECE_DELAY_, this);
+    delay.start();
   } else {
     this.curY_++;
     tetriweb.Graphics.moveCurPieceV(this.curY_);
     this.setTimer();
   }
-
 };
 
 
@@ -466,7 +467,6 @@ tetriweb.Tetris.prototype.moveLeftOrRight = function(shift) {
  * Moves the current piece down, when DOWN key is pressed.
  */
 tetriweb.Tetris.prototype.moveDown = function() {
-  clearTimeout(this.stepTimer);
   this.step_();
 };
 
@@ -967,24 +967,17 @@ tetriweb.Tetris.prototype.newPiece_ = function() {
   this.currentColor_ = getColor(this.nextId_);
   this.generateRandom_();
 
-  // Remonte un peu l'objet si commence par du vide.
-  for (var l = 0; l < tetriweb.Tetris.DIM_PIECE_; l++) {
-    var empty = true;
-    for (var c = 0; c < tetriweb.Tetris.DIM_PIECE_; c++) {
-      empty = empty && !this.current_[l][c];
-    }
-    if (empty && this.curY_ > 0) {
-      this.curY_--;
-    } else {
-      break;
-    }
-  }
-
-  tetriweb.Graphics.updatePiece(
-      this.current_, this.curX_, this.curY_, this.currentColor_);
-
   clearTimeout(this.stepTimer);
-  this.setTimer();
+  
+  if (this.checkCurrentPieceCollision_(this.curX_, this.curY_)) {
+    this.gameLost_ = true;
+    this.tetrinet_.sendPlayerlost();
+    this.fillRandomly_();
+  } else {
+    tetriweb.Graphics.updatePiece(
+        this.current_, this.curX_, this.curY_, this.currentColor_);
+    this.setTimer();
+  }
 };
 
 
