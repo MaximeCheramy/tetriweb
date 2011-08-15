@@ -563,12 +563,32 @@ tetriweb.Graphics.showResumeButton = function() {
  */
 tetriweb.Graphics.showScoresWindow = function(scores) {
   var dialog = new goog.ui.Dialog();
-  var content = '';
+  var wrapper = goog.dom.createDom('div');
+  var content = goog.dom.createDom('table', {id: 'winlist'});
+  goog.dom.appendChild(wrapper, content);
+  /*var title_row = content.insertRow(-1);
+  title_row.insertCell(-1).appendChild(document.createTextNode('T'));
+  title_row.insertCell(-1).appendChild(document.createTextNode('Name'));
+  title_row.insertCell(-1).appendChild(document.createTextNode('Score'));*/
+
   for (var i = 0; i < scores.length; i++) {
-    content += scores[i].type + ' ' + scores[i].name + ' : ' +
-        scores[i].score + '<br />';
+    var line = content.insertRow(-1);
+    var img = goog.dom.createDom('img', {
+        src: 'img/' + scores[i].type + '.png',
+        width: 25,
+    });
+    var cell1 = line.insertCell(-1);
+    cell1.setAttribute("width", 25);
+    cell1.appendChild(img);
+    var cell2 = line.insertCell(-1);
+    cell2.setAttribute("width", 100);
+    cell2.appendChild(document.createTextNode(scores[i].name));
+    var cell3 = line.insertCell(-1);
+    cell3.setAttribute("width", 30);
+    cell3.setAttribute("align", "right");
+    cell3.appendChild(document.createTextNode(scores[i].score));
   }
-  dialog.setContent(content);
+  dialog.setContent(wrapper.innerHTML);
   dialog.setTitle('Winlist');
   dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
   dialog.setVisible(true);

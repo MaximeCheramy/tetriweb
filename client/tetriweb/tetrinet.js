@@ -307,7 +307,7 @@ tetriweb.Tetrinet.prototype.handleResponse_ = function(response) {
         this.scores_ = [];
         for (var j = 0; j < scores.length; j++) {
           var data2 = scores[j].split(';');
-          var type = (data2[0].substr(0, 1) == 'p') ? 'player' : 'team';
+          var type = (data2[0].substr(0, 1) == 'p') ? 'alone' : 'team';
           var name = data2[0].substr(1);
           var score = parseInt(data2[1], 10);
           this.scores_[j] = {name: name, type: type, score: score};

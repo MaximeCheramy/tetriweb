@@ -281,3 +281,11 @@ body {
   width: 500px;
   bottom: 2px;
 }
+
+#winlist {
+  font-size: 12px;
+}
+
+#winlist td {
+  padding: 4px;
+}
