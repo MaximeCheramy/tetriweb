@@ -15,155 +15,153 @@
  * You should have received a copy of the GNU General Public License
  * along with TetriWeb.  If not, see <http://www.gnu.org/licenses/>.
  */
+declare(ticks = 1);
 
-require_once('proxy.inc.php');
+require_once('log.inc.php');
+require_once('clients.inc.php');
 
 define('BUFFER_LEN', 1024);
 define('PING_INTERVAL', 20);
 define('TIMEOUT', 10);
+define('LISTEN_PORT', 1234);
+define('SERVER_ADDR', 'localhost');
+define('SERVER_PORT', 31457);
 
-$port = 1234;
-$server_addr = 'localhost';
-$server_port = 31457;
+function sig_handler($signo) {
+  global $s_in;
+  echo "Graceful stop.\n";
+  switch ($signo) {
+    case SIGINT:
+      socket_close($s_in);
+      exit;
+      break;
+  }
+}
 
-$clients = array();
-$data_in = array();
-$tmp_clients = 0;
+// Setup signal handler
+pcntl_signal(SIGINT, "sig_handler");
 
+// Open a socket and listen for connections
 $s_in = socket_create(AF_INET, SOCK_STREAM, 0);
 socket_set_option($s_in, SOL_SOCKET, SO_REUSEADDR, 1);
-socket_bind($s_in, 0, $port);
+socket_bind($s_in, 0, LISTEN_PORT);
 socket_listen($s_in);
 
-while(true) {
-  $r = getAllSockets();
+$clients = new ClientsList();
+$logger = new Logger('log_proxy.html');
+
+while (true) {
+  // Check traffic on all the sockets using select()
+  $r = $clients->getAllSockets($s_in);
   $w = null;
   $e = null;
-  if(false === socket_select($r, $w, $e, NULL)) {
-    echo "socket_select() failed : " . socket_strerror(socket_last_error()) . "\n";	
+
+  if (false === socket_select($r, $w, $e, NULL)) {
+    $logger->write(ERR, "socket_select() failed : " . socket_strerror(socket_last_error()));
   }
-  foreach($r as $s) {
-    echo "--------------------\n";
-    if($s == $s_in) {
-      // Arrivée client
-      echo "Arrivée d'un client...\n";
-      $s_client_read = socket_accept($s_in);
-      $msg = array();
-      $clients['tmp_'.(++$tmp_clients)] = compact('s_client_read', 'msg');
-    }
-    else {
-      $type = $client = null;
-      getSocketInfo($s, $type, $client);
-      if($type == 'server') {
-        // Message du serveur
+
+  foreach ($r as $s) {
+    $logger->write_separator();
+    if ($s == $s_in) {
+      // Incoming client
+      $logger->write(INFO, "Incoming client...");
+      $s_read = socket_accept($s_in);
+      $clients->add_tmp_client(compact('s_read'));
+    } else {
+      list($type, $client) = $clients->getSocketInfo($s);
+      if ($type == 'server') {
+        // Message(s) from server
         $msg = socket_read($s, BUFFER_LEN);
-        echo "Server input pour le client $client : '$msg'\n";
-        if(strlen($msg) == 0) {
-          // Déconnecté par serveur
-          echo "Le client $client s'est fait jarrter par le serveur.\n";
-          disconnect_client($client);
-        }
-        else {
-          $msg = parse_server_message($msg, $client);
-          echo "Message(s) du serveur pour le client $client : '$msg'.\n";
+	$logger->write(INFO, "Server input for client $client: '$msg'");
+        if (strlen($msg) == 0) {
+          // Server closed the connection
+          $logger->write(WARN, "Client $client has been disconnected by the server.");
+          $clients->disconnect($client);
+        } else {
+          // Relay the messages to the client
+          $msg = $clients->get($client)->parse_server_message($msg);
+          $logger->write(INFO, "Server messages for client $client: '$msg'");
           if (strlen($msg) > 0) {
-            if(isset($clients[$client]['s_client_read'])) {
-              send_message($msg, $client);
-            }
-            else {
-              echo "Stockage de '$msg' pour le client $client...\n";
-              array_push($clients[$client]['msg'], $msg);
+            if ($clients->get($client)->can_write()) {
+              $clients->get($client)->send_message($msg);
+            } else {
+              $logger->write(INFO, "Storing '$msg' for client $client...");
+              $clients->get($client)->enqueue_message($msg);
             }
           }
         }
-      }
-      elseif($type == 'client_read' || $type == 'client_write') {
-        // Message d'un client
+      } elseif($type == 'client_read' || $type == 'client_write') {
+        // Message(s) from client
         $msgsocket = @socket_read($s, BUFFER_LEN, PHP_NORMAL_READ);
         $msg = trim($msgsocket, "\r\n");
-        if(empty($msgsocket)) {
-          // Déconnexion du client
-          echo "Le client $client ($type) s'est déconnecté.\n";
-          socket_close($clients[$client]['s_'.$type]);
-          unset($clients[$client]['s_'.$type]);
-          if(preg_match('#^tmp_#', $client)) {
-            $tmp_clients--;
-          }
-        }
-        elseif($msg == 'pong') {
-          // PONG !
-          echo "Client $client PONG !\n";
-          $clients[$client]['pong'] = true;
-        }
-        elseif($msg == 'disconnect') {
-          // Demande de déconnexion
-          echo "Le client $client a quitté le jeu.\n";
-          disconnect_client($client);
-        }
-        elseif(preg_match('#^tmp_#', $client)) {
-          if(preg_match('#^connect ([A-Za-z0-9-_]+)$#', $msg, $results)) {
-            // Nouveau client
-            echo "Nouveau client !\n";
+        if (empty($msgsocket)) {
+          $logger->write(INFO, "Client $client ($type) has disconnected.");
+          $clients->close_socket($client, $type);
+        } elseif ($msg == 'pong') {
+          $logger->write(INFO, "Client $client PONG !");
+          $clients->get($client)->pong();
+        } elseif ($msg == 'disconnect') {
+          $logger->write(INFO, "Client $client has quitted the game.");
+          $clients->disconnect($client);
+        } elseif (preg_match('#^tmp_#', $client)) {
+          if (preg_match('#^connect ([A-Za-z0-9-_]+)$#', $msg, $results)) {
+            // New client
             $pseudo = $results[1];
-            // Connexion au serveur et récupération du numéro de client
-            $s_server = socket_create(AF_INET, SOCK_STREAM, 0);
-            if (socket_connect($s_server, $server_addr, $server_port)) {
-              socket_write($s_server, hello_msg($pseudo).chr(0xFF));
-              get_playernum($s_server, $client, $c_id, $server_buffer);
-
-              // Connexion acceptée
-              if($c_id) {
-                // Stockage nouveau client
-                $clients[$c_id] = $clients[$client];
-                $clients[$c_id]['s_server'] = $s_server;
-                $clients[$c_id]['last_ping'] = time();
-                $clients[$c_id]['pong'] = true;
-                $clients[$c_id]['server_buffer'] = $server_buffer;
-                
-                send_message("playernum $c_id", $c_id);
+            $logger->write(INFO, "New client ($pseudo) !");
+            // Connect to tetrinet server and get playernum
+            if ($clients->get($client)->connect()) {
+              $clients->get($client)->proxy_message(hello_msg($pseudo));
+              if ($c_id = $clients->get($client)->get_playernum()) {
+                // Connection accepted, store new client
+                $logger->write(INFO, "$pseudo got playernum $c_id.");
+                $clients->copy($client, $c_id);
+		$clients->get($c_id)->set_nick($pseudo);
+                // Send the client his playernum 
+                $clients->get($c_id)->send_message("playernum $c_id");
+              } else {
+                // Connection refused: send all the messages received from server to the client, he will figure out the reason of the failure
+                $clients->get($client)->send_message(implode("\n", $clients->get($client)->get_server_messages()));
               }
-              else {
-                // Envoi de tous les messages envoyés par le serveur au client, il se débrouillera pour retrouver la raison de l'échec de connexion dedans
-                send_message(implode("\n", $clients[$client]['msg']), $client);
-              }
-
-              remove_tmp_client($client);
+              // Clear temp client
+              $clients->delete_tmp_client($client);
+            } else {
+              $logger->write(ERR, "Unable to connect to tetrinet server. Stopping.");
+              exit(1);
             }
-            else {
-              // TODO: erreur.
-            }
-          }
-          elseif(preg_match('#^(read|write) ([0-9]+)$#', $msg, $results)) {
-            // Retour d'un client
+          } elseif (preg_match('#^(read|write) ([0-9]+)$#', $msg, $results)) {
+            // Returning client
             $rw = $results[1];
             $c_id = $results[2];
-            if(isset($clients[$c_id])) {
-              echo "Retour du client $c_id ($rw)\n";
-              $clients[$c_id]['s_client_'.$rw] = $s;
-
-              if($rw == 'read') {
-                send_pending_messages($c_id);
+            // Do we know this client ?
+            if ($clients->exists($c_id)) {
+              $logger->write(INFO, "Client $c_id came back ($rw)");
+              $clients->get($c_id)->update_socket($rw, $s);
+              // If he wants to read from server, send him all pending messages
+              if ($rw == 'read') {
+                $clients->get($c_id)->send_pending_messages();
               }
-            }
-            else {
-              echo "Demande de retour du client $c_id qui n'existe pas.\n";
+              // Client is alive
+              $clients->get($c_id)->pong();
+            } else {
+              $logger->write(WARN, "Unknown client ($c_id) wanted to come back ($rw).");
               socket_close($s);
             }
-            remove_tmp_client($client);
+            // Clear temp client
+            $clients->delete_tmp_client($client);
+          } else {
+            $logger->write(WARN, "Ignoring unknown command '$msg' from temp client $c_id.");
           }
+        } else {
+          $logger->write(INFO, "Message from client $client: '$msg'");
+          $clients->get($client)->proxy_message($msg);
         }
-        else {
-          echo "Message du client $client : '$msg'.\n";
-          socket_write($clients[$client]['s_server'], $msg.chr(0xFF));
-        }
-      }
-      else {
-        // TODO: erreur.
+      } else {
+        $logger->write(ERR, "Should not reach here: unknown socket type.");
       }
     }
   }
 
   // Check for timeouts
-  handle_timeouts();
+  $clients->handle_timeouts();
 }
 ?>

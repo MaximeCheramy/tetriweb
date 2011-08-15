@@ -17,76 +17,90 @@
  */
 
 require_once('backend.inc.php');
+require_once('../log.inc.php');
 fix_magic_quotes();
 set_time_limit(0);
 
-$host = 'localhost';
-$port = 1234;
+define('PROXY_HOST', 'localhost');
+define('PROXY_PORT', 1234);
 
-if(empty($_GET['connect']) && empty($_GET['pnum'])) {
+$logger = new Logger('log_backend.html');
+
+// Client doesn't want to connect and didn't give his playernum: bad request
+if (empty($_GET['connect']) && empty($_GET['pnum'])) {
   header('HTTP/1.1 400 Bad Request');
   die();
 }
 
+// Connect to proxy
 $sock = socket_create(AF_INET, SOCK_STREAM, 0);
-if(!socket_connect($sock, $host, $port)) {
+if (!socket_connect($sock, PROXY_HOST, PROXY_PORT)) {
   header('HTTP/1.1 500 Internal Server Error');
-  socket_close($sock);
   die();
 }
 
-if(!empty($_GET['connect'])) {
+// Connect to tetrinet server through the proxy
+if (!empty($_GET['connect'])) {
   $pseudo = $_GET['connect'];
+  $logger->write(INFO, "CONNECT from new client ($pseudo)"); 
   socket_write($sock, "connect $pseudo\n");
   $msg = read_messages($sock);
-  //file_put_contents('log_recu', $msg, FILE_APPEND);
+  socket_close($sock);
+  
+  $logger->write(INFO, "[proxy >>> $pseudo] $msg");
+  $logger->write_separator();
 
+  // Extract playernum from the response
   $response = array();
   $data = explode(' ', trim($msg), 2);
   if($data[0] == 'playernum') {
     $response['pnum'] = (int)$data[1];
-  }
-  else {
+  } else {
     $response['error'] = $data[1];
   }
 
-  echo json_encode($response);
-  socket_close($sock);
-  die();
+  // Output response
+  die(json_encode($response));
 }
 
-if(!empty($_GET['pnum'])) {
+// Read from or write to proxy
+if (!empty($_GET['pnum'])) {
   $pnum = (int)$_GET['pnum'];
 
   if(isset($_GET['send'])) {
-    file_put_contents("backend_client_$pnum.log", "WRITE from client $client\n", FILE_APPEND);
+    // Send a message (write)
+    $logger->write(INFO, "WRITE from client $client");
     $send = $_GET['send'];
     socket_write($sock, "write $pnum\n");
     socket_write($sock, $send."\n");
     socket_close($sock);
-    file_put_contents("backend_client_$pnum.log", "client >>> proxy :\n$send\n--------------------\n", FILE_APPEND);
+    $logger->write(INFO, "[client $client >>> proxy] $send");
+    $logger->write_separator();
     die();
-  }
-  else {
-    file_put_contents("backend_client_$pnum.log", "READ from client $client\n", FILE_APPEND);
+  } else {
+    // Read from tetrinet server through the proxy
+    $logger->write(INFO, "READ from client $client");
     socket_write($sock, "read $pnum\n");
     $msg = read_messages($sock);
     socket_close($sock);
 
-    if(empty($msg)) {
-      // Le proxy nous a fermé la connexion au nez : quelque chose ne va pas.
+    if (empty($msg)) {
+      // Connection closed by the proxy: something is wrong
       header('HTTP/1.1 410 Gone');
       die();
     }
 
-    file_put_contents("backend_client_$pnum.log", "proxy >>> client :\n$msg\n--------------------\n", FILE_APPEND);
+    $logger->write(INFO, "[proxy >>> client $client] $msg");
+    $logger->write_separator();
+    
+    // Output received messages
     $response = array();
     $response['msg'] = explode("\n", trim($msg));
     format_messages($response['msg']);
-    echo json_encode($response);
-    die();
+    die(json_encode($response));
   }
 }
 
+// Close the connection to the proxy
 socket_close($sock);
 ?>
